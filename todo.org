@@ -1,0 +1,18 @@
+* System Behavioral Requirements
+** Tasks
+*** Provide a Gene Set
+**** Provide a Producer Gene Set
+**** Provide a Gene Set previously computed
+**** Provide a Custom Gene Set
+*** Run a Sequence of Transformers
+*** View Transformer Results as "Slice"
+* Architecture
+** Service
+*** Transformers
+**** Phenotype Similarity
+**** Functional Similarity
+*** Producers
+**** Disease Genes
+** Components (UI)
+*** Input Form
+*** Producer/Transformer Selection
