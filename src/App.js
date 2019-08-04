@@ -3,26 +3,20 @@ import React from 'react';
 import SearchBar from './components/SearchBar.js'
 import GeneTable from './components/GeneFeed.js';
 import {MyLoader} from './components/ListItem.js'
-
-
 // remote components
-import update from 'react-addons-update';
-import BootstrapTable from 'react-bootstrap-table-next';
-
 // libraries
 import _ from "underscore"
-
 // stylesheets
 import './App.css';
 import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
 import 'font-awesome/css/font-awesome.min.css';
-import TransformerMenu from "./components/TransformerMenu";
+import TransformerList, {TransformerQuerySender, TransformerCurrentQuery} from "./components/TransformerMenu";
 
 const FRONTEND_URL =  process.env.REACT_APP_FRONTEND_URL;
 const SERVICE_URL =  process.env.REACT_APP_SERVICE_URL;
 
 const divStyle = {
-    marginTop: "30px"
+    margin:"2.25em"
 };
 
 class App extends React.Component {
@@ -43,104 +37,15 @@ class App extends React.Component {
             selectedProducer: null,
 
             // gene view state
-            geneListIDs: ["rHotao9c3m"],
-            // TODO: meant to emulate a cache for re-rendering
-            geneListCache: {
-                "rHotao9c3m": {
-                    "gene_list_id": "rHotao9c3m",
-                    "genes": [
-                        {
-                            "gene_id": "HGNC:17646",
-                            "attributes": [
-                                {
-                                    "name": "myGene.info id",
-                                    "value": "55768",
-                                    "source": "myGene.info"
-                                },
-                                {
-                                    "name": "gene_symbol",
-                                    "value": "NGLY1",
-                                    "source": "myGene.info"
-                                },
-                                {
-                                    "name": "entrez_gene_id",
-                                    "value": "55768",
-                                    "source": "myGene.info"
-                                },
-                                {
-                                    "name": "HGNC",
-                                    "value": "HGNC:17646",
-                                    "source": "myGene.info"
-                                },
-                                {
-                                    "name": "MIM",
-                                    "value": "MIM:610661",
-                                    "source": "myGene.info"
-                                },
-                                {
-                                    "name": "synonyms",
-                                    "value": "CDDG;CDG1V;PNG1;PNGase",
-                                    "source": "myGene.info"
-                                },
-                                {
-                                    "name": "ensembl_gene_id",
-                                    "value": "ENSG00000151092",
-                                    "source": "myGene.info"
-                                },
-                                {
-                                    "name": "gene_name",
-                                    "value": "N-glycanase 1",
-                                    "source": "myGene.info"
-                                },
-                                {
-                                    "name": "source",
-                                    "value": "user input",
-                                    "source": "user input"
-                                }
-                            ]
-                        }
-                    ]
-                }
+            gene_list_ids: ["LQuc2bN6fE"],
 
-            },
-
-            // TODO: ARCHIVE
-            sbgn: '',
-            imgSrc : null,
-            searchText : '',
-            curieList: [
-                {id: '1', name: 'No Search'}
-            ],
-            list: [
-                {id: 'MONDO:0010863', text: 'No Search',
-                    items: [
-                        {id: 'MONDO:0012919',text: 'tiny 3'},
-                        {id: 'MONDO:0012921',text: 'tiny 2'}
-                    ]},
-                {id: 'MONDO:0011168',text: 'No Search2'}
-
-            ],
-
-            biomodelList: [
-                {pathway_id: 1, name: 'No Search'}
-            ],
-            curieIsClickEnabled: false,
-            geneisClickEnabled: false,
-            bioisClickEnabled: false,
-
-            curieIsLoading:false,
-            bioisLoading:false,
-            descriptionIsLoading:false,
-
-            curieSelected: '',
-            description: {}
+            // transformer query
+            selectedGeneListsByID: ["LQuc2bN6fE"],
+            selectedExpanders: []
         };
 
         this.handleGeneListCreation = this.handleGeneListCreation.bind(this);
         this.handleTextChange = this.handleTextChange.bind(this);
-        this.handleCurieClick = this.handleCurieClick.bind(this);
-        this.handleGeneClick = this.handleGeneClick.bind(this);
-        this.handleBiomodelClick = this.handleBiomodelClick.bind(this);
     }
 
     getTransformers = () => {
@@ -153,7 +58,7 @@ class App extends React.Component {
                     this.setState({transformers: data, curieIsClickEnabled: true, curieIsLoading: false});
 
                     const defaultProducer = {
-                        name: "Genes",
+                        name: "Basic Gene Set Producer",
                             function: "producer",
                             parameters: [], // TODO: can we always assume producers have a single parameter for input?
                             genes: [],
@@ -172,49 +77,87 @@ class App extends React.Component {
             });
     };
 
-    updateProducers = () => {
-        const defaultProducer = {
-            name: "Genes",
-            function: "producer",
-            parameters: [], // TODO: can we always assume producers have a single parameter for input?
-            genes: [],
-            // TODO: Gene ID sources/types returned? Link up with Biolink Schema's context/JSON-LD?
+    // TODO
+    queryTransformer = () => {
+        // TODO: add args
+
+        // TODO: remember to stringify the parameter number?
+        let transformerQuery = {
+            name: "DepMap correlation expander",
+            gene_list_id: "LQuc2bN6fE",
+            controls: [
+                { name: "correlation threshold", value: "0.5" },
+                { name: "correlated values", value: "gene knockout" }
+            ]
         };
-        this.setState({producers: [defaultProducer]});
-        this.setState({selectedProducer: defaultProducer});
+        fetch(SERVICE_URL.concat('/transform'), {
+                            method: "POST",
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(transformerQuery)
+                        })
+                        .then(response => response.json())
+                        .then(data => { console.log(data) })
+    }
 
-        fetch(SERVICE_URL.concat('/transformers'))
-            .then(response => response.json())
-            .then(data => {
-                if (data === undefined || data.length === 0) {
-                    this.setState({producers: [defaultProducer]})
-                } else {
-                    const onlyProducers = data.filter((item) => { return item['function'] === 'producer' });
-                    this.setState({producers: [defaultProducer].concat(onlyProducers)});
-                }
-            })
-            .catch(error => {
-                console.error(error)
-            });
-    };
+    // TODO
+    queryTransformers = () => {
+        // TODO: GET THE QUERY VALUES! THE FORM VALUES ARE NOT IN THE SELECTED EXPANDER STATE
 
-    updateExpander = () => {
-        fetch(SERVICE_URL.concat('/transformers'))
-            .then(response => response.json())
-            .then(data => {
-                if (data === undefined || data.length === 0) {
-                    const newExpanders = this.state.expanders;
-                    this.setState({expanders: newExpanders, curieIsClickEnabled: false});
-                } else {
-                    const onlyExpanders = data.filter(function (item) { return item['function'] === 'expander' });
-                    const newExpanders = this.state.expanders.concat(onlyExpanders);
-                    this.setState({producers: newExpanders, curieIsClickEnabled: true, curieIsLoading: false});
-                }
-            })
-            .catch(error => {
-                const expander = this.state.expanders;
-                this.setState({expanders: expander, curieIsClickEnabled: false});
-            });
+        // This takes the selected expanders and genelists, and returns an aggregate of all of the results
+        // that come from applying each selected transformer to each selected gene list
+
+        // Let's be heroes
+        // https://stackoverflow.com/a/43053803
+        const f = (a, b) => [].concat(...a.map(d => b.map(e => [].concat(d, e))));  // pair constructor
+        const cartesian = (a, b, ...c) => (b ? cartesian(f(a, b), ...c) : a);   // tensor operator/recursively constructed onto mapping...
+        // yeah this could be simpler -- it's only complicated because it's the general case
+
+        // TODO: safer to pass these in as arguments for query transformer: how to do this from a child react component? event?
+        // answer is probably "from the events"
+        const transformerPreQueries =
+            cartesian(this.state.selectedGeneListsByID, this.state.selectedExpanders)
+                .map((result) => {
+                    console.log("parameter-gene list pairs", result);
+                    return result;
+                });
+
+        let transformerQueries = transformerPreQueries.map(geneListTransformerPair => {
+
+            const gene_list_id = geneListTransformerPair[0];
+            const selectedExpander = geneListTransformerPair[1];
+
+            // transformer query object
+            return {
+                name: selectedExpander.name,
+                gene_list_id: gene_list_id,
+                controls: selectedExpander.controls
+            };
+
+        });
+
+        transformerQueries.map((result) => {
+            console.log("upcoming transformer queries", result);
+        });
+
+        // transformerQueries.map(transformerQuery => {
+        //     return new Promise(
+        //         // Abandon all hope: Async Hell Ahoy
+        //         // TODO: https://stackoverflow.com/a/41516919
+        //         fetch(SERVICE_URL.concat('/transform'), {
+        //                 method: "POST",
+        //                 headers: {
+        //                     'Accept': 'application/json',
+        //                     'Content-Type': 'application/json'
+        //                 },
+        //                 body: JSON.stringify(transformerQuery)
+        //             })
+        //             .then(response => response.json())
+        //             .then(data => { console.log(data) })
+        //     )
+        // });
     };
 
     handleProducerChange = (event) => {
@@ -223,223 +166,121 @@ class App extends React.Component {
     };
 
     handleGeneListCreation = () => {
-        let geneList = this.state.searchText.split(',');
-        fetch(SERVICE_URL.concat("create_gene_list"),
-            {
-                    method: "POST",
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(geneList)
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data === undefined || data.length === 0) {
-                    throw "Data is undefined or not there"
-                } else {
-                    console.log(data);
-                    // log the gene list
-                    let tempGeneListCache = this.state.geneListCache;
-                    tempGeneListCache[data.gene_list_id] = data;
-                    this.setState({geneListIDs: this.state.geneListIDs.concat([data.gene_list_id]), geneListCache: tempGeneListCache})
-                }
-            })
-            .catch(error => {
-                console.error(error)
-            });
+        if (this.state.searchText) {
+            let geneList = this.state.searchText.split(',');
+
+            // TODO: update with producer code user
+            fetch(SERVICE_URL.concat("create_gene_list"),
+                {
+                        method: "POST",
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(geneList)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data === undefined || data.length === 0) {
+                        throw "Data is undefined or not there"
+                    } else {
+                        console.log(data);
+                        // log the gene list
+                        this.setState({gene_list_ids: this.state.gene_list_ids.concat([data.gene_list_id])},
+                            () => {
+                                console.log(
+                                    "gene list id for input ".concat(geneList),
+                                    data.gene_list_id
+                                );
+                                console.log(
+                                    "new gene ids given input ".concat(geneList),
+                                    this.state.gene_list_ids
+                                );
+                            });
+                    }
+                })
+                .catch(error => {
+                    console.error(error)
+                });
+        }
     };
 
     handleTextChange(e) {
         this.setState({searchText : e.target.value});
     }
 
-    handleCurieClick(curieItem) {
+    updateExpanderSelection = (chosenExpanderWithControls) => {
+        console.log(chosenExpanderWithControls);
+        !(this.state.selectedExpanders
+            .map(selectedExpanderWithControls => selectedExpanderWithControls.name)
+            .includes(chosenExpanderWithControls.name)) ?
+            this.setState(
+                {selectedExpanders: this.state.selectedExpanders.concat([chosenExpanderWithControls]) },
+                () => console.log("added expander".concat(chosenExpanderWithControls.name), this.state.selectedExpanders)) :
+            this.setState(
+                {selectedExpanders: this.state.selectedExpanders.filter(el => el.name !== chosenExpanderWithControls.name) },
+                () => console.log("remove expander ".concat(chosenExpanderWithControls.name), this.state.selectedExpanders));
+    };
 
-        this.setState({
-            curieIsClickEnabled: true,
-            descriptionIsLoading:true,
-            curieList: update(this.state.curieList,
-                {
-                    0: {isLoading: {$set: true}},
-                    1: {isLoading: {$set: true}},
-                    2: {isLoading: {$set: true}}
-                })
-        });
-
-        /* TODO: Previous Strategy was to start distributing the computations across modules immediately. This cascaded
-         *  out many changes throughout the application. (Not necessarily bad) */
-        //Load mod0
-        // fetch(SERVICE_URL.concat('/api/workflow/mod0/').concat(curieItem))
-        //     .then(response => response.json())
-        //     .then(data => {
-        //         console.log("FINISH: mod0");
-        //         if (data === undefined || data.length === 0) {
-        //             data = [{hit_id: 1, hit_symbol: 'No Result'}];
-        //         }
-        //         this.setState({
-        //             curieList: update(this.state.curieList, {0 : {items: {$set: data},
-        //                     isLoading:{$set: false}}}),
-        //
-        //         })})
-        //     .catch(error=> {
-        //         const data = [{hit_id: 1, hit_symbol: 'No Result'}];
-        //         this.setState({
-        //             curieList: update(this.state.curieList, {0 : {items: {$set: data},
-        //                     isLoading:{$set: false}}}),
-        //         })});
-        //Load mod1e
-        // fetch(SERVICE_URL.concat('/api/workflow/mod1e/').concat(curieItem))
-        //     .then(response => response.json())
-        //     .then(data => {
-        //         console.log("FINISH: mod1e");
-        //         if (data === undefined || data.length === 0) {
-        //             data = [{hit_id: 1, hit_symbol: 'No Result'}];
-        //         }
-        //         this.setState({
-        //             geneList: update(this.state.geneList, {1 : {items: {$set: data},
-        //                     isLoading:{$set:false}}}),
-        //         })
-        //     })
-        //     .catch(error=> {
-        //         const data = [{hit_id: 1, hit_symbol: 'No Result'}];
-        //         this.setState({
-        //             geneList: update(this.state.geneList, {1 : {items: {$set: data},
-        //                     isLoading:{$set:false}}}),
-        //         })});
-        // //Load mod1b1
-        // fetch(SERVICE_URL.concat('/api/workflow/mod1b1/').concat(curieItem))
-        //     .then(response => response.json())
-        //     .then(data => {
-        //         console.log("FINISH: mod1b1");
-        //         if (data === undefined || data.length === 0) {
-        //             data = [{hit_id: 1, hit_symbol: 'No Result'}];
-        //         }
-        //         this.setState({
-        //             geneList: update(this.state.geneList, {2 : {items: {$set: data},
-        //                     isLoading:{$set:false}}}),
-        //         })
-        //     }).catch(error=> {
-        //     const data = [{hit_id: 1, hit_symbol: 'No Result'}];
-        //     this.setState({
-        //         geneList: update(this.state.geneList, {2 : {items: {$set: data},
-        //                 isLoading:{$set:false}}}),
-        //     })});
-        //
-        // fetch(SERVICE_URL.concat('/api/get-ncats-data/').concat(curieItem))
-        //     .then(response => response.json())
-        //     .then(data => {
-        //         if (data !== undefined || data.length !== 0) {
-        //             this.setState({description:data});
-        //         }
-        //         this.setState({descriptionIsLoading:false})
-        //     })
-        //     .catch(error => {
-        //         this.setState({description:{concept:{category:'Not Found'}}});
-        //     });
-
-    }
-
-    handleGeneClick(geneItem) {
-        this.setState({bioisLoading:true, descriptionIsLoading:true});
-
-        fetch(SERVICE_URL.concat('/api/gene-to-pathway/').concat(geneItem).concat('?size=5'))
-            .then(response => response.json())
-            .then(data => {
-                if (data === undefined || data.length === 0) {
-                    const newData = [
-                        {pathway_id: 1, name: 'No Result'}
-                    ];
-                    this.setState({ biomodelList: newData, bioisClickEnabled: false });
-                }
-                else {
-                    this.setState({ biomodelList: data, bioisClickEnabled: true, bioisLoading:false });
-                }
-            });
-
-        //Load gene description
-        fetch(SERVICE_URL.concat('/api/get-ncats-data/').concat(geneItem))
-            .then(response => response.json())
-            .then(data => {
-                if (data !== undefined || data.length !== 0) {
-                    this.setState({description:data});
-                }
-                this.setState({descriptionIsLoading:false})
-            })
-            .catch(error => {
-                this.setState({description:{concept:{category:'Not Found'}}});
-            });
-
-    }
-
-    handleBiomodelClick(index) {
-        console.log(index);
-        this.setState({imgSrc : SERVICE_URL.concat('/api/pathway-to-png/') + index});
-        fetch(SERVICE_URL.concat('/api/pathway-to-sbgn/') + index)
-            .then(response => {
-                return response.text().then((text)=>{
-                    // console.log(text);
-                    this.setState({sbgn: text});
-                });
-            });
-        fetch(SERVICE_URL.concat('/api/pathway-to-sbgn/') + index)
-            .then(response => {
-                return response.text().then((text)=>{
-                    console.log(text);
-                    this.setState({sbgn: text});
-                });
-            });
-    }
+    updateGeneListSelection = (chosenGeneListID) => {
+        !(this.state.selectedGeneListsByID.includes(chosenGeneListID)) ?
+            this.setState(
+                {selectedGeneListsByID: this.state.selectedGeneListsByID.concat([chosenGeneListID]) },
+                () => console.log("added gene list ".concat(chosenGeneListID), this.state.selectedGeneListsByID)) :
+            this.setState(
+                {selectedGeneListsByID: this.state.selectedGeneListsByID.filter(el => el !== chosenGeneListID) },
+                () => console.log("remove gene list ".concat(chosenGeneListID), this.state.selectedGeneListsByID));
+    };
 
     render() {
-        console.log("Workbench Environmental Variables:");
-        console.log("\tFRONTEND_URL:\t" + FRONTEND_URL);
-        console.log("\tSERVICE_URL:\t" + SERVICE_URL);
-
         return (
             <div style={divStyle}>
+                {/*<div className="container-fluid">*/}
+                {/*    <h1>STAR Gene Transformer</h1><br/>*/}
+                {/*</div>*/}
                 <div className="container-fluid">
-
-                    {/* Producer Components */}
-                    {this.state.producers ?
-                        <SearchBar producers={this.state.producers}
-                                   handleCreation={this.handleGeneListCreation}
-                                   handleProducerSelect={this.handleProducerChange}
-                                   handleTextChange={this.handleTextChange}/> :
-                        <MyLoader active={true}/>}
+                    <div className="row">
+                    </div>
 
                     <div className="row">
 
-                        {/* Expander Components */}
-                        <div className="col-sm-2">
-                            {this.state.expanders ?
-                                <TransformerMenu expanders={this.state.expanders}/>
-                                : <MyLoader active={true}/>}
-                        </div>
-
                         {/* Gene Lists */}
-                        <div className="col-sm-10">
-                        {/* Reduce state.geneList to a network call/calculation */}
-                        { this.state.geneListIDs.length > 0 ?
-                            this.state.geneListIDs
-                                // reverse historical order (most recent)
-                                .slice(0).reverse()
-                                .map(geneListID => {
-                                    return (
-                                        <GeneTable
-                                            // TODO: replace with a fetch request to aggregator?
-                                            // TODO: replace with get-gene-list call when implemented.
-                                            geneListID={ geneListID }
-                                        />
-                                    )
-                            })
-                            :
-                            <MyLoader active={true}/> }
+                        <div className="col-sm-8">
+                            <h3>Producers</h3>
+                            {/* Producer Components */}
+                            {this.state.producers ?
+                                <SearchBar producers={this.state.producers}
+                                           handleGeneListCreation={this.handleGeneListCreation}
+                                           handleProducerSelect={this.handleProducerChange}
+                                           handleTextChange={this.handleTextChange}/> :
+                                <MyLoader active={true}/>}
+
+                            {/* Tables of Genes */}
+                            { this.state.gene_list_ids.length > 0 ?
+                                this.state.gene_list_ids
+                                    .map(gene_list_id => {
+                                        return <GeneTable geneListID={ gene_list_id }
+                                                          handleGeneListSelection={ this.updateGeneListSelection }/>
+                                    })
+                                : <MyLoader active={true}/> }
                         </div>
 
-                        {/* Real Time Visualization */}
-                        <div className="col-sm-1">
-
+                        {/* Expander Components */}
+                        <div className="col-sm-4">
+                            <h3>Expanders</h3>
+                            <TransformerQuerySender
+                                selectedGeneLists={ this.state.selectedGeneListsByID }
+                                selectedExpanders={ this.state.selectedExpanders }
+                                onClickCallback = { this.queryTransformer }
+                            />
+                            <TransformerCurrentQuery
+                                currentSelections = {{ selectedGeneLists: this.state.selectedGeneListsByID, selectedExpanders: this.state.selectedExpanders }}
+                            />
+                            {this.state.expanders ?
+                                <TransformerList
+                                    handleExpanderSelection={ this.updateExpanderSelection  }
+                                    expanders={ this.state.expanders }/>
+                                : <MyLoader active={true}/>}
                         </div>
 
                     </div>

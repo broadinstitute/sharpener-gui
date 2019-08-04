@@ -3,8 +3,8 @@ import React from 'react';
 const SERVICE_URL =  process.env.REACT_APP_SERVICE_URL;
 
 const searchBarStyle = {
-    marginTop: "20px",
-    marginLeft: "25px",
+    marginTop: "18px",
+    marginLeft: "0px",
     marginRight: "15px",
     marginBottom: "20px",
 };
@@ -19,7 +19,7 @@ export class SearchBar extends React.Component {
     handleKeyPress = event => {
         if (event.key === 'Enter') {
             event.preventDefault(); // this will result in an "event undefined" error, but will prevent page refresh
-            this.props.handleCreation();
+            this.props.handleGeneListCreation();
         }
     };
 
@@ -29,7 +29,7 @@ export class SearchBar extends React.Component {
                 <form className="form-inline">
                     <select id="producer" onChange={this.props.handleProducerSelect}>
                         {this.props.producers.map((producer) =>
-                            <option value={producer.name}>
+                            <option key={producer.name} value={producer.name}>
                                 {producer.name}
                             </option>
                         )}
@@ -38,16 +38,16 @@ export class SearchBar extends React.Component {
                         type="search"
                         className="form-control mr-sm-2"
                         onChange={this.props.handleTextChange}
-                        placeholder="Search.."
-                        aria-label="Search"
+                        placeholder="source:identifier..."
+                        aria-label="Produce Genes"
                         id="search"
                         onKeyPress={this.handleKeyPress}
                     />
                     <button
                         type="button"
-                        onClick={this.props.handleCreation}
+                        onClick={this.props.handleGeneListCreation}
                         className="btn btn-outline-success my-2 my-sm-0">
-                        Search
+                        Produce Genes
                     </button>
                 </form>
             </div>

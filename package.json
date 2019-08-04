@@ -5,6 +5,7 @@
   "dependencies": {
     "underscore": "^1.9.1",
     "react-bootstrap-table-next": "^3.1.7",
+    "react-bootstrap-typeahead": "^3.4.6",
     "bootstrap": "^4.3.1",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
