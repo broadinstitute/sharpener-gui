@@ -235,21 +235,6 @@ class App extends React.Component {
                         {/* Expander Components */}
                         <div className="col-sm-3">
                             <h3>Expanders</h3>
-                            {/*<TransformerQuerySender*/}
-                            {/*    currentSelections={ { selectedGeneLists: this.state.selectedGeneListsByID, selectedExpanders: this.state.selectedExpanders } }*/}
-                            {/*    onClickCallback={ () => { // this.queryTransformers*/}
-                            {/*    } }*/}
-                            {/*/>*/}
-                            {/*<TransformerCurrentQuery*/}
-                            {/*    currentSelections={ { selectedGeneLists: this.state.selectedGeneListsByID, selectedExpanders: this.state.selectedExpanders } } />*/}
-                            {/*{this.state.expanders ?*/}
-                            {/*    <TransformerList*/}
-                            {/*        expanders={ this.state.expanders }*/}
-                            {/*        handleExpanderSelection={ this.props.handleExpanderSelection }*/}
-                            {/*        throwbackExpanderIndex={ this.updateTransformerControls }/>*/}
-                            {/* : <MyLoader active={true}/>*/}
-                            {/*}*/}
-
                             <TransformerControls
                                 expanders={ this.state.expanders }
                                 selectedGeneLists={ this.state.selectedGeneListsByID }

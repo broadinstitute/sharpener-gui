@@ -57,47 +57,48 @@ export default class TransformerControls extends React.Component {
     };
 
     queryTransformers = () => {
-    //     // DONE: do we always have access to the latest selected gene lists and selected expanders?
-    //     // DONE: do we always have access to the latest expander states?
-    //         // PO: Expanders are searched for and added programatically (through props),
-    //         // to prevent scaling out too wide by tracking a tonne of expanders + parameters changes through state modifications?
-    //
-    //     /* the first approach: aggregate upstream */
-    //
-    //     // TODO: Actually do this approach (it's probably more efficient but also a bigger implementation right now)
-    //     // step one:
-    //         // aggregation
-    //             // why aggregation first? because it's cheap and fast
-    //             // if we were to not aggregate first then we expand out the number of parallel asynchronous
-    //             // requests we're making, which is a headache for both server and client
-    //     // step two:
-    //         // apply expander requests onto the resultant aggregator set (in sync with it)
-    //     // step three:
-    //         // return the set as a gene ID to the main App (which should trigger downstream rendering)
-    //         // this should be taken care of through our callback
-    //
-    //
-    //
-    //     /* The other approach: iterate over a bunch of independent queries */
-    //
-    //     // This takes the selected expanders and genelists, and returns an aggregate of all of the results
-    //     // that come from applying each selected transformer to each selected gene list
-    //
-    //     // Let's be heroes
-    //     // https://stackoverflow.com/a/43053803
-    //     const f = (a, b) => [].concat(...a.map(d => b.map(e => [].concat(d, e))));  // pair constructor
-    //     const cartesian = (a, b, ...c) => (b ? cartesian(f(a, b), ...c) : a);   // tensor operator/recursively constructed onto mapping...
-    //     // yeah this could be simpler -- it's only complicated because it's defined for the general case
-    //
-    //     let transformerSelectionPairs = cartesian(...Object.values(this.props.currentSelections));  // https://stackoverflow.com/a/1316389
-    //
-    //     // https://stackoverflow.com/a/41516919
-    //     Promise.all(transformerSelectionPairs.map(pair =>
-    //                 this.queryTransformer(pair[0], this.state.transformerControls[indexNameOf(pair[1].name)])
-    //             ))
-    //             .then(response => response.json())
-    //             .then(data => { console.log(data); });
-    //
+        // DONE: do we always have access to the latest selected gene lists and selected expanders?
+        // DONE: do we always have access to the latest expander states?
+            // PO: Expanders are searched for and added programatically (through props),
+            // to prevent scaling out too wide by tracking a tonne of expanders + parameters changes through state modifications?
+
+        /* the first approach: aggregate upstream */
+
+        // TODO: Actually do this approach (it's probably more efficient but also a bigger implementation right now)
+        // step one:
+            // aggregation
+                // why aggregation first? because it's cheap and fast
+                // if we were to not aggregate first then we expand out the number of parallel asynchronous
+                // requests we're making, which is a headache for both server and client
+        // step two:
+            // apply expander requests onto the resultant aggregator set (in sync with it)
+        // step three:
+            // return the set as a gene ID to the main App (which should trigger downstream rendering)
+            // this should be taken care of through our callback
+
+
+
+        /* The other approach: iterate over a bunch of independent queries */
+
+        // This takes the selected expanders and genelists, and returns an aggregate of all of the results
+        // that come from applying each selected transformer to each selected gene list
+
+        // Let's be heroes
+        // https://stackoverflow.com/a/43053803
+        const f = (a, b) => [].concat(...a.map(d => b.map(e => [].concat(d, e))));  // pair constructor
+        const cartesian = (a, b, ...c) => (b ? cartesian(f(a, b), ...c) : a);   // tensor operator/recursively constructed onto mapping...
+        // yeah this could be simpler -- it's only complicated because it's defined for the general case
+
+        let transformerSelectionPairs = cartesian(this.props.selectedGeneLists, this.props.selectedExpanders);  // https://stackoverflow.com/a/1316389
+        console.log(transformerSelectionPairs);
+
+        // Test: just take the first list and transformer, see if we can get what we need back
+
+        // https://stackoverflow.com/a/41516919
+        Promise.all(transformerSelectionPairs.map(pair =>
+                    // The actual Promise: see App.js
+                    this.queryTransformer(pair[0], this.state.transformerControls[indexNameOf(pair[1].name)])
+                ));
     };
 
     render() {
@@ -106,7 +107,7 @@ export default class TransformerControls extends React.Component {
             <form>
                 <TransformerQuerySender
                     currentSelections={ { selectedGeneLists: this.props.selectedGeneLists, selectedExpanders: this.props.selectedExpanders } }
-                    onClickCallback={ this.queryTransformer }
+                    onClickCallback={ this.queryTransformers }
                 />
                 <TransformerCurrentQuery
                     currentSelections={ { selectedGeneLists: this.props.selectedGeneLists, selectedExpanders: this.props.selectedExpanders } } />
@@ -124,7 +125,6 @@ export default class TransformerControls extends React.Component {
 // DONE - RC1
 export class TransformerCurrentQuery extends React.Component {
     render() {
-        console.log("transformer current query");
         return (
             <Fragment>
                 <label as={"h5"}>Current Gene Lists</label>
@@ -173,8 +173,6 @@ export class TransformerQuerySender extends React.Component {
     }
 
     render() {
-        console.log("transformer query sender");
-
         return (
             <Fragment>
                 <div style={transformerMenuStyle}>
