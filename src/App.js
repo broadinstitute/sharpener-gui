@@ -1,6 +1,6 @@
 // local components
 import React from 'react';
-import SearchBar from './components/SearchBar.js'
+import ProducerControls from './components/ProducerControls.js'
 import GeneTable from './components/GeneFeed.js';
 import {MyLoader} from './components/ListItem.js'
 // remote components
@@ -10,10 +10,17 @@ import _ from "underscore"
 import './App.css';
 import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
 import 'font-awesome/css/font-awesome.min.css';
-import TransformerControls, {TransformerCurrentQuery, TransformerQuerySender, TransformerList} from "./components/TransformerMenu";
+import TransformerControls, {TransformerCurrentQuery, TransformerQuerySender, TransformerList} from "./components/TransformerControls";
+import GeneFeed from "./components/GeneFeed";
 
 const FRONTEND_URL =  process.env.REACT_APP_FRONTEND_URL;
 const SERVICE_URL =  process.env.REACT_APP_SERVICE_URL;
+
+const FEATURE_FLAG = {
+    alwaysUpdateToLatestGeneList: {
+        aggregator: true
+    }
+};
 
 const divStyle = {
     margin:"2.25em"
@@ -40,7 +47,7 @@ class App extends React.Component {
             gene_list_ids: ["LQuc2bN6fE"],
 
             // transformer query
-            selectedGeneListsByID: ["LQuc2bN6fE"],
+            selectedGeneListsByID: [],
             selectedExpanders: []
         };
 
@@ -58,7 +65,7 @@ class App extends React.Component {
                     this.setState({transformers: data, curieIsClickEnabled: true, curieIsLoading: false});
 
                     const defaultProducer = {
-                        name: "Basic Gene Set Producer",
+                        name: "Gene Symbols",
                             function: "producer",
                             parameters: [], // TODO: can we always assume producers have a single parameter for input?
                             genes: [],
@@ -81,7 +88,7 @@ class App extends React.Component {
     queryTransformer = (geneListId, transformerControls) => {
         let transformerQuery = {
             gene_list_id: geneListId,
-            name: transformerControls.expander.name,
+            name: transformerControls.transformer.name,
             controls: Object.values(transformerControls.controls)
                 .map(control => {
                     return { name: control.parameter.name, value: control.value }
@@ -103,7 +110,6 @@ class App extends React.Component {
                                         console.log("new gene list ids", this.state.gene_list_ids, "with", data.gene_list_id);
                                 });
                         })
-                        .then(data => { console.log(data) })
     };
 
     handleProducerChange = (event) => {
@@ -111,35 +117,44 @@ class App extends React.Component {
         this.setState({selectedProducer: selectedProducer});
     };
 
-    // handleGeneListCreation = () => {
-    //     let queryProducer = this.queryTransformer;
-    //     let createGeneList = this.postGeneList;
-    //
-    //     if (this.state.searchText) {
-    //         let geneList = this.state.searchText.split(',');
-    //
-    //         // TODO: need to abstract out this producer name so it doesn't become a magic value
-    //         if (this.state.selectedProducer && this.state.selectedProducer === "Basic Gene Producer") {
-    //
-    //             let producerGenes = new Promise(queryProducer(geneList, this.state.selectedProducer));
-    //             producerGenes.resolve()
-    //                 .then(response => response.json())
-    //                 .then(data => { console.log(data); })
-    //                 .then(data => {
-    //                     // get new gene list from data?
-    //                     let newGeneList = data.genes // map out to gene Ids
-    //                     return new Promise(createGeneList(newGeneList));
-    //                 })
-    //
-    //         } else {
-    //             this.postGeneList(geneList);
-    //         }
-    //     }
-    //
-    // };
+    handleGeneListCreation = () => {
 
-    handleGeneListCreation = (geneList) => {
-          fetch(SERVICE_URL.concat("create_gene_list"),
+        let queryProducer = this.queryTransformer;
+        let promiseNewGeneList = this.postGeneList;
+
+        if (this.state.searchText) {
+            let geneList = this.state.searchText.split(', ');
+            console.log(geneList);
+
+            console.log("selected producer", this.state.selectedProducer);
+            let producerControls = {
+                transformer: this.state.selectedProducer,
+                controls: []  // TODO: map the searchText to the controls for the gene producer <-- probably entails redesigning those controls
+            };
+
+            // TODO: need to abstract out this producer name so it doesn't become a magic value
+            if (this.state.selectedProducer.name !== "Gene Symbols") {
+                let producerGenes = new Promise(queryProducer(geneList, this.state.selectedProducer));
+
+                // helpful for understanding promise chaining: https://stackoverflow.com/a/36877743
+                Promise.resolve(producerGenes)
+                    .then(response => response.json())
+                    .then(data => { console.log(data); })
+                    .then(data => {
+                        // get new gene list from data?
+                        let newGeneList = data.genes.map(geneInfo => geneInfo.gene_id);  // map out to gene Ids, which are create_gene_list's bread and butter
+                        return new Promise(promiseNewGeneList(newGeneList));
+                    })
+
+            } else {
+                Promise.resolve(promiseNewGeneList(geneList));
+            }
+        }
+
+    };
+
+    postGeneList = (geneList) => {
+          return fetch(SERVICE_URL.concat("create_gene_list"),
             {
                 method: "POST",
                 headers: {
@@ -177,6 +192,18 @@ class App extends React.Component {
         this.setState({searchText : e.target.value});
     }
 
+    updateText = (newText) => {
+        console.log("attempting to update text");
+        let addedText = (newText) => {
+            if (this.state.searchText === undefined || this.state.searchText === '') {
+                return newText;
+            } else {
+                return this.state.searchText.concat(", ").concat(newText);
+            }
+        };
+        this.setState({ searchText : addedText(newText) });
+    };
+
     updateExpanderSelection = (selectedExpander) => {
         !(this.state.selectedExpanders.map(prevSelectedExpander => prevSelectedExpander.name).includes(selectedExpander.name)) ?
             this.setState(
@@ -197,7 +224,21 @@ class App extends React.Component {
             this.setState(
                 {selectedGeneListsByID: this.state.selectedGeneListsByID.filter(el => el !== selectedGeneListID) },
                 () => console.log("remove gene list ".concat(selectedGeneListID), this.state.selectedGeneListsByID));
+
+        // TODO: this is a form of responsibility incohesion that I need to figure out.
+        //  It's stemming from the way that Aggregation currently is placed.
+        // TODO: need to decouple updating, posting, and addition to the feed
+        if(!(this.state.gene_list_ids.includes(selectedGeneListID))) {
+            this.setState({gene_list_ids: this.state.gene_list_ids.concat([selectedGeneListID])});
+
+            // TODO: Should the Transformers also exhibit this behavior?
+            if(FEATURE_FLAG.alwaysUpdateToLatestGeneList.aggregator) {
+                this.setState({selectedGeneListsByID: [].concat([selectedGeneListID])});
+            }
+
+        }
     };
+
 
     render() {
         return (
@@ -216,19 +257,20 @@ class App extends React.Component {
                             <h3>Producers</h3>
                             {/* Producer Components */}
                             {this.state.producers ?
-                                <SearchBar producers={this.state.producers}
-                                           handleGeneListCreation={this.handleGeneListCreation}
-                                           handleProducerSelect={this.handleProducerChange}
-                                           handleTextChange={this.handleTextChange}/> :
-                                <MyLoader active={true}/>}
+                                <ProducerControls searchText={this.state.searchText}
+                                                  producers={this.state.producers}
+                                                  handleGeneListCreation={this.handleGeneListCreation}
+                                                  handleProducerSelect={this.handleProducerChange}
+                                                  handleTextChange={this.handleTextChange}/>
+                                : <MyLoader active={true}/>}
 
                             {/* Tables of Genes */}
-                            { this.state.gene_list_ids.length > 0 ?
-                                this.state.gene_list_ids
-                                    .map(gene_list_id => {
-                                        return <GeneTable geneListID={ gene_list_id }
-                                                          handleGeneListSelection={ this.updateGeneListSelection }/>
-                                    })
+                            {this.state.gene_list_ids ?
+                                <GeneFeed
+                                    geneListIDs={ this.state.gene_list_ids }
+                                    handleGeneListSelection={ this.updateGeneListSelection }
+                                    handleGeneSelection={ this.updateText }
+                                />
                                 : <MyLoader active={true}/> }
                         </div>
 
@@ -240,12 +282,12 @@ class App extends React.Component {
                                 selectedGeneLists={ this.state.selectedGeneListsByID }
                                 selectedExpanders={ this.state.selectedExpanders }
                                 handleExpanderSelection={ this.updateExpanderSelection }
-                                queryPromise={ this.queryTransformer }
-                            />
-
+                                handleGeneListSelection={ this.updateGeneListSelection }
+                                queryPromise={ this.queryTransformer }/>
                         </div>
 
                     </div>
+
                 </div>
 
             </div>

@@ -9,7 +9,7 @@ const searchBarStyle = {
     marginBottom: "20px",
 };
 
-export class SearchBar extends React.Component {
+export class ProducerControls extends React.Component {
 
     constructor(props) {
         super(props);
@@ -37,9 +37,10 @@ export class SearchBar extends React.Component {
                     <input
                         type="search"
                         className="form-control mr-sm-2"
+                        value={this.props.searchText}
                         onChange={this.props.handleTextChange}
-                        placeholder="source:identifier..."
-                        aria-label="Produce Genes"
+                        placeholder=""  // TODO -- producer dependent
+                        aria-label="Produce Gene Set"
                         id="search"
                         onKeyPress={this.handleKeyPress}
                     />
@@ -47,7 +48,7 @@ export class SearchBar extends React.Component {
                         type="button"
                         onClick={this.props.handleGeneListCreation}
                         className="btn btn-outline-success my-2 my-sm-0">
-                        Produce Genes
+                        Produce Gene Set
                     </button>
                 </form>
             </div>
@@ -55,4 +56,4 @@ export class SearchBar extends React.Component {
   }
 }
 
-export default SearchBar;
+export default ProducerControls;

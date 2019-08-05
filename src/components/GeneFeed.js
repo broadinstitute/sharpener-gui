@@ -1,11 +1,57 @@
 import React, {Fragment} from 'react';
 import _ from "underscore";
 import BootstrapTable from "react-bootstrap-table-next"
+import ToolkitProvider, { CSVExport } from 'react-bootstrap-table2-toolkit';
+const { ExportCSVButton } = CSVExport;
 import Card from "react-bootstrap/Card"
+import {MyLoader} from "./ListItem";
 
 const SERVICE_URL =  process.env.REACT_APP_SERVICE_URL;
 
-export default class GeneTable extends React.Component {
+// practically speaking all this component does or should do is showcase gene tables in chronological order (soonest to farthest)
+export default class GeneFeed extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            geneListIDs: props.geneListIDs,
+        }
+    }
+
+    // https://medium.com/p/387720c3cff8/responses/show
+    static getDerivedStateFromProps(props, state) {
+        let feedOrder = (geneIDs) => {
+            // TODO:
+            // return geneIDs.slice(0).reverse();
+            return geneIDs
+        };
+
+        if (props.geneListIDs !== state.geneListIDs) {
+            return { geneListIDs: feedOrder(props.geneListIDs) };
+        }
+        return null;
+    }
+
+
+
+    render () {
+        // feed order is going to be run each render
+        return (
+            <div>
+                {
+                    this.state.geneListIDs.length > 0 ? this.state.geneListIDs.map(geneListID =>
+                        <GeneTable
+                            geneListID={ geneListID }
+                            handleGeneListSelection={ this.props.handleGeneListSelection }
+                            handleGeneSelection={ this.props.handleGeneSelection }
+                        />
+                    ) : <MyLoader active={true}/>
+                }
+            </div>
+        )
+    }
+}
+
+export class GeneTable extends React.Component {
     /* LIFECYCLE METHODS */
     constructor(props) {
         super(props);
@@ -23,7 +69,9 @@ export default class GeneTable extends React.Component {
         // TODO replace with different more flexible table library
         return (
             <Card>
-                <Card.Header as={"h6"} onClick={this.handleOnClick}>{this.geneListID}</Card.Header>
+                <Card.Header as={"h6"} onClick={this.handleOnClick}>
+                    {this.geneListID}
+                </Card.Header>
                 <BootstrapTable
                     keyField={this.keyField}
                     name={this.geneListID}
@@ -50,10 +98,12 @@ export default class GeneTable extends React.Component {
         const geneListAttributes =
             _.uniq(this.state.geneList.map((current_gene) => current_gene.attributes, [])
                 .reduce((attributes_list, current_gene_attributes) => attributes_list.concat(current_gene_attributes), [])  // flatten list of depth one
-                .map(attribute => attribute.name)).concat(["gene_id"]);  // interpret gene_id as a column
+                .map(attribute => attribute.name));
+                //.concat(["gene_id"]);  // interpret gene_id as a column  TODO: DEPRECATED -- it needs to be handled specially
 
         let geneTableColumns =
             this.makeTableColumns(geneListAttributes);
+
         let geneTableData =
             this.state.geneList
                 .map(gene => gene.attributes.concat([{ name: "gene_id", value: gene["gene_id"] }]))
@@ -97,9 +147,55 @@ export default class GeneTable extends React.Component {
     };
 
     makeTableColumns = (attributeList) => {
+        let formatHeader = (gla) => {
+            return gla.replace(/_/g, " ").replace(/Id/gi, "ID");
+        };
         return (
             attributeList
-                .map(gla => { return { dataField: gla, text: gla.toUpperCase() } }))
+                .map(gla => {
+                    return {
+                        dataField: gla,
+                        text: formatHeader(gla),
+                        headerStyle: {  textTransform: "capitalize" },
+                        // TODO: for now we're enabling all input to be placed in the search field
+                        // THIS IS TO ENABLE INTERACTION WITH PRODUCERS; BUT SHOULD BE FLAGGED FOR CHANGE
+                        events: {
+                            onClick: (e, column, columnIndex, row, rowIndex) => {
+                                console.log("clicking gene_id ", row[column.dataField]);
+                                this.props.handleGeneSelection(row[column.dataField]);
+                            }
+                        },
+                        headerEvents: {
+                            events: {
+                                onClick: (e, column, columnIndex, row, rowIndex) => {
+                                    console.log("clicking gene_id ", row[column.dataField]);
+                                    this.props.handleGeneSelection(row[column.dataField]);
+                                }
+                            }
+                        }
+                    }
+            }).concat([
+                {
+                    dataField: "gene_id",
+                    text: formatHeader("gene_id"),
+                    headerStyle: {  textTransform: "capitalize" },
+                    events: {
+                        onClick: (e, column, columnIndex, row, rowIndex) => {
+                            console.log("clicking gene_id ", row[column.dataField]);
+                            this.props.handleGeneSelection(row[column.dataField]);
+                        }
+                    },
+                    headerEvents: {
+                        events: {
+                            onClick: (e, column, columnIndex, row, rowIndex) => {
+                                console.log("clicking gene_id ", row[column.dataField]);
+                                this.props.handleGeneSelection(row[column.dataField]);
+                            }
+                        }
+                    }
+                }
+            ])
+        )
     };
 
 }

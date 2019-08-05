@@ -11,8 +11,6 @@ const Fragment = React.Fragment;
  */
 const transformerMenuStyle = {
     marginTop: "18px",
-    marginLeft: "0px",
-    marginRight: "15px",
     marginBottom: "20px",
 };
 
@@ -36,11 +34,12 @@ export default class TransformerControls extends React.Component {
     constructor(props) {
         console.log("Transformer Controls");
         super(props);
-        this.queryTransformer = props.queryPromise;
 
         this.state = {
-            transformerControls : {}  // these aren't query controls since not all transformers might be selected while a control is being filled TODO: sane?
+            transformerControls : {}  // these aren't query controls specifically since not all transformers might be selected while a control is being filled TODO: sane?
         };
+
+        this.queryTransformer = props.queryPromise;
 
         this.queryTransformers = this.queryTransformers.bind(this);
         this.updateTransformerControls = this.updateTransformerControls.bind(this);
@@ -65,6 +64,7 @@ export default class TransformerControls extends React.Component {
         /* the first approach: aggregate upstream */
 
         // TODO: Actually do this approach (it's probably more efficient but also a bigger implementation right now)
+        // helpful for understanding promise chaining: https://stackoverflow.com/a/36877743
         // step one:
             // aggregation
                 // why aggregation first? because it's cheap and fast
@@ -98,18 +98,36 @@ export default class TransformerControls extends React.Component {
         Promise.all(transformerSelectionPairs.map(pair =>
                     // The actual Promise: see App.js
                     this.queryTransformer(pair[0], this.state.transformerControls[indexNameOf(pair[1].name)])
-                ));
+                )).then(resolved => { console.log("query complete"); });
+    };
+
+    onAggregate = (newAggregationGeneListID) => {
+        this.props.handleGeneListSelection(newAggregationGeneListID);
     };
 
     render() {
         // form has to wrap every transformer even if not all of them are contributing to the extant query
         return (
-            <form>
+            <div style={transformerMenuStyle}>
                 <TransformerQuerySender
                     currentSelections={ { selectedGeneLists: this.props.selectedGeneLists, selectedExpanders: this.props.selectedExpanders } }
-                    onClickCallback={ this.queryTransformers }
-                />
-                <TransformerCurrentQuery
+                    onClickCallback={ this.queryTransformers }/>
+                <div className={"container"}>
+                    <div className={"row"}>
+                    <div className="col-xs-8">
+                        <CurrentlySelectedGenes
+                            currentSelections={ { selectedGeneLists: this.props.selectedGeneLists, selectedExpanders: this.props.selectedExpanders } } />
+                        </div> {'\u00A0'}{'\u00A0'}{'\u00A0'}{'\u00A0'}{'\u00A0'}{'\u00A0'}{'\u00A0'}{'\u00A0'}{'\u00A0'}{'\u00A0'}{'\u00A0'}
+                    <div className="col-xs-4">
+                        <AggregatorControls
+                            currentSelections={ { selectedGeneLists: this.props.selectedGeneLists, selectedExpanders: this.props.selectedExpanders } }
+                            actions={["union", "intersection"]}
+                            handleOnClick={ this.onAggregate }
+                        />
+                    </div>
+                    </div>
+                </div>
+                <CurrentlySelectedExpanders
                     currentSelections={ { selectedGeneLists: this.props.selectedGeneLists, selectedExpanders: this.props.selectedExpanders } } />
                 {this.props.expanders ?
                     <TransformerList
@@ -117,22 +135,106 @@ export default class TransformerControls extends React.Component {
                         handleExpanderSelection={ this.props.handleExpanderSelection }
                         throwbackExpanderIndex={ this.updateTransformerControls }/>
                         : <MyLoader active={true}/> }
-            </form>
+
+            </div>
+        )
+    }
+}
+
+export class AggregatorControls extends React.Component {
+    render() {
+        return (
+            <Fragment>
+                <div>
+                    { this.props.currentSelections.selectedGeneLists ?
+                        this.props.actions.map(operation =>
+                            <AggregationSender
+                                selectedGeneLists={this.props.currentSelections.selectedGeneLists}
+                                handleOnClick={this.props.handleOnClick}
+                                action={operation}/>) :
+                            <button
+                                className="btn my-2 my-sm-0"
+                                disabled={true}
+                                style={{
+                                    padding:"0%",
+                                    fontSize: "x-small"
+                                }}>
+                                Aggregation requires {2 - this.props.currentSelections.selectedGeneLists.length} more Gene List(s)
+                            </button> }
+                </div>
+            </Fragment> )
+    }
+}
+
+export class AggregationSender extends React.Component {
+    constructor(props) {
+        super(props);
+        this.SERVICE_URL =  process.env.REACT_APP_SERVICE_URL;
+        this.throwbackGeneListID = props.handleOnClick;
+    }
+
+    queryAggregator = (action, selectedGeneLists) => {
+        let aggregationQuery = {
+            operation: action,
+            gene_list_ids: selectedGeneLists
+        };
+
+        return fetch(this.SERVICE_URL.concat("/aggregate"), {
+                method: "POST",
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(aggregationQuery)
+            })
+    };
+
+    promiseAggregation = () => {
+        if (this.props.selectedGeneLists && this.props.selectedGeneLists.length > 0) {
+            return Promise.resolve(this.queryAggregator(this.props.action, this.props.selectedGeneLists))
+                .then(response => response.json())
+                .then(data => {
+                    this.throwbackGeneListID(data.gene_list_id);
+                });
+        }
+    };
+
+    render() {
+        return (
+            <Fragment>
+            <button
+                type="button"
+                onClick={ this.promiseAggregation }
+                className="btn btn-outline-success my-2 my-sm-0"
+                style={{display: "inline"}}>
+                {/* Capitalize the operation label */}
+                {this.props.action.replace(/^[a-z]/g, function(t) { return t.toUpperCase() })}
+            </button>{'\u00A0'}
+        </Fragment>
         )
     }
 }
 
 // DONE - RC1
-export class TransformerCurrentQuery extends React.Component {
+export class CurrentlySelectedGenes extends React.Component {
+        render() {
+            return (
+                <Fragment>
+                    <label as={"h5"}>Current Gene Lists</label>
+                    <ul>
+                    {this.props.currentSelections.selectedGeneLists.length > 0 ? this.props.currentSelections.selectedGeneLists.map(selectedGeneList =>
+                                <li>{selectedGeneList}</li>) :
+                            <p>None</p>}
+                     </ul>
+                </Fragment>
+            )
+        }
+}
+
+export class CurrentlySelectedExpanders extends React.Component {
     render() {
         return (
             <Fragment>
-                <label as={"h5"}>Current Gene Lists</label>
-                <ul>
-                    {this.props.currentSelections.selectedGeneLists.length > 0 ? this.props.currentSelections.selectedGeneLists.map(selectedGeneList =>
-                            <li>{selectedGeneList}</li>) :
-                        <p>None</p>}
-                </ul>
                 <label as={"h5"}>Current Expanders</label>
                 <ul>
                     {this.props.currentSelections.selectedExpanders.length > 0 ? this.props.currentSelections.selectedExpanders.map(selectedExpander =>
@@ -186,7 +288,15 @@ export class TransformerQuerySender extends React.Component {
                         <button
                             className="btn my-2 my-sm-0"
                             disabled={true}>
-                            Select Transformers and Gene Lists
+
+                            {   !(this.props.currentSelections.selectedGeneLists.length > 0) &&
+                                (this.props.currentSelections.selectedExpanders.length > 0) ?
+                                    "Select Gene Lists as input for your Transformers" :
+                                (this.props.currentSelections.selectedGeneLists.length > 0) &&
+                                !(this.props.currentSelections.selectedExpanders.length > 0) ?
+                                    "Select Transformers for your Gene Lists" :
+                                    "Select Gene Lists and Transformers"}
+
                         </button> }
                 </div>
             </Fragment> )
@@ -227,7 +337,7 @@ export class TransformerList extends React.Component{
         this.expanders.map(expander => {
             let stateCopy = { ...this.state };
             stateCopy.expanderIndex[indexNameOf(expander.name)] = {
-                expander: expander,
+                transformer: expander,
                 controls: {}
             };
             this.setState(stateCopy,
@@ -249,11 +359,14 @@ export class TransformerList extends React.Component{
             <Fragment>
                 {/*{JSON.stringify(this.props)}*/}
                 {this.expanders.map(expander =>
-                    <TransformerItem
-                        expander={ expander }
-                        // TODO: what are the naming conventions for custom props
-                        handleExpanderSelection={ this.handleExpanderSelection }
-                        throwbackParameterValues={ this.updateExpanderControls }/>)}
+                    <Fragment>
+                        <TransformerItem
+                            expander={ expander }
+                            // TODO: what are the naming conventions for custom props
+                            handleExpanderSelection={ this.handleExpanderSelection }
+                            throwbackParameterValues={ this.updateExpanderControls }/>
+                        <br/>
+                    </Fragment>)}
             </Fragment>
         )
     }
