@@ -10,7 +10,7 @@ import _ from "underscore"
 import './App.css';
 import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
 import 'font-awesome/css/font-awesome.min.css';
-import TransformerControls from "./components/TransformerMenu";
+import TransformerControls, {TransformerCurrentQuery, TransformerQuerySender, TransformerList} from "./components/TransformerMenu";
 
 const FRONTEND_URL =  process.env.REACT_APP_FRONTEND_URL;
 const SERVICE_URL =  process.env.REACT_APP_SERVICE_URL;
@@ -40,7 +40,7 @@ class App extends React.Component {
             gene_list_ids: ["LQuc2bN6fE"],
 
             // transformer query
-            selectedGeneListsByID: [],
+            selectedGeneListsByID: ["LQuc2bN6fE"],
             selectedExpanders: []
         };
 
@@ -111,35 +111,35 @@ class App extends React.Component {
         this.setState({selectedProducer: selectedProducer});
     };
 
-    handleGeneListCreation = () => {
-        let queryProducer = this.queryTransformer;
-        let createGeneList = this.postGeneList;
+    // handleGeneListCreation = () => {
+    //     let queryProducer = this.queryTransformer;
+    //     let createGeneList = this.postGeneList;
+    //
+    //     if (this.state.searchText) {
+    //         let geneList = this.state.searchText.split(',');
+    //
+    //         // TODO: need to abstract out this producer name so it doesn't become a magic value
+    //         if (this.state.selectedProducer && this.state.selectedProducer === "Basic Gene Producer") {
+    //
+    //             let producerGenes = new Promise(queryProducer(geneList, this.state.selectedProducer));
+    //             producerGenes.resolve()
+    //                 .then(response => response.json())
+    //                 .then(data => { console.log(data); })
+    //                 .then(data => {
+    //                     // get new gene list from data?
+    //                     let newGeneList = data.genes // map out to gene Ids
+    //                     return new Promise(createGeneList(newGeneList));
+    //                 })
+    //
+    //         } else {
+    //             this.postGeneList(geneList);
+    //         }
+    //     }
+    //
+    // };
 
-        if (this.state.searchText) {
-            let geneList = this.state.searchText.split(',');
-
-            // TODO: need to abstract out this producer name so it doesn't become a magic value
-            if (this.state.selectedProducer && this.state.selectedProducer === "Basic Gene Producer") {
-
-                let producerGenes = new Promise(queryProducer(geneList, this.state.selectedProducer));
-                producerGenes.resolve()
-                    .then(response => response.json())
-                    .then(data => { console.log(data); })
-                    .then(data => {
-                        // get new gene list from data?
-                        let newGeneList = data.genes // map out to gene Ids
-                        return new Promise(createGeneList(newGeneList));
-                    })
-
-            } else {
-                this.postGeneList(geneList);
-            }
-        }
-
-    };
-
-    postGeneList = (geneList) => {
-        return fetch(SERVICE_URL.concat("create_gene_list"),
+    handleGeneListCreation = (geneList) => {
+          fetch(SERVICE_URL.concat("create_gene_list"),
             {
                 method: "POST",
                 headers: {
@@ -235,13 +235,29 @@ class App extends React.Component {
                         {/* Expander Components */}
                         <div className="col-sm-3">
                             <h3>Expanders</h3>
-                            {this.state.expanders ?
+                            {/*<TransformerQuerySender*/}
+                            {/*    currentSelections={ { selectedGeneLists: this.state.selectedGeneListsByID, selectedExpanders: this.state.selectedExpanders } }*/}
+                            {/*    onClickCallback={ () => { // this.queryTransformers*/}
+                            {/*    } }*/}
+                            {/*/>*/}
+                            {/*<TransformerCurrentQuery*/}
+                            {/*    currentSelections={ { selectedGeneLists: this.state.selectedGeneListsByID, selectedExpanders: this.state.selectedExpanders } } />*/}
+                            {/*{this.state.expanders ?*/}
+                            {/*    <TransformerList*/}
+                            {/*        expanders={ this.state.expanders }*/}
+                            {/*        handleExpanderSelection={ this.props.handleExpanderSelection }*/}
+                            {/*        throwbackExpanderIndex={ this.updateTransformerControls }/>*/}
+                            {/* : <MyLoader active={true}/>*/}
+                            {/*}*/}
+
                             <TransformerControls
-                                expanders={this.state.expanders}
-                                currentSelections ={{ selectedGeneLists: this.state.selectedGeneListsByID, selectedExpanders: this.state.selectedExpanders }}
+                                expanders={ this.state.expanders }
+                                selectedGeneLists={ this.state.selectedGeneListsByID }
+                                selectedExpanders={ this.state.selectedExpanders }
                                 handleExpanderSelection={ this.updateExpanderSelection }
                                 queryPromise={ this.queryTransformer }
-                            /> : <MyLoader active={true}/>}
+                            />
+
                         </div>
 
                     </div>

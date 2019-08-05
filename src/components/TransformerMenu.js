@@ -32,8 +32,9 @@ let indexNameOf = (schemaName) => {
 Components
  */
 
-export class TransformerControls extends React.Component {
+export default class TransformerControls extends React.Component {
     constructor(props) {
+        console.log("Transformer Controls");
         super(props);
         this.queryTransformer = props.queryPromise;
 
@@ -43,9 +44,6 @@ export class TransformerControls extends React.Component {
 
         this.queryTransformers = this.queryTransformers.bind(this);
         this.updateTransformerControls = this.updateTransformerControls.bind(this);
-    }
-
-    componentDidMount() {
 
     }
 
@@ -59,47 +57,47 @@ export class TransformerControls extends React.Component {
     };
 
     queryTransformers = () => {
-        // DONE: do we always have access to the latest selected gene lists and selected expanders?
-        // DONE: do we always have access to the latest expander states?
-            // PO: Expanders are searched for and added programatically (through props),
-            // to prevent scaling out too wide by tracking a tonne of expanders + parameters changes through state modifications?
-
-        /* the first approach: aggregate upstream */
-
-        // TODO: Actually do this approach (it's probably more efficient but also a bigger implementation right now)
-        // step one:
-            // aggregation
-                // why aggregation first? because it's cheap and fast
-                // if we were to not aggregate first then we expand out the number of parallel asynchronous
-                // requests we're making, which is a headache for both server and client
-        // step two:
-            // apply expander requests onto the resultant aggregator set (in sync with it)
-        // step three:
-            // return the set as a gene ID to the main App (which should trigger downstream rendering)
-            // this should be taken care of through our callback
-
-
-
-        /* The other approach: iterate over a bunch of independent queries */
-
-        // This takes the selected expanders and genelists, and returns an aggregate of all of the results
-        // that come from applying each selected transformer to each selected gene list
-
-        // Let's be heroes
-        // https://stackoverflow.com/a/43053803
-        const f = (a, b) => [].concat(...a.map(d => b.map(e => [].concat(d, e))));  // pair constructor
-        const cartesian = (a, b, ...c) => (b ? cartesian(f(a, b), ...c) : a);   // tensor operator/recursively constructed onto mapping...
-        // yeah this could be simpler -- it's only complicated because it's defined for the general case
-
-        let transformerSelectionPairs = cartesian(...Object.values(this.props.currentSelections));  // https://stackoverflow.com/a/1316389
-
-        // https://stackoverflow.com/a/41516919
-        return Promise.all(transformerSelectionPairs.map(pair =>
-                    this.queryTransformer(pair[0], this.state.transformerControls[indexNameOf(pair[1].name)])
-                ))
-                .then(response => response.json())
-                .then(data => { console.log(data); });
-
+    //     // DONE: do we always have access to the latest selected gene lists and selected expanders?
+    //     // DONE: do we always have access to the latest expander states?
+    //         // PO: Expanders are searched for and added programatically (through props),
+    //         // to prevent scaling out too wide by tracking a tonne of expanders + parameters changes through state modifications?
+    //
+    //     /* the first approach: aggregate upstream */
+    //
+    //     // TODO: Actually do this approach (it's probably more efficient but also a bigger implementation right now)
+    //     // step one:
+    //         // aggregation
+    //             // why aggregation first? because it's cheap and fast
+    //             // if we were to not aggregate first then we expand out the number of parallel asynchronous
+    //             // requests we're making, which is a headache for both server and client
+    //     // step two:
+    //         // apply expander requests onto the resultant aggregator set (in sync with it)
+    //     // step three:
+    //         // return the set as a gene ID to the main App (which should trigger downstream rendering)
+    //         // this should be taken care of through our callback
+    //
+    //
+    //
+    //     /* The other approach: iterate over a bunch of independent queries */
+    //
+    //     // This takes the selected expanders and genelists, and returns an aggregate of all of the results
+    //     // that come from applying each selected transformer to each selected gene list
+    //
+    //     // Let's be heroes
+    //     // https://stackoverflow.com/a/43053803
+    //     const f = (a, b) => [].concat(...a.map(d => b.map(e => [].concat(d, e))));  // pair constructor
+    //     const cartesian = (a, b, ...c) => (b ? cartesian(f(a, b), ...c) : a);   // tensor operator/recursively constructed onto mapping...
+    //     // yeah this could be simpler -- it's only complicated because it's defined for the general case
+    //
+    //     let transformerSelectionPairs = cartesian(...Object.values(this.props.currentSelections));  // https://stackoverflow.com/a/1316389
+    //
+    //     // https://stackoverflow.com/a/41516919
+    //     Promise.all(transformerSelectionPairs.map(pair =>
+    //                 this.queryTransformer(pair[0], this.state.transformerControls[indexNameOf(pair[1].name)])
+    //             ))
+    //             .then(response => response.json())
+    //             .then(data => { console.log(data); });
+    //
     };
 
     render() {
@@ -107,25 +105,26 @@ export class TransformerControls extends React.Component {
         return (
             <form>
                 <TransformerQuerySender
-                    currentSelections={ this.props.currentSelections }
-                    onClickCallback={ this.queryTransformers }
+                    currentSelections={ { selectedGeneLists: this.props.selectedGeneLists, selectedExpanders: this.props.selectedExpanders } }
+                    onClickCallback={ this.queryTransformer }
                 />
                 <TransformerCurrentQuery
-                    currentSelections={ this.props.currentSelections  }
-                />
+                    currentSelections={ { selectedGeneLists: this.props.selectedGeneLists, selectedExpanders: this.props.selectedExpanders } } />
                 {this.props.expanders ?
                     <TransformerList
                         expanders={ this.props.expanders }
                         handleExpanderSelection={ this.props.handleExpanderSelection }
                         throwbackExpanderIndex={ this.updateTransformerControls }/>
-                    : <MyLoader active={true}/>}
-            </form> )
+                        : <MyLoader active={true}/> }
+            </form>
+        )
     }
 }
 
 // DONE - RC1
 export class TransformerCurrentQuery extends React.Component {
     render() {
+        console.log("transformer current query");
         return (
             <Fragment>
                 <label as={"h5"}>Current Gene Lists</label>
@@ -174,6 +173,8 @@ export class TransformerQuerySender extends React.Component {
     }
 
     render() {
+        console.log("transformer query sender");
+
         return (
             <Fragment>
                 <div style={transformerMenuStyle}>
@@ -201,12 +202,16 @@ export class TransformerQuerySender extends React.Component {
 // https://ourcodeworld.com/articles/read/409/how-to-update-parent-state-from-child-component-in-react
 // because the expanders are programmatically defined, we're manipulating an array of state
 // furthermore since the state we're storing itself an array of state, it's an array of array of state, which is state
-export default class TransformerList extends React.Component{
+export class TransformerList extends React.Component{
     constructor(props) {
         super(props);
         this.expanders = props.expanders;
         this.handleExpanderSelection = props.handleExpanderSelection;
         this.throwbackExpanderIndex = props.throwbackExpanderIndex;
+
+        console.log(this.expanders); // check
+        console.log(this.handleExpanderSelection); // check
+        console.log(this.throwbackExpanderIndex); // nope
 
         // the expander index keeps track of the state of expanders
         // TODO: IF AN EXPANDER IS SELECTED, THEN ITS STATE NEEDS TO BE UPDATED
@@ -227,7 +232,8 @@ export default class TransformerList extends React.Component{
                 expander: expander,
                 controls: {}
             };
-            this.setState(stateCopy, () => { console.log("expanderIndex ", this.state.expanderIndex); });
+            this.setState(stateCopy,
+                () => { console.log("expanderIndex ", this.state.expanderIndex); });
         });
     }
 
@@ -243,6 +249,7 @@ export default class TransformerList extends React.Component{
     render() {
         return (
             <Fragment>
+                {/*{JSON.stringify(this.props)}*/}
                 {this.expanders.map(expander =>
                     <TransformerItem
                         expander={ expander }
