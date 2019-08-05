@@ -27,7 +27,7 @@ export class SearchBar extends React.Component {
         return (
             <div style={searchBarStyle}>
                 <form className="form-inline">
-                    <select id="producer" onChange={this.props.handleProducerSelect}>
+                    <select id="producer" onChange={this.props.handleProducerSelect }>
                         {this.props.producers.map((producer) =>
                             <option key={producer.name} value={producer.name}>
                                 {producer.name}

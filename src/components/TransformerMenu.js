@@ -2,6 +2,7 @@ import React from 'react';
 import InputGroup from 'react-bootstrap/InputGroup'
 import FormControl from 'react-bootstrap/FormControl'
 import Card from 'react-bootstrap/Card'
+import {MyLoader} from "./ListItem";
 
 const Fragment = React.Fragment;
 
@@ -27,23 +28,16 @@ let indexNameOf = (schemaName) => {
     return schemaName.toLowerCase().replace(/ /g, "-");
 };
 
-
 /*
 Components
  */
 
-// The TransformerControls component serves two purposes:
 export class TransformerControls extends React.Component {
     constructor(props) {
         super(props);
-        this.queryTransformer = props.queryHandler;
+        this.queryTransformer = props.queryPromise;
 
         this.state = {
-            // we get these from App who keeps track of identifier selections between producers and expanders
-            querySelections : {
-                selectedGeneLists: props.selectedGeneLists,
-                selectedExpanders: props.selectedExpanders
-            },
             transformerControls : {}  // these aren't query controls since not all transformers might be selected while a control is being filled TODO: sane?
         };
 
@@ -51,9 +45,13 @@ export class TransformerControls extends React.Component {
         this.updateTransformerControls = this.updateTransformerControls.bind(this);
     }
 
-    updateTransformerControls = (expanderName, expanderControls) => {
+    componentDidMount() {
+
+    }
+
+    updateTransformerControls = (expanderIndexName, expanderControls) => {
         let stateCopy = { ...this.state };
-        stateCopy.transformerControls[indexNameOf(expanderName)] = expanderControls;
+        stateCopy.transformerControls[expanderIndexName] = expanderControls;
         this.setState(stateCopy, () => {
             console.log("transformerControls with expanderIndex update ", this.state.transformerControls);
             // no throwback
@@ -61,12 +59,14 @@ export class TransformerControls extends React.Component {
     };
 
     queryTransformers = () => {
-        // TODO: do we always have access to the latest selected gene lists and selected expanders?
-        // TODO: do we always have access to the latest expander states?
-            // PO: Expanders are searched for and added programatically,
-            // to prevent scaling out too wide by tracking a tonne of expanders + parameters?
+        // DONE: do we always have access to the latest selected gene lists and selected expanders?
+        // DONE: do we always have access to the latest expander states?
+            // PO: Expanders are searched for and added programatically (through props),
+            // to prevent scaling out too wide by tracking a tonne of expanders + parameters changes through state modifications?
 
-        // TODO:
+        /* the first approach: aggregate upstream */
+
+        // TODO: Actually do this approach (it's probably more efficient but also a bigger implementation right now)
         // step one:
             // aggregation
                 // why aggregation first? because it's cheap and fast
@@ -78,17 +78,47 @@ export class TransformerControls extends React.Component {
             // return the set as a gene ID to the main App (which should trigger downstream rendering)
             // this should be taken care of through our callback
 
-        // singular
-        this.queryTransformer()
+
+
+        /* The other approach: iterate over a bunch of independent queries */
+
+        // This takes the selected expanders and genelists, and returns an aggregate of all of the results
+        // that come from applying each selected transformer to each selected gene list
+
+        // Let's be heroes
+        // https://stackoverflow.com/a/43053803
+        const f = (a, b) => [].concat(...a.map(d => b.map(e => [].concat(d, e))));  // pair constructor
+        const cartesian = (a, b, ...c) => (b ? cartesian(f(a, b), ...c) : a);   // tensor operator/recursively constructed onto mapping...
+        // yeah this could be simpler -- it's only complicated because it's defined for the general case
+
+        let transformerSelectionPairs = cartesian(...Object.values(this.props.currentSelections));  // https://stackoverflow.com/a/1316389
+
+        // https://stackoverflow.com/a/41516919
+        return Promise.all(transformerSelectionPairs.map(pair =>
+                    this.queryTransformer(pair[0], this.state.transformerControls[indexNameOf(pair[1].name)])
+                ))
+                .then(response => response.json())
+                .then(data => { console.log(data); });
+
     };
 
     render() {
         // form has to wrap every transformer even if not all of them are contributing to the extant query
         return (
             <form>
-                <TransformerQuerySender handleQuery={ this.queryTransformers }/>
-                <TransformerCurrentQuery currentSelections={ this.state.querySelections }/>
-                <TransformerList throwbackExpanderIndex={ this.updateTransformerControls }/>
+                <TransformerQuerySender
+                    currentSelections={ this.props.currentSelections }
+                    onClickCallback={ this.queryTransformers }
+                />
+                <TransformerCurrentQuery
+                    currentSelections={ this.props.currentSelections  }
+                />
+                {this.props.expanders ?
+                    <TransformerList
+                        expanders={ this.props.expanders }
+                        handleExpanderSelection={ this.props.handleExpanderSelection }
+                        throwbackExpanderIndex={ this.updateTransformerControls }/>
+                    : <MyLoader active={true}/>}
             </form> )
     }
 }
@@ -136,8 +166,9 @@ export class TransformerQuerySender extends React.Component {
             return selectedGeneLists.length > 0 && selectedExpanders.length > 0;
         };
 
-        if (canQueryTransformers(props.selectedGeneLists, props.selectedExpanders) !== state.canQueryTransformers) {
-            return { canQueryTransformers: canQueryTransformers(props.selectedGeneLists, props.selectedExpanders) };
+        // can't reference selectedGeneLists and selectedExpanders with "this" b/c static method
+        if (canQueryTransformers(...Object.values(props.currentSelections)) !== state.canQueryTransformers) {
+            return { canQueryTransformers: canQueryTransformers(...Object.values(props.currentSelections)) };
         }
         return null;
     }
@@ -205,7 +236,7 @@ export default class TransformerList extends React.Component{
         stateCopy.expanderIndex[indexNameOf(expanderName)]["controls"][parameterIndexName] = parameterIndexValues;
         this.setState(stateCopy, () => {
             console.log("expanderIndex with controls now", this.state.expanderIndex);
-            this.throwbackExpanderIndex(this.state.expanderIndex[indexNameOf(expanderName)]);
+            this.throwbackExpanderIndex(indexNameOf(expanderName), this.state.expanderIndex[indexNameOf(expanderName)]);
         });
     };
 
@@ -271,7 +302,6 @@ export class TransformerItem extends React.Component {
         this.setState(stateCopy, () => {
             console.log("new parameter value ".concat(newParameterValue).concat(" equal to"), this.state.parameterIndex[parameterIndexName]);
             // this "throwback" is put into the setState callback to guarantee synchrony (setState is asynchronous)
-            // TODO: nota bene, can this use a simplification? probably entails pushing *all* state up to TransformerControls... making it an uber component
             this.throwbackParameterValues(this.expander.name, parameterIndexName, this.state.parameterIndex[parameterIndexName]);
         });
 
@@ -298,7 +328,7 @@ export class TransformerItem extends React.Component {
         // it also has to update frequently
 
         // delegate
-        this.handleExpanderSelection();
+        this.handleExpanderSelection(this.expander);
     };
 
     render() {

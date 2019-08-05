@@ -10,7 +10,7 @@ import _ from "underscore"
 import './App.css';
 import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
 import 'font-awesome/css/font-awesome.min.css';
-import TransformerList, {TransformerQuerySender, TransformerCurrentQuery} from "./components/TransformerMenu";
+import TransformerControls from "./components/TransformerMenu";
 
 const FRONTEND_URL =  process.env.REACT_APP_FRONTEND_URL;
 const SERVICE_URL =  process.env.REACT_APP_SERVICE_URL;
@@ -40,7 +40,7 @@ class App extends React.Component {
             gene_list_ids: ["LQuc2bN6fE"],
 
             // transformer query
-            selectedGeneListsByID: ["LQuc2bN6fE"],
+            selectedGeneListsByID: [],
             selectedExpanders: []
         };
 
@@ -78,19 +78,17 @@ class App extends React.Component {
     };
 
     // TODO
-    queryTransformer = () => {
-        // TODO: add args
-
-        // TODO: remember to stringify the parameter number?
+    queryTransformer = (geneListId, transformerControls) => {
         let transformerQuery = {
-            name: "DepMap correlation expander",
-            gene_list_id: "LQuc2bN6fE",
-            controls: [
-                { name: "correlation threshold", value: "0.5" },
-                { name: "correlated values", value: "gene knockout" }
-            ]
+            gene_list_id: geneListId,
+            name: transformerControls.expander.name,
+            controls: Object.values(transformerControls.controls)
+                .map(control => {
+                    return { name: control.parameter.name, value: control.value }
+                })
         };
-        fetch(SERVICE_URL.concat('/transform'), {
+        // remember: returning fetch, a Promise, doesn't return its result, but rather just the promise
+        return fetch(SERVICE_URL.concat('/transform'), {
                             method: "POST",
                             headers: {
                                 'Accept': 'application/json',
@@ -99,65 +97,13 @@ class App extends React.Component {
                             body: JSON.stringify(transformerQuery)
                         })
                         .then(response => response.json())
+                        .then(data => {
+                            this.setState({gene_list_ids: this.state.gene_list_ids.concat(data.gene_list_id)},
+                                () => {
+                                        console.log("new gene list ids", this.state.gene_list_ids, "with", data.gene_list_id);
+                                });
+                        })
                         .then(data => { console.log(data) })
-    }
-
-    // TODO
-    queryTransformers = () => {
-        // TODO: GET THE QUERY VALUES! THE FORM VALUES ARE NOT IN THE SELECTED EXPANDER STATE
-
-        // This takes the selected expanders and genelists, and returns an aggregate of all of the results
-        // that come from applying each selected transformer to each selected gene list
-
-        // Let's be heroes
-        // https://stackoverflow.com/a/43053803
-        const f = (a, b) => [].concat(...a.map(d => b.map(e => [].concat(d, e))));  // pair constructor
-        const cartesian = (a, b, ...c) => (b ? cartesian(f(a, b), ...c) : a);   // tensor operator/recursively constructed onto mapping...
-        // yeah this could be simpler -- it's only complicated because it's the general case
-
-        // TODO: safer to pass these in as arguments for query transformer: how to do this from a child react component? event?
-        // answer is probably "from the events"
-        const transformerPreQueries =
-            cartesian(this.state.selectedGeneListsByID, this.state.selectedExpanders)
-                .map((result) => {
-                    console.log("parameter-gene list pairs", result);
-                    return result;
-                });
-
-        let transformerQueries = transformerPreQueries.map(geneListTransformerPair => {
-
-            const gene_list_id = geneListTransformerPair[0];
-            const selectedExpander = geneListTransformerPair[1];
-
-            // transformer query object
-            return {
-                name: selectedExpander.name,
-                gene_list_id: gene_list_id,
-                controls: selectedExpander.controls
-            };
-
-        });
-
-        transformerQueries.map((result) => {
-            console.log("upcoming transformer queries", result);
-        });
-
-        // transformerQueries.map(transformerQuery => {
-        //     return new Promise(
-        //         // Abandon all hope: Async Hell Ahoy
-        //         // TODO: https://stackoverflow.com/a/41516919
-        //         fetch(SERVICE_URL.concat('/transform'), {
-        //                 method: "POST",
-        //                 headers: {
-        //                     'Accept': 'application/json',
-        //                     'Content-Type': 'application/json'
-        //                 },
-        //                 body: JSON.stringify(transformerQuery)
-        //             })
-        //             .then(response => response.json())
-        //             .then(data => { console.log(data) })
-        //     )
-        // });
     };
 
     handleProducerChange = (event) => {
@@ -166,70 +112,91 @@ class App extends React.Component {
     };
 
     handleGeneListCreation = () => {
+        let queryProducer = this.queryTransformer;
+        let createGeneList = this.postGeneList;
+
         if (this.state.searchText) {
             let geneList = this.state.searchText.split(',');
 
-            // TODO: update with producer code user
-            fetch(SERVICE_URL.concat("create_gene_list"),
-                {
-                        method: "POST",
-                        headers: {
-                            'Accept': 'application/json',
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(geneList)
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data === undefined || data.length === 0) {
-                        throw "Data is undefined or not there"
-                    } else {
-                        console.log(data);
-                        // log the gene list
-                        this.setState({gene_list_ids: this.state.gene_list_ids.concat([data.gene_list_id])},
-                            () => {
-                                console.log(
-                                    "gene list id for input ".concat(geneList),
-                                    data.gene_list_id
-                                );
-                                console.log(
-                                    "new gene ids given input ".concat(geneList),
-                                    this.state.gene_list_ids
-                                );
-                            });
-                    }
-                })
-                .catch(error => {
-                    console.error(error)
-                });
+            // TODO: need to abstract out this producer name so it doesn't become a magic value
+            if (this.state.selectedProducer && this.state.selectedProducer === "Basic Gene Producer") {
+
+                let producerGenes = new Promise(queryProducer(geneList, this.state.selectedProducer));
+                producerGenes.resolve()
+                    .then(response => response.json())
+                    .then(data => { console.log(data); })
+                    .then(data => {
+                        // get new gene list from data?
+                        let newGeneList = data.genes // map out to gene Ids
+                        return new Promise(createGeneList(newGeneList));
+                    })
+
+            } else {
+                this.postGeneList(geneList);
+            }
         }
+
+    };
+
+    postGeneList = (geneList) => {
+        return fetch(SERVICE_URL.concat("create_gene_list"),
+            {
+                method: "POST",
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(geneList)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data === undefined || data.length === 0) {
+                    throw "Data is undefined or not there"
+                } else {
+                    console.log(data);
+                    // log the gene list
+                    this.setState({gene_list_ids: this.state.gene_list_ids.concat([data.gene_list_id])},
+                        () => {
+                            console.log(
+                                "gene list id for input ".concat(geneList),
+                                data.gene_list_id
+                            );
+                            console.log(
+                                "new gene ids given input ".concat(geneList),
+                                this.state.gene_list_ids
+                            );
+                        });
+                }
+            })
+            .catch(error => {
+                console.error(error)
+            });
     };
 
     handleTextChange(e) {
         this.setState({searchText : e.target.value});
     }
 
-    updateExpanderSelection = (chosenExpanderWithControls) => {
-        console.log(chosenExpanderWithControls);
-        !(this.state.selectedExpanders
-            .map(selectedExpanderWithControls => selectedExpanderWithControls.name)
-            .includes(chosenExpanderWithControls.name)) ?
+    updateExpanderSelection = (selectedExpander) => {
+        !(this.state.selectedExpanders.map(prevSelectedExpander => prevSelectedExpander.name).includes(selectedExpander.name)) ?
             this.setState(
-                {selectedExpanders: this.state.selectedExpanders.concat([chosenExpanderWithControls]) },
-                () => console.log("added expander".concat(chosenExpanderWithControls.name), this.state.selectedExpanders)) :
+                {selectedExpanders: this.state.selectedExpanders.concat([selectedExpander]) },
+                () => console.log("added expander".concat(selectedExpander.name), this.state.selectedExpanders)) :
+            // deselect -> remove from selectedExpanders list
             this.setState(
-                {selectedExpanders: this.state.selectedExpanders.filter(el => el.name !== chosenExpanderWithControls.name) },
-                () => console.log("remove expander ".concat(chosenExpanderWithControls.name), this.state.selectedExpanders));
+                {selectedExpanders: this.state.selectedExpanders.filter(el => el.name !== selectedExpander.name) },
+                () => console.log("remove expander ".concat(selectedExpander.name), this.state.selectedExpanders));
     };
 
-    updateGeneListSelection = (chosenGeneListID) => {
-        !(this.state.selectedGeneListsByID.includes(chosenGeneListID)) ?
+    updateGeneListSelection = (selectedGeneListID) => {
+        !(this.state.selectedGeneListsByID.includes(selectedGeneListID)) ?
             this.setState(
-                {selectedGeneListsByID: this.state.selectedGeneListsByID.concat([chosenGeneListID]) },
-                () => console.log("added gene list ".concat(chosenGeneListID), this.state.selectedGeneListsByID)) :
+                {selectedGeneListsByID: this.state.selectedGeneListsByID.concat([selectedGeneListID]) },
+                () => console.log("added gene list ".concat(selectedGeneListID), this.state.selectedGeneListsByID)) :
+            // deselect -> remove from selectedGeneListsByID list
             this.setState(
-                {selectedGeneListsByID: this.state.selectedGeneListsByID.filter(el => el !== chosenGeneListID) },
-                () => console.log("remove gene list ".concat(chosenGeneListID), this.state.selectedGeneListsByID));
+                {selectedGeneListsByID: this.state.selectedGeneListsByID.filter(el => el !== selectedGeneListID) },
+                () => console.log("remove gene list ".concat(selectedGeneListID), this.state.selectedGeneListsByID));
     };
 
     render() {
@@ -245,7 +212,7 @@ class App extends React.Component {
                     <div className="row">
 
                         {/* Gene Lists */}
-                        <div className="col-sm-8">
+                        <div className="col-sm-9">
                             <h3>Producers</h3>
                             {/* Producer Components */}
                             {this.state.producers ?
@@ -266,21 +233,15 @@ class App extends React.Component {
                         </div>
 
                         {/* Expander Components */}
-                        <div className="col-sm-4">
+                        <div className="col-sm-3">
                             <h3>Expanders</h3>
-                            <TransformerQuerySender
-                                selectedGeneLists={ this.state.selectedGeneListsByID }
-                                selectedExpanders={ this.state.selectedExpanders }
-                                onClickCallback = { this.queryTransformer }
-                            />
-                            <TransformerCurrentQuery
-                                currentSelections = {{ selectedGeneLists: this.state.selectedGeneListsByID, selectedExpanders: this.state.selectedExpanders }}
-                            />
                             {this.state.expanders ?
-                                <TransformerList
-                                    handleExpanderSelection={ this.updateExpanderSelection  }
-                                    expanders={ this.state.expanders }/>
-                                : <MyLoader active={true}/>}
+                            <TransformerControls
+                                expanders={this.state.expanders}
+                                currentSelections ={{ selectedGeneLists: this.state.selectedGeneListsByID, selectedExpanders: this.state.selectedExpanders }}
+                                handleExpanderSelection={ this.updateExpanderSelection }
+                                queryPromise={ this.queryTransformer }
+                            /> : <MyLoader active={true}/>}
                         </div>
 
                     </div>
