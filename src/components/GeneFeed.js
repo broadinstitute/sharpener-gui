@@ -22,7 +22,7 @@ export default class GeneFeed extends React.Component {
         let feedOrder = (geneIDs) => {
             // TODO:
             // return geneIDs.slice(0).reverse();
-            return geneIDs
+            return geneIDs;
         };
 
         if (props.geneListIDs !== state.geneListIDs) {
@@ -31,15 +31,13 @@ export default class GeneFeed extends React.Component {
         return null;
     }
 
-
-
     render () {
         // feed order is going to be run each render
         return (
             <div>
-                {
-                    this.state.geneListIDs.length > 0 ? this.state.geneListIDs.map(geneListID =>
+                {this.state.geneListIDs.length > 0 ? this.state.geneListIDs.slice(0).reverse().map((geneListID) =>
                         <GeneTable
+                            key={ geneListID }
                             geneListID={ geneListID }
                             handleGeneListSelection={ this.props.handleGeneListSelection }
                             handleGeneSelection={ this.props.handleGeneSelection }

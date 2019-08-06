@@ -1,7 +1,6 @@
 // local components
 import React from 'react';
 import ProducerControls from './components/ProducerControls.js'
-import GeneTable from './components/GeneFeed.js';
 import {MyLoader} from './components/ListItem.js'
 // remote components
 // libraries
@@ -12,6 +11,10 @@ import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
 import 'font-awesome/css/font-awesome.min.css';
 import TransformerControls, {TransformerCurrentQuery, TransformerQuerySender, TransformerList} from "./components/TransformerControls";
 import GeneFeed from "./components/GeneFeed";
+import GeneTable from './components/GeneFeed.js';
+import Card from "react-bootstrap/Card";
+import BootstrapTable from "react-bootstrap-table-next";
+
 
 const FRONTEND_URL =  process.env.REACT_APP_FRONTEND_URL;
 const SERVICE_URL =  process.env.REACT_APP_SERVICE_URL;
@@ -19,7 +22,8 @@ const SERVICE_URL =  process.env.REACT_APP_SERVICE_URL;
 const FEATURE_FLAG = {
     alwaysUpdateToLatestGeneList: {
         aggregator: true
-    }
+    },
+    notUniqueGeneList: true
 };
 
 const divStyle = {
@@ -44,6 +48,7 @@ class App extends React.Component {
             selectedProducer: null,
 
             // gene view state
+            recent_gene_list_id: "LQuc2bN6fE",
             gene_list_ids: ["LQuc2bN6fE"],
 
             // transformer query
@@ -129,7 +134,13 @@ class App extends React.Component {
             console.log("selected producer", this.state.selectedProducer);
             let producerControls = {
                 transformer: this.state.selectedProducer,
-                controls: []  // TODO: map the searchText to the controls for the gene producer <-- probably entails redesigning those controls
+                controls: [
+                    // TODO: map the searchText to the controls for the gene producer <-- probably entails redesigning those controls
+                    // Make the assumption that all producers have a mono-control schema
+                    // implies that the producer control and the form input has 1-1 correspondence as each is unique
+                    // thus the mapping is fully determined and we can map to the first control
+
+                ]
             };
 
             // TODO: need to abstract out this producer name so it doesn't become a magic value
@@ -170,17 +181,31 @@ class App extends React.Component {
                 } else {
                     console.log(data);
                     // log the gene list
-                    this.setState({gene_list_ids: this.state.gene_list_ids.concat([data.gene_list_id])},
-                        () => {
-                            console.log(
-                                "gene list id for input ".concat(geneList),
-                                data.gene_list_id
-                            );
-                            console.log(
-                                "new gene ids given input ".concat(geneList),
-                                this.state.gene_list_ids
-                            );
-                        });
+                    if (FEATURE_FLAG.notUniqueGeneList) {
+                        this.setState({gene_list_ids: this.state.gene_list_ids.concat([data.gene_list_id])},
+                            () => {
+                                console.log(
+                                    "gene list id for input ".concat(geneList),
+                                    data.gene_list_id
+                                );
+                                console.log(
+                                    "new gene ids given input ".concat(geneList),
+                                    this.state.gene_list_ids
+                                );
+                            });
+                    } else {
+                        this.setState({gene_list_ids: [data.gene_list_id]} ,
+                            () => {
+                                console.log(
+                                    "gene list id for input ".concat(geneList),
+                                    data.gene_list_id
+                                );
+                                console.log(
+                                    "new gene ids given input ".concat(geneList),
+                                    this.state.gene_list_ids
+                                );
+                            });
+                    }
                 }
             })
             .catch(error => {
@@ -265,13 +290,18 @@ class App extends React.Component {
                                 : <MyLoader active={true}/>}
 
                             {/* Tables of Genes */}
+                            <h4>Gene Sets</h4>
                             {this.state.gene_list_ids ?
-                                <GeneFeed
-                                    geneListIDs={ this.state.gene_list_ids }
-                                    handleGeneListSelection={ this.updateGeneListSelection }
-                                    handleGeneSelection={ this.updateText }
-                                />
-                                : <MyLoader active={true}/> }
+                                <React.Fragment>
+                                    {/*<h6>Previous Gene Sets</h6>*/}
+                                    <GeneFeed
+                                        geneListIDs={ this.state.gene_list_ids }
+                                        handleGeneListSelection={ this.updateGeneListSelection }
+                                        handleGeneSelection={ this.updateText }
+                                    />
+                                </React.Fragment>
+                            : <MyLoader active={true}/> }
+
                         </div>
 
                         {/* Expander Components */}
