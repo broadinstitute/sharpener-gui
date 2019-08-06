@@ -1,3 +1,19 @@
+# Gene Sharperner UI
+
+## Getting Started
+
+### Configuration
+
+Copy the ```template.env``` file into ```.env``` then customize (if necessary).
+
+Run ```npm install```.
+
+### Running the Application
+
+Run ```npm start```. This should bring up the web application in your web browser.
+
+# Managing the Core React Libraries Used here
+
 This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
 
 Below you will find some information on how to perform common tasks.<br>
