@@ -87,7 +87,7 @@ class App extends React.Component {
                     const onlyProducers = this.state.transformers.filter((item) => { return item['function'] === 'producer' });
                     this.setState({producers: [defaultProducer].concat(onlyProducers)});
 
-                    const onlyExpanders =  this.state.transformers.filter((item) => { return item['function'] === 'expander' });
+                    const onlyExpanders =  this.state.transformers.filter((item) => { return item['function'] === 'expander' || item['function'] === 'producer'  });
                     this.setState({ expanders: [].concat(onlyExpanders) });
                 }
             })
@@ -96,17 +96,8 @@ class App extends React.Component {
             });
     };
 
-    // TODO
-    queryTransformer = (geneListId, transformerControls) => {
-        console.log(geneListId, transformerControls);
-        let transformerQuery = {
-            gene_list_id: geneListId,
-            name: transformerControls.transformer.name,
-            controls: Object.values(transformerControls.controls)
-                .map(control => {
-                    return { name: control.parameter.name, value: control.value }
-                })
-        };
+    // DONE - RC2
+    queryTransformer = (transformerQuery) => {
         // remember: returning fetch, a Promise, doesn't return its result, but rather just the promise
         return fetch(SERVICE_URL.concat('/transform'), {
                             method: "POST",
@@ -138,20 +129,21 @@ class App extends React.Component {
 
         if (this.state.searchText) {
             let inputList = this.state.searchText.split(', ');
-            console.log(inputList);
 
             let producerQuery = {
-                gene_list_id: [],
                 name: this.state.selectedProducer.name,
                 controls: [
-                    { name: this.state.selectedProducer.parameters[0], value: inputList }
+                     { parameter: this.state.selectedProducer.parameters[0], value: inputList[0] }
                 ]
             };
 
+            console.log(producerQuery);
+
             // TODO: need to abstract out this producer name so it doesn't become a magic value
             if (this.state.selectedProducer.name !== "Gene Symbols") {
-                let producerGenes = new Promise(queryProducer(inputList, this.state.selectedProducer));
 
+                // TODO: looking at this now it looks like we could still make the queryTransformer argument structure homoiconic to the API
+                let producerGenes = queryProducer("", producerQuery.name, producerQuery.controls);
                 // helpful for understanding promise chaining: https://stackoverflow.com/a/36877743
                 Promise.resolve(producerGenes)
                     .then(response => response.json())
@@ -163,8 +155,10 @@ class App extends React.Component {
                     })
 
             } else {
-                // TODO not gonna work for hetergenuous inputs
-                // Promise.resolve(promiseNewGeneList(inputList));
+                // TODO not gonna work for hetergenuous inputs?
+                // actually it says something about the gene symbols transformer that it can automatically pass out to this call
+                // something about having a canonical gene definitions or properties that can be used on expectation
+                Promise.resolve(promiseNewGeneList(inputList));
             }
         }
 

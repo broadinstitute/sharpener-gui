@@ -90,16 +90,33 @@ export default class TransformerControls extends React.Component {
         const cartesian = (a, b, ...c) => (b ? cartesian(f(a, b), ...c) : a);   // tensor operator/recursively constructed onto mapping...
         // yeah this could be simpler -- it's only complicated because it's defined for the general case
 
-        let transformerSelectionPairs = cartesian(this.props.selectedGeneLists, this.props.selectedExpanders);  // https://stackoverflow.com/a/1316389
+        let transformerSelectionPairs = cartesian(this.props.selectedExpanders, this.props.selectedGeneLists);  // https://stackoverflow.com/a/1316389
         console.log(transformerSelectionPairs);
 
         // Test: just take the first list and transformer, see if we can get what we need back
 
-        // https://stackoverflow.com/a/41516919
-        Promise.all(transformerSelectionPairs.map(pair =>
-                    // The actual Promise: see App.js
-                    this.queryTransformer(pair[0], this.state.transformerControls[indexNameOf(pair[1].name)])
-                )).then(resolved => { console.log("query complete"); });
+        Promise.all(transformerSelectionPairs.map(pair => {
+                let transformerName=pair[0].name,
+                    transformerControls=
+                        Object.values(this.state.transformerControls[indexNameOf(pair[0].name)].controls)
+                            .map(control => {
+                                return { name: control.parameter.name, value: control.value }
+                            }),
+                    geneListID=pair[1];
+
+                // Concordant with Sharpener Schema version 1.1.0
+                // ie. gene_list_id is optional
+                let transformerQuery = {
+                    name: transformerName,
+                    controls: transformerControls,
+                    // The spread operator is the niftiest thing since pre-sliced cheese
+                    // https://stackoverflow.com/a/47892178
+                    ...(geneListID && {gene_list_id: geneListID})
+                };
+
+                return this.queryTransformer(transformerQuery)
+            }
+            )).then(resolved => { console.log("query complete"); });
     };
 
     onAggregate = (newAggregationGeneListID) => {
@@ -314,11 +331,7 @@ export class TransformerList extends React.Component{
 
         console.log(this.expanders); // check
         console.log(this.handleExpanderSelection); // check
-        console.log(this.throwbackExpanderIndex); // nope
-
-        // the expander index keeps track of the state of expanders
-        // TODO: IF AN EXPANDER IS SELECTED, THEN ITS STATE NEEDS TO BE UPDATED
-        // TODO: CAN WE JUST CALCULATE OR RETRIEVE THIS STATE AT SUBMISSION TIME? HOW ABOUT A FORM?
+        console.log(this.throwbackExpanderIndex); // check
 
         this.state = {
             expanderIndex: {}

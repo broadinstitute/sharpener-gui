@@ -1,4 +1,8 @@
 import React from 'react';
+import {TransformerList} from "./TransformerControls";
+import InputGroup from "react-bootstrap/InputGroup";
+import FormControl from "react-bootstrap/FormControl";
+import Card from "react-bootstrap/Card";
 
 const SERVICE_URL =  process.env.REACT_APP_SERVICE_URL;
 
@@ -36,16 +40,19 @@ export class ProducerControls extends React.Component {
                             </option>
                         )}
                     </select>
-                    <input
-                        type="search"
-                        className="form-control mr-sm-2"
-                        value={this.props.searchText}
-                        onChange={this.props.handleTextChange}
-                        placeholder=""  // TODO -- producer dependent
-                        aria-label="Produce Gene Set"
-                        id="search"
-                        onKeyPress={this.handleKeyPress}
+                    <TransformerList
                     />
+
+                    {/*<input*/}
+                    {/*    type="search"*/}
+                    {/*    className="form-control mr-sm-10"*/}
+                    {/*    value={this.props.searchText}*/}
+                    {/*    onChange={this.props.handleTextChange}*/}
+                    {/*    placeholder=""  // TODO -- producer dependent*/}
+                    {/*    aria-label="Produce Gene Set"*/}
+                    {/*    id="search"*/}
+                    {/*    onKeyPress={this.handleKeyPress}*/}
+                    {/*/>*/}
                     <button
                         type="button"
                         onClick={this.props.handleGeneListCreation}
@@ -57,5 +64,4 @@ export class ProducerControls extends React.Component {
     );
   }
 }
-
 export default ProducerControls;
