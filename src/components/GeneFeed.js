@@ -71,7 +71,8 @@ export class GeneTable extends React.Component {
             <Card>
                 <div>
                 <Card.Header as={"h6"}>
-                    <button style={{marginLeft: "-0.8em",  border: "none", background:"none"}}  onClick={this.handleOnClick}>{this.geneListID}</button>
+                    <span style={{textAlign: "center"}}>{this.state.geneTableData.length} gene{this.state.geneTableData.length > 1 ? "s" : this.state.geneTableData.length <= 0 ? "s" : ''}</span>
+                    <button style={{border: "none", background:"none"}}  onClick={this.handleOnClick}>{this.geneListID}</button>
                     <div style={{float:"right", marginRight:"-.7em"}}>
                         <button value={ this.geneListID } onClick={ this.handleOnClick } style={{ border: "none", background:"none"}}>
                             Select

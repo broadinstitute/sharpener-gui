@@ -9,6 +9,7 @@ const Fragment = React.Fragment;
 /*
  Miscellaneous
  */
+
 const transformerMenuStyle = {
     marginTop: "18px",
     marginBottom: "20px",
@@ -105,25 +106,12 @@ export default class TransformerControls extends React.Component {
         this.props.handleGeneListSelection(newAggregationGeneListID);
     };
 
-    clearSelections = () => {
-        // the approach we're taking is untoggling everything.
-        // TODO: unperformant? alternative is using throwbacks which expands the state surface
-        if (this.props.selectedGeneLists.length > 0) {
-            this.props.selectedGeneLists.forEach(geneList => {
-                this.props.handleGeneListSelection(geneList);
-            });
-        }
-        if (this.props.selectedExpanders.length > 0) {
-            this.props.selectedExpanders.forEach(expander => {
-                this.props.handleExpanderSelection(expander);
-            });
-        }
-    };
+
 
     render() {
         // form has to wrap every transformer even if not all of them are contributing to the extant query
         return (
-            <div style={transformerMenuStyle}>
+            <div>
                 <TransformerQuerySender
                     currentSelections={ { selectedGeneLists: this.props.selectedGeneLists, selectedExpanders: this.props.selectedExpanders } }
                     onClickCallback={ this.queryTransformers }/>
@@ -151,12 +139,6 @@ export default class TransformerControls extends React.Component {
                         handleExpanderSelection={ this.props.handleExpanderSelection }
                         throwbackExpanderIndex={ this.updateTransformerControls }/>
                         : <MyLoader active={true}/> }
-                <button className="btn my-2 my-sm-0"
-                        style={{padding:"0%", fontSize: "small"}}
-                        onClick={this.clearSelections}>
-                    Clear Selections
-                </button>
-
             </div>
         )
     }

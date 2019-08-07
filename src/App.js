@@ -31,6 +31,12 @@ const divStyle = {
     margin:"2.25em"
 };
 
+const transformerMenuStyle = {
+    marginTop: "18px",
+    marginBottom: "20px",
+};
+
+
 class App extends React.Component {
     componentWillMount() {
         this.getTransformers()
@@ -140,7 +146,6 @@ class App extends React.Component {
                     // Make the assumption that all producers have a mono-control schema
                     // implies that the producer control and the form input has 1-1 correspondence as each is unique
                     // thus the mapping is fully determined and we can map to the first control
-
                 ]
             };
 
@@ -265,6 +270,11 @@ class App extends React.Component {
         }
     };
 
+    clearSelections = () => {
+        this.setState({selectedExpanders: []});
+        this.setState({selectedGeneListsByID: []});
+    };
+
     clearGeneListHandler = (e) => {
         console.log("clearing gene list", e.target.value);
         const geneListID = e.target.value;
@@ -365,7 +375,7 @@ class App extends React.Component {
                                 : <MyLoader active={true}/> }
                         </div>
 
-                        <div className="col-sm-3">
+                        <div className="col-sm-3" style={{transformerMenuStyle}}>
                             <h3>Expanders</h3>
                             <TransformerControls
                                 expanders={ this.state.expanders }
@@ -374,6 +384,11 @@ class App extends React.Component {
                                 handleExpanderSelection={ this.updateExpanderSelection }
                                 handleGeneListSelection={ this.updateGeneListSelection }
                                 queryPromise={ this.queryTransformer }/>
+                            <button className="btn my-2 my-sm-0"
+                                    style={{padding:"0%", fontSize: "small"}}
+                                    onClick={this.clearSelections}>
+                                Clear Selections
+                            </button>
                         </div>
 
                     </div>
