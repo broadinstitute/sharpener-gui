@@ -62,18 +62,29 @@ export class GeneTable extends React.Component {
             geneList: null,
             geneTableColumns: [{dataName: ""}],
             geneTableData: [],
-            isOpened: false
-        }
+            isOpened: true
+        };
+
+        this.handleOnClickTableHeader = this.handleOnClickTableHeader.bind(this);
     }
+
+    handleOnClickTableHeader = (e) => {
+        // https://github.com/facebook/react/issues/5625
+        const target = e.target;
+        if (target.id !== "table-header-".concat(this.props.geneListID)) {  // equivalent to Card.Header id, see render
+            return ; // child was clicked, ignore onClick
+        }
+        this.setState({isOpened: !this.state.isOpened}, console.log("open?", this.state.isOpened))
+    };
 
     render() {
         // TODO replace with different more flexible table library
         return (
             <Card>
                 <Card.Header as={"h6"}
-                             onClick={() =>
-                                 this.setState({isOpened: !this.state.isOpened}, console.log("open?", this.state.isOpened))
-                             }>
+                             id={"table-header-".concat(this.props.geneListID)}
+                             key={this.props.geneListID}  // collision unlikely
+                             onClick={ this.handleOnClickTableHeader }>
                     <button style={{ border: "none", background:"none",}} onClick={this.handleOnClick}>{this.geneListID}</button>
                     <span>has {this.state.geneTableData.length} gene{this.state.geneTableData.length > 1 ? "s" : this.state.geneTableData.length <= 0 ? "s" : ''}</span>
                     <div style={{float:"right", marginRight:"-.7em", display: "inline-block"}}>
@@ -94,6 +105,7 @@ export class GeneTable extends React.Component {
                     </div>
                 </Card.Header>
                 <Collapse isOpened={this.state.isOpened}>
+                    {/*TODO: this thing has an embedded margin style that is preventing the Collapse animation from being as smooth as it should be*/}
                     <BootstrapTable
                         keyField={this.keyField}
                         name={this.geneListID}
