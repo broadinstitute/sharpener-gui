@@ -273,12 +273,10 @@ class App extends React.Component {
 
     clearGeneList = (clearedGeneListID) => {
         const tempGeneLists = this.state.gene_list_ids.slice(0);
-
         this.setState({gene_list_ids: tempGeneLists.filter(el => el !== clearedGeneListID)});
         this.setState({selectedGeneListsByID: this.state.selectedGeneListsByID.filter(el => el !== clearedGeneListID)});
 
         if (FEATURE_FLAG.undoGeneLists) {
-            console.log("starting to place on the undo stack:", clearedGeneListID);
             this.updateUndoStack([clearedGeneListID])
         }
     };
@@ -288,18 +286,17 @@ class App extends React.Component {
         tempGeneLists.forEach(geneListID => {
             this.setState({selectedGeneListsByID: this.state.selectedGeneListsByID.filter(el => el !== geneListID)});
         });
+
         if (FEATURE_FLAG.undoGeneLists) {
-            console.log("starting to place on the undo stack:", tempGeneLists);
-            this.updateUndoStack(tempGeneLists)
+            this.updateUndoStack(tempGeneLists);
         }
+
         this.setState({gene_list_ids:[]});
     };
 
     updateUndoStack = (batchOfGeneListIDs) => {
-        const tempUndoGeneLists = this.state.recently_cleared_gene_lists.slice(0);
-
-        tempUndoGeneLists.push([batchOfGeneListIDs]);
-
+        let tempUndoGeneLists = this.state.recently_cleared_gene_lists;
+        tempUndoGeneLists.push(batchOfGeneListIDs);
         this.setState({recently_cleared_gene_lists: tempUndoGeneLists}, () => {
             console.log("adding a gene list to the undo stack", this.state.recently_cleared_gene_lists);
         });
@@ -307,7 +304,6 @@ class App extends React.Component {
 
     undoClearGeneLists = () => {
         const tempUndoneGeneLists = this.state.recently_cleared_gene_lists.slice(0);
-        console.log(tempUndoneGeneLists.pop());
 
         // if they were cleared, and another gene set was added, these should go before that gene set
         this.setState({ gene_list_ids: this.state.gene_list_ids.concat(tempUndoneGeneLists.pop()) });
@@ -341,7 +337,7 @@ class App extends React.Component {
                                                   handleTextChange={this.handleTextChange}/>
                                 : <MyLoader active={true}/>}
                             {/* Tables of Genes */}
-                            <div className={"row"} style={{padding:"15px", paddingTop: "0%", paddingBottom: "0%"}}>
+                            <div className={"row"} style={{padding:"15px", paddingTop: "0%"}}>
                                 <h4>Gene Sets</h4>
                                 <div style={{marginLeft: "auto", marginRight: 0}}>
                                     <button onClick={ this.clearGeneLists }>Clear Gene Sets</button>
