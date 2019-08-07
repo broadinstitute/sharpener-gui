@@ -62,34 +62,38 @@ class App extends React.Component {
             selectedGeneListsByID: [],
             selectedExpanders: []
         };
-
-        this.handleGeneListCreation = this.handleGeneListCreation.bind(this);
         this.handleTextChange = this.handleTextChange.bind(this);
     }
 
     getTransformers = () => {
+        console.log("get transformers");
         fetch(SERVICE_URL.concat('/transformers'))
             .then(response => response.json())
+            .then(response => { console.log(response); return response; })
             .then(data => {
                 if (data === undefined || data.length === 0) {
                     throw "No data or undefined data";
                 } else {
-                    this.setState({transformers: data, curieIsClickEnabled: true, curieIsLoading: false});
-
-                    const defaultProducer = {
-                        name: "Gene Symbols",
+                    this.setState({transformers: data},
+                        () => {
+                        console.log("received", this.state.transformers);
+                        const defaultProducer = {
+                            name: "Gene Symbols",
                             function: "producer",
-                            parameters: [], // TODO: can we always assume producers have a single parameter for input?
+                            parameters: [{name: "gene symbol", type: "string"}], // TODO: can we always assume producers have a single parameter for input?
                             genes: [],
-                        // TODO: Gene ID sources/types returned? Link up with Biolink Schema's context/JSON-LD?
-                    };
-                    this.setState({selectedProducer: defaultProducer});
-                    const onlyProducers = this.state.transformers.filter((item) => { return item['function'] === 'producer' });
-                    this.setState({producers: [defaultProducer].concat(onlyProducers)});
+                            // TODO: Gene ID sources/types returned? Link up with Biolink Schema's context/JSON-LD?
+                        };
+                        this.setState({selectedProducer: defaultProducer});
+                        const onlyProducers = this.state.transformers.filter((item) => { return item['function'] === 'producer' });
+                        this.setState({producers: [defaultProducer].concat(onlyProducers)});
 
-                    const onlyExpanders =  this.state.transformers.filter((item) => { return item['function'] === 'expander' || item['function'] === 'producer'  });
-                    this.setState({ expanders: [].concat(onlyExpanders) });
+                        const onlyExpanders =  this.state.transformers.filter((item) => { return item['function'] === 'expander' });
+                        this.setState({ expanders: [].concat(onlyExpanders) });
+                    });
+
                 }
+                return data;
             })
             .catch(error => {
                 console.log(error);
@@ -116,52 +120,10 @@ class App extends React.Component {
                         })
     };
 
-    handleProducerChange = (event) => {
+    handleProducerSelect = (event) => {
         const selectedProducer = this.state.producers.filter(producer => { return producer.name === event.target.value})[0];
-        this.setState({selectedProducer: selectedProducer});
-        console.log("you changed your producer how exciting", selectedProducer);
-    };
-
-    handleGeneListCreation = () => {
-
-        let queryProducer = this.queryTransformer;
-        let promiseNewGeneList = this.postGeneList;
-
-        if (this.state.searchText) {
-            let inputList = this.state.searchText.split(', ');
-
-            let producerQuery = {
-                name: this.state.selectedProducer.name,
-                controls: [
-                     { parameter: this.state.selectedProducer.parameters[0], value: inputList[0] }
-                ]
-            };
-
-            console.log(producerQuery);
-
-            // TODO: need to abstract out this producer name so it doesn't become a magic value
-            if (this.state.selectedProducer.name !== "Gene Symbols") {
-
-                // TODO: looking at this now it looks like we could still make the queryTransformer argument structure homoiconic to the API
-                let producerGenes = queryProducer("", producerQuery.name, producerQuery.controls);
-                // helpful for understanding promise chaining: https://stackoverflow.com/a/36877743
-                Promise.resolve(producerGenes)
-                    .then(response => response.json())
-                    .then(data => { console.log(data); })
-                    .then(data => {
-                        // get new gene list from data?
-                        let newGeneList = data.genes.map(geneInfo => geneInfo.gene_id);  // map out to gene Ids, which are create_gene_list's bread and butter
-                        return new Promise(promiseNewGeneList(newGeneList));
-                    })
-
-            } else {
-                // TODO not gonna work for hetergenuous inputs?
-                // actually it says something about the gene symbols transformer that it can automatically pass out to this call
-                // something about having a canonical gene definitions or properties that can be used on expectation
-                Promise.resolve(promiseNewGeneList(inputList));
-            }
-        }
-
+        this.setState({selectedProducer: selectedProducer}, () => {
+            console.log("you changed your producer how exciting", selectedProducer); });
     };
 
     postGeneList = (geneList) => {
@@ -335,9 +297,11 @@ class App extends React.Component {
                             {/* Producer Components */}
                             {this.state.producers ?
                                 <ProducerControls searchText={this.state.searchText}
+                                                  selectedProducer={this.state.selectedProducer}
                                                   producers={this.state.producers}
-                                                  handleGeneListCreation={this.handleGeneListCreation}
-                                                  handleProducerSelect={this.handleProducerChange}
+                                                  queryPromise={this.queryTransformer}
+                                                  handleGeneListCreation={this.postGeneList}
+                                                  handleProducerSelect={this.handleProducerSelect}
                                                   handleTextChange={this.handleTextChange}/>
                                 : <MyLoader active={true}/>}
                             {/* Tables of Genes */}
@@ -370,14 +334,16 @@ class App extends React.Component {
                         </div>
 
                         <div className="col-sm-3" style={{transformerMenuStyle}}>
+
                             <h3>Expanders</h3>
+                            {this.state.expanders && this.state.expanders.length > 0 ?
                             <TransformerControls
                                 expanders={ this.state.expanders }
                                 selectedGeneLists={ this.state.selectedGeneListsByID }
                                 selectedExpanders={ this.state.selectedExpanders }
                                 handleExpanderSelection={ this.updateExpanderSelection }
                                 handleGeneListSelection={ this.updateGeneListSelection }
-                                queryPromise={ this.queryTransformer }/>
+                                queryPromise={ this.queryTransformer }/> : <MyLoader active={true}/> }
                             { this.state.selectedExpanders.length > 0 || this.state.selectedGeneListsByID.length > 0 ?
                             <button className="btn my-2 my-sm-0"
                                     style={{padding:"0%", fontSize: "small"}}

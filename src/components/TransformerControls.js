@@ -33,15 +33,15 @@ Components
 
 export default class TransformerControls extends React.Component {
     constructor(props) {
-        console.log("Transformer Controls");
         super(props);
+
+        console.log("Expander Controls", props.expanders);
 
         this.state = {
             transformerControls : {}  // these aren't query controls specifically since not all transformers might be selected while a control is being filled TODO: sane?
         };
 
         this.queryTransformer = props.queryPromise;
-
         this.queryTransformers = this.queryTransformers.bind(this);
         this.updateTransformerControls = this.updateTransformerControls.bind(this);
 
@@ -152,8 +152,8 @@ export default class TransformerControls extends React.Component {
                     currentSelections={ { selectedGeneLists: this.props.selectedGeneLists, selectedExpanders: this.props.selectedExpanders } } />
                 {this.props.expanders ?
                     <TransformerList
-                        expanders={ this.props.expanders }
-                        handleExpanderSelection={ this.props.handleExpanderSelection }
+                        transformers={ this.props.expanders }
+                        handleTransformerSelection={ this.props.handleExpanderSelection }
                         throwbackExpanderIndex={ this.updateTransformerControls }/>
                         : <MyLoader active={true}/> }
             </div>
@@ -325,15 +325,16 @@ export class TransformerQuerySender extends React.Component {
 export class TransformerList extends React.Component{
     constructor(props) {
         super(props);
-        this.expanders = props.expanders;
-        this.handleExpanderSelection = props.handleExpanderSelection;
+        this.transformers = props.transformers;
+        this.handleTransformerSelection = props.handleTransformerSelection;
         this.throwbackExpanderIndex = props.throwbackExpanderIndex;
 
-        console.log(this.expanders); // check
-        console.log(this.handleExpanderSelection); // check
+        console.log(this.transformers); // check
+        console.log(this.handleTransformerSelection); // check
         console.log(this.throwbackExpanderIndex); // check
 
         this.state = {
+            // TODO: refactor to Redux
             expanderIndex: {}
         };
 
@@ -342,7 +343,7 @@ export class TransformerList extends React.Component{
     }
 
     componentDidMount() {
-        this.expanders.map(expander => {
+        this.transformers.map(expander => {
             let stateCopy = { ...this.state };
             stateCopy.expanderIndex[indexNameOf(expander.name)] = {
                 transformer: expander,
@@ -365,13 +366,12 @@ export class TransformerList extends React.Component{
     render() {
         return (
             <Fragment>
-                {/*{JSON.stringify(this.props)}*/}
-                {this.expanders.map(expander =>
+                {this.transformers.map(transformer =>
                     <Fragment>
                         <TransformerItem
-                            expander={ expander }
+                            transformer={ transformer }
                             // TODO: what are the naming conventions for custom props
-                            handleExpanderSelection={ this.handleExpanderSelection }
+                            handleTransformerSelection={ this.handleTransformerSelection }
                             throwbackParameterValues={ this.updateExpanderControls }/>
                         <br/>
                     </Fragment>)}
@@ -389,12 +389,13 @@ export class TransformerItem extends React.Component {
 
     constructor(props) {
         super(props);
-        this.expander = props.expander;
-        this.id = indexNameOf(props.expander.name);
-        this.handleExpanderSelection = props.handleExpanderSelection;
+        this.transformer = props.transformer;
+        this.id = indexNameOf(props.transformer.name);
+        this.handleTransformerSelection = props.handleTransformerSelection;
         this.throwbackParameterValues = props.throwbackParameterValues;
 
         this.state = {
+            // TODO: refactor to Redux
             parameterIndex : {}
         };
 
@@ -404,7 +405,7 @@ export class TransformerItem extends React.Component {
     }
 
     componentDidMount() {
-        this.expander.parameters.map(parameter => {
+        this.transformer.parameters.map(parameter => {
             let stateCopy = { ...this.state };
             stateCopy.parameterIndex[indexNameOf(parameter.name)] = {
                 parameter: parameter,
@@ -428,7 +429,7 @@ export class TransformerItem extends React.Component {
         this.setState(stateCopy, () => {
             console.log("new parameter value ".concat(newParameterValue).concat(" equal to"), this.state.parameterIndex[parameterIndexName]);
             // this "throwback" is put into the setState callback to guarantee synchrony (setState is asynchronous)
-            this.throwbackParameterValues(this.expander.name, parameterIndexName, this.state.parameterIndex[parameterIndexName]);
+            this.throwbackParameterValues(this.transformer.name, parameterIndexName, this.state.parameterIndex[parameterIndexName]);
         });
 
     };
@@ -443,7 +444,7 @@ export class TransformerItem extends React.Component {
                 stateCopy.parameterIndex[parameterIndexName].value = stateCopy.parameterIndex[parameterIndexName].parameter.default;
                 this.setState(stateCopy,() => {
                     console.log("update parameterIndex with default values of ".concat(parameterIndexName), this.state.parameterIndex);
-                    this.throwbackParameterValues(this.expander.name, parameterIndexName, this.state.parameterIndex[parameterIndexName]);
+                    this.throwbackParameterValues(this.transformer.name, parameterIndexName, this.state.parameterIndex[parameterIndexName]);
                 });
             }
         });
@@ -454,14 +455,14 @@ export class TransformerItem extends React.Component {
         // it also has to update frequently
 
         // delegate
-        this.handleExpanderSelection(this.expander);
+        this.handleTransformerSelection(this.transformer);
     };
 
     render() {
         return (
             <Card>
-                <Card.Header as={"h6"} onClick={ this.onClickHandleSelection }>{this.expander.name}</Card.Header>
-                <div id={"expander-".concat(indexNameOf(this.expander.name))}>
+                <Card.Header as={"h6"} onClick={ this.onClickHandleSelection }>{this.transformer.name}</Card.Header>
+                <div id={"expander-".concat(indexNameOf(this.transformer.name))}>
                     {Object.keys(this.state.parameterIndex).map(parameterIndexKey => {
                         return <TransformerParameter id={ parameterIndexKey }
                                                      value = {this.state.parameterIndex[parameterIndexKey].value}
