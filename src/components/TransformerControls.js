@@ -105,6 +105,21 @@ export default class TransformerControls extends React.Component {
         this.props.handleGeneListSelection(newAggregationGeneListID);
     };
 
+    clearSelections = () => {
+        // the approach we're taking is untoggling everything.
+        // TODO: unperformant? alternative is using throwbacks which expands the state surface
+        if (this.props.selectedGeneLists.length > 0) {
+            this.props.selectedGeneLists.forEach(geneList => {
+                this.props.handleGeneListSelection(geneList);
+            });
+        }
+        if (this.props.selectedExpanders.length > 0) {
+            this.props.selectedExpanders.forEach(expander => {
+                this.props.handleExpanderSelection(expander);
+            });
+        }
+    };
+
     render() {
         // form has to wrap every transformer even if not all of them are contributing to the extant query
         return (
@@ -114,17 +129,18 @@ export default class TransformerControls extends React.Component {
                     onClickCallback={ this.queryTransformers }/>
                 <div className={"container"}>
                     <div className={"row"}>
-                    <div className="col-xs-8">
-                        <CurrentlySelectedGenes
-                            currentSelections={ { selectedGeneLists: this.props.selectedGeneLists, selectedExpanders: this.props.selectedExpanders } } />
-                        </div> {'\u00A0'}{'\u00A0'}{'\u00A0'}{'\u00A0'}{'\u00A0'}{'\u00A0'}{'\u00A0'}{'\u00A0'}{'\u00A0'}{'\u00A0'}{'\u00A0'}
-                    <div className="col-xs-4">
-                        <AggregatorControls
-                            currentSelections={ { selectedGeneLists: this.props.selectedGeneLists, selectedExpanders: this.props.selectedExpanders } }
-                            actions={["union", "intersection"]}
-                            handleOnClick={ this.onAggregate }
-                        />
-                    </div>
+                        <div className="col-xs-8">
+                            <CurrentlySelectedGenes
+                                currentSelections={ { selectedGeneLists: this.props.selectedGeneLists, selectedExpanders: this.props.selectedExpanders } } />
+                            </div> {'\u00A0'}{'\u00A0'}{'\u00A0'}{'\u00A0'}{'\u00A0'}{'\u00A0'}{'\u00A0'}{'\u00A0'}{'\u00A0'}{'\u00A0'}{'\u00A0'}
+                        <div className="col-xs-4">
+                            <AggregatorControls
+                                currentSelections={ { selectedGeneLists: this.props.selectedGeneLists, selectedExpanders: this.props.selectedExpanders } }
+                                actions={["union", "intersection"]}
+                                handleOnClick={ this.onAggregate }
+                            />
+                        </div>
+
                     </div>
                 </div>
                 <CurrentlySelectedExpanders
@@ -135,6 +151,11 @@ export default class TransformerControls extends React.Component {
                         handleExpanderSelection={ this.props.handleExpanderSelection }
                         throwbackExpanderIndex={ this.updateTransformerControls }/>
                         : <MyLoader active={true}/> }
+                <button className="btn my-2 my-sm-0"
+                        style={{padding:"0%", fontSize: "small"}}
+                        onClick={this.clearSelections}>
+                    Clear Selections
+                </button>
 
             </div>
         )
@@ -151,16 +172,7 @@ export class AggregatorControls extends React.Component {
                             <AggregationSender
                                 selectedGeneLists={this.props.currentSelections.selectedGeneLists}
                                 handleOnClick={this.props.handleOnClick}
-                                action={operation}/>) :
-                            <button
-                                className="btn my-2 my-sm-0"
-                                disabled={true}
-                                style={{
-                                    padding:"0%",
-                                    fontSize: "x-small"
-                                }}>
-                                Aggregation requires {2 - this.props.currentSelections.selectedGeneLists.length} more Gene List(s)
-                            </button> }
+                                action={operation}/>) : <div/> }
                 </div>
             </Fragment> )
     }

@@ -76,7 +76,7 @@ export class GeneTable extends React.Component {
                         <button value={ this.geneListID } onClick={ this.handleOnClick } style={{ border: "none", background:"none"}}>
                             Select
                         </button>
-                        <button value={ this.geneListID } onClick={ this.clearGeneList } style={{border: "none", background:"none"}}>Undo Clear</button>
+                        <button value={ this.geneListID } onClick={ this.clearGeneList } style={{border: "none", background:"none"}}>Clear</button>
                     </div>
                 </Card.Header>
                 </div>
