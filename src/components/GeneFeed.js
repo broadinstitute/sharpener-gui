@@ -5,7 +5,7 @@ import ToolkitProvider, { CSVExport } from 'react-bootstrap-table2-toolkit';
 const { ExportCSVButton } = CSVExport;
 import Card from "react-bootstrap/Card"
 import {MyLoader} from "./ListItem";
-import Collapse from "react-bootstrap/Collapse";
+import {Collapse} from "react-collapse"
 
 const SERVICE_URL =  process.env.REACT_APP_SERVICE_URL;
 
@@ -52,7 +52,6 @@ export default class GeneFeed extends React.Component {
 }
 
 export class GeneTable extends React.Component {
-    /* LIFECYCLE METHODS */
     constructor(props) {
         super(props);
         this.keyField = 'gene_id';
@@ -63,6 +62,7 @@ export class GeneTable extends React.Component {
             geneList: null,
             geneTableColumns: [{dataName: ""}],
             geneTableData: [],
+            isOpened: false
         }
     }
 
@@ -70,7 +70,10 @@ export class GeneTable extends React.Component {
         // TODO replace with different more flexible table library
         return (
             <Card>
-                <Card.Header as={"h6"}>
+                <Card.Header as={"h6"}
+                             onClick={() =>
+                                 this.setState({isOpened: !this.state.isOpened}, console.log("open?", this.state.isOpened))
+                             }>
                     <button style={{ border: "none", background:"none",}} onClick={this.handleOnClick}>{this.geneListID}</button>
                     <span>has {this.state.geneTableData.length} gene{this.state.geneTableData.length > 1 ? "s" : this.state.geneTableData.length <= 0 ? "s" : ''}</span>
                     <div style={{float:"right", marginRight:"-.7em", display: "inline-block"}}>
@@ -90,7 +93,7 @@ export class GeneTable extends React.Component {
                         </button>
                     </div>
                 </Card.Header>
-                <Collapse>
+                <Collapse isOpened={this.state.isOpened}>
                     <BootstrapTable
                         keyField={this.keyField}
                         name={this.geneListID}
