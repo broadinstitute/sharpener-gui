@@ -20,6 +20,8 @@ export class ProducerControls extends React.Component {
         if (event.key === 'Enter') {
             event.preventDefault(); // this will result in an "event undefined" error, but will prevent page refresh
             this.props.handleGeneListCreation();
+
+            // TODO: clear search text?
         }
     };
 

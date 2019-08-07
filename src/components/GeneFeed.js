@@ -39,6 +39,7 @@ export default class GeneFeed extends React.Component {
                         <GeneTable
                             key={ geneListID }
                             geneListID={ geneListID }
+                            clearGeneListHandler={ this.props.clearGeneListHandler }
                             handleGeneListSelection={ this.props.handleGeneListSelection }
                             handleGeneSelection={ this.props.handleGeneSelection }
                         />
@@ -55,6 +56,7 @@ export class GeneTable extends React.Component {
         super(props);
         this.keyField = 'gene_id';
         this.geneListID = props.geneListID;
+        this.clearGeneList = props.clearGeneListHandler;
 
         this.state = {
             geneList: null,
@@ -67,9 +69,18 @@ export class GeneTable extends React.Component {
         // TODO replace with different more flexible table library
         return (
             <Card>
-                <Card.Header as={"h6"} onClick={this.handleOnClick}>
-                    {this.geneListID}
+                <div>
+                <Card.Header as={"h6"}>
+                    <button style={{marginLeft: "-0.8em",  border: "none", background:"none"}}  onClick={this.handleOnClick}>{this.geneListID}</button>
+                    <div style={{float:"right", marginRight:"-.7em"}}>
+                        <button value={ this.geneListID } onClick={ this.handleOnClick } style={{ border: "none", background:"none"}}>
+                            Select
+                        </button>
+                        <button value={ this.geneListID } onClick={ this.clearGeneList } style={{border: "none", background:"none"}}>Clear</button>
+                    </div>
                 </Card.Header>
+                </div>
+
                 <BootstrapTable
                     keyField={this.keyField}
                     name={this.geneListID}
@@ -185,7 +196,7 @@ export class GeneTable extends React.Component {
                     },
                     headerEvents: {
                         events: {
-                            onClick: (e, column, columnIndex, row, rowIndex) => {
+                            onClick: (e, column, columnIndex, row) => {
                                 console.log("clicking gene_id ", row[column.dataField]);
                                 this.props.handleGeneSelection(row[column.dataField]);
                             }

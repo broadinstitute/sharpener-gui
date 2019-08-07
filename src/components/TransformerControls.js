@@ -145,7 +145,7 @@ export class AggregatorControls extends React.Component {
     render() {
         return (
             <Fragment>
-                <div>
+                <div style={{display: "inline"}}>
                     { this.props.currentSelections.selectedGeneLists ?
                         this.props.actions.map(operation =>
                             <AggregationSender
@@ -201,15 +201,16 @@ export class AggregationSender extends React.Component {
 
     render() {
         return (
-            <Fragment>
+        <Fragment>
             <button
                 type="button"
                 onClick={ this.promiseAggregation }
-                className="btn btn-outline-success my-2 my-sm-0"
-                style={{display: "inline"}}>
+                // className="btn btn-outline-success my-2 my-sm-0"
+                style={{marginLeft: "auto", marginRight: "0%"}}
+            >
                 {/* Capitalize the operation label */}
                 {this.props.action.replace(/^[a-z]/g, function(t) { return t.toUpperCase() })}
-            </button>{'\u00A0'}
+            </button>{'\u00A0'}{'\u00A0'}
         </Fragment>
         )
     }
@@ -291,11 +292,11 @@ export class TransformerQuerySender extends React.Component {
 
                             {   !(this.props.currentSelections.selectedGeneLists.length > 0) &&
                                 (this.props.currentSelections.selectedExpanders.length > 0) ?
-                                    "Select Gene Lists as input for your Transformers" :
+                                    "Select Gene Sets as input for your Transformers" :
                                 (this.props.currentSelections.selectedGeneLists.length > 0) &&
                                 !(this.props.currentSelections.selectedExpanders.length > 0) ?
-                                    "Select Transformers for your Gene Lists" :
-                                    "Select Gene Lists and Transformers"}
+                                    "Select Transformers for your Gene Sets" :
+                                    "Select Gene Sets and Transformers"}
 
                         </button> }
                 </div>

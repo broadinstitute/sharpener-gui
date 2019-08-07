@@ -23,7 +23,8 @@ const FEATURE_FLAG = {
     alwaysUpdateToLatestGeneList: {
         aggregator: true
     },
-    notUniqueGeneList: true
+    notUniqueGeneList: true,
+    undoGeneLists: true
 };
 
 const divStyle = {
@@ -48,8 +49,8 @@ class App extends React.Component {
             selectedProducer: null,
 
             // gene view state
-            recent_gene_list_id: "LQuc2bN6fE",
             gene_list_ids: ["LQuc2bN6fE"],
+            recently_cleared_gene_lists: [],
 
             // transformer query
             selectedGeneListsByID: [],
@@ -264,6 +265,58 @@ class App extends React.Component {
         }
     };
 
+    clearGeneListHandler = (e) => {
+        console.log("clearing gene list", e.target.value);
+        const geneListID = e.target.value;
+        this.clearGeneList(geneListID);
+    };
+
+    clearGeneList = (clearedGeneListID) => {
+        const tempGeneLists = this.state.gene_list_ids.slice(0);
+
+        this.setState({gene_list_ids: tempGeneLists.filter(el => el !== clearedGeneListID)});
+        this.setState({selectedGeneListsByID: this.state.selectedGeneListsByID.filter(el => el !== clearedGeneListID)});
+
+        if (FEATURE_FLAG.undoGeneLists) {
+            console.log("starting to place on the undo stack:", clearedGeneListID);
+            this.updateUndoStack([clearedGeneListID])
+        }
+    };
+
+    clearGeneLists = () => {
+        const tempGeneLists = this.state.gene_list_ids.slice(0);
+        tempGeneLists.forEach(geneListID => {
+            this.setState({selectedGeneListsByID: this.state.selectedGeneListsByID.filter(el => el !== geneListID)});
+        });
+        if (FEATURE_FLAG.undoGeneLists) {
+            console.log("starting to place on the undo stack:", tempGeneLists);
+            this.updateUndoStack(tempGeneLists)
+        }
+        this.setState({gene_list_ids:[]});
+    };
+
+    updateUndoStack = (batchOfGeneListIDs) => {
+        const tempUndoGeneLists = this.state.recently_cleared_gene_lists.slice(0);
+
+        tempUndoGeneLists.push([batchOfGeneListIDs]);
+
+        this.setState({recently_cleared_gene_lists: tempUndoGeneLists}, () => {
+            console.log("adding a gene list to the undo stack", this.state.recently_cleared_gene_lists);
+        });
+    };
+
+    undoClearGeneLists = () => {
+        const tempUndoneGeneLists = this.state.recently_cleared_gene_lists.slice(0);
+        console.log(tempUndoneGeneLists.pop());
+
+        // if they were cleared, and another gene set was added, these should go before that gene set
+        this.setState({ gene_list_ids: this.state.gene_list_ids.concat(tempUndoneGeneLists.pop()) });
+        // no partial clearings/unclearings?
+        // TODO: pop list off of list of list
+        // Undo history is queue: first in last out
+        this.setState({ recently_cleared_gene_lists: tempUndoneGeneLists });
+
+    };
 
     render() {
         return (
@@ -276,7 +329,6 @@ class App extends React.Component {
                     </div>
 
                     <div className="row">
-
                         {/* Gene Lists */}
                         <div className="col-sm-9">
                             <h3>Producers</h3>
@@ -288,9 +340,22 @@ class App extends React.Component {
                                                   handleProducerSelect={this.handleProducerChange}
                                                   handleTextChange={this.handleTextChange}/>
                                 : <MyLoader active={true}/>}
-
                             {/* Tables of Genes */}
-                            <h4>Gene Sets</h4>
+                            <div className={"row"} style={{padding:"15px", paddingTop: "0%", paddingBottom: "0%"}}>
+                                <h4>Gene Sets</h4>
+                                <div style={{marginLeft: "auto", marginRight: 0}}>
+                                    <button onClick={ this.clearGeneLists }>Clear Gene Sets</button>
+                                    { this.state.recently_cleared_gene_lists.length > 0 ?
+                                        <React.Fragment>
+                                            {'\u00A0'}{'\u00A0'}<button onClick={ this.undoClearGeneLists }>Undo</button>
+                                        </React.Fragment> :
+                                        <React.Fragment>
+                                            {'\u00A0'}{'\u00A0'}<button onClick={ this.undoClearGeneLists } disabled>Undo</button>
+                                        </React.Fragment>
+                                    }
+                                </div>
+
+                            </div>
                             {this.state.gene_list_ids ?
                                 <React.Fragment>
                                     {/*<h6>Previous Gene Sets</h6>*/}
@@ -298,13 +363,12 @@ class App extends React.Component {
                                         geneListIDs={ this.state.gene_list_ids }
                                         handleGeneListSelection={ this.updateGeneListSelection }
                                         handleGeneSelection={ this.updateText }
+                                        clearGeneListHandler={ this.clearGeneListHandler }
                                     />
                                 </React.Fragment>
-                            : <MyLoader active={true}/> }
-
+                                : <MyLoader active={true}/> }
                         </div>
 
-                        {/* Expander Components */}
                         <div className="col-sm-3">
                             <h3>Expanders</h3>
                             <TransformerControls
