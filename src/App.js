@@ -98,6 +98,7 @@ class App extends React.Component {
 
     // TODO
     queryTransformer = (geneListId, transformerControls) => {
+        console.log(geneListId, transformerControls);
         let transformerQuery = {
             gene_list_id: geneListId,
             name: transformerControls.transformer.name,
@@ -127,6 +128,7 @@ class App extends React.Component {
     handleProducerChange = (event) => {
         const selectedProducer = this.state.producers.filter(producer => { return producer.name === event.target.value})[0];
         this.setState({selectedProducer: selectedProducer});
+        console.log("you changed your producer how exciting", selectedProducer);
     };
 
     handleGeneListCreation = () => {
@@ -135,23 +137,20 @@ class App extends React.Component {
         let promiseNewGeneList = this.postGeneList;
 
         if (this.state.searchText) {
-            let geneList = this.state.searchText.split(', ');
-            console.log(geneList);
+            let inputList = this.state.searchText.split(', ');
+            console.log(inputList);
 
-            console.log("selected producer", this.state.selectedProducer);
-            let producerControls = {
-                transformer: this.state.selectedProducer,
+            let producerQuery = {
+                gene_list_id: [],
+                name: this.state.selectedProducer.name,
                 controls: [
-                    // TODO: map the searchText to the controls for the gene producer <-- probably entails redesigning those controls
-                    // Make the assumption that all producers have a mono-control schema
-                    // implies that the producer control and the form input has 1-1 correspondence as each is unique
-                    // thus the mapping is fully determined and we can map to the first control
+                    { name: this.state.selectedProducer.parameters[0], value: inputList }
                 ]
             };
 
             // TODO: need to abstract out this producer name so it doesn't become a magic value
             if (this.state.selectedProducer.name !== "Gene Symbols") {
-                let producerGenes = new Promise(queryProducer(geneList, this.state.selectedProducer));
+                let producerGenes = new Promise(queryProducer(inputList, this.state.selectedProducer));
 
                 // helpful for understanding promise chaining: https://stackoverflow.com/a/36877743
                 Promise.resolve(producerGenes)
@@ -164,7 +163,8 @@ class App extends React.Component {
                     })
 
             } else {
-                Promise.resolve(promiseNewGeneList(geneList));
+                // TODO not gonna work for hetergenuous inputs
+                // Promise.resolve(promiseNewGeneList(inputList));
             }
         }
 
@@ -384,11 +384,12 @@ class App extends React.Component {
                                 handleExpanderSelection={ this.updateExpanderSelection }
                                 handleGeneListSelection={ this.updateGeneListSelection }
                                 queryPromise={ this.queryTransformer }/>
+                            { this.state.selectedExpanders.length > 0 || this.state.selectedGeneListsByID.length > 0 ?
                             <button className="btn my-2 my-sm-0"
                                     style={{padding:"0%", fontSize: "small"}}
                                     onClick={this.clearSelections}>
                                 Clear Selections
-                            </button>
+                            </button> : <React.Fragment></React.Fragment>}
                         </div>
 
                     </div>

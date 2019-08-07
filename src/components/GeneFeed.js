@@ -5,6 +5,7 @@ import ToolkitProvider, { CSVExport } from 'react-bootstrap-table2-toolkit';
 const { ExportCSVButton } = CSVExport;
 import Card from "react-bootstrap/Card"
 import {MyLoader} from "./ListItem";
+import Collapse from "react-bootstrap/Collapse";
 
 const SERVICE_URL =  process.env.REACT_APP_SERVICE_URL;
 
@@ -61,7 +62,7 @@ export class GeneTable extends React.Component {
         this.state = {
             geneList: null,
             geneTableColumns: [{dataName: ""}],
-            geneTableData: []
+            geneTableData: [],
         }
     }
 
@@ -69,25 +70,34 @@ export class GeneTable extends React.Component {
         // TODO replace with different more flexible table library
         return (
             <Card>
-                <div>
                 <Card.Header as={"h6"}>
-                    <span style={{textAlign: "center"}}>{this.state.geneTableData.length} gene{this.state.geneTableData.length > 1 ? "s" : this.state.geneTableData.length <= 0 ? "s" : ''}</span>
-                    <button style={{border: "none", background:"none"}}  onClick={this.handleOnClick}>{this.geneListID}</button>
-                    <div style={{float:"right", marginRight:"-.7em"}}>
-                        <button value={ this.geneListID } onClick={ this.handleOnClick } style={{ border: "none", background:"none"}}>
-                            Select
+                    <button style={{ border: "none", background:"none",}} onClick={this.handleOnClick}>{this.geneListID}</button>
+                    <span>has {this.state.geneTableData.length} gene{this.state.geneTableData.length > 1 ? "s" : this.state.geneTableData.length <= 0 ? "s" : ''}</span>
+                    <div style={{float:"right", marginRight:"-.7em", display: "inline-block"}}>
+                        <button
+                            title={"Toggle selecting this Gene Set for Expander inputs"}
+                            value={ this.geneListID }
+                            onClick={ this.handleOnClick }
+                            style={{ border: "none", background:"none", fontSize: "large"}}>
+                            +
                         </button>
-                        <button value={ this.geneListID } onClick={ this.clearGeneList } style={{border: "none", background:"none"}}>Clear</button>
+                        <button
+                            title={"Clear this Gene Set from the Gene Feed"}
+                            value={ this.geneListID }
+                            onClick={ this.clearGeneList }
+                            style={{border: "none", background:"none", fontSize: "large"}}>
+                            &times;
+                        </button>
                     </div>
                 </Card.Header>
-                </div>
-
-                <BootstrapTable
-                    keyField={this.keyField}
-                    name={this.geneListID}
-                    data={this.state.geneTableData}
-                    columns={this.state.geneTableColumns}
-                />
+                <Collapse>
+                    <BootstrapTable
+                        keyField={this.keyField}
+                        name={this.geneListID}
+                        data={this.state.geneTableData}
+                        columns={this.state.geneTableColumns}
+                    />
+                </Collapse>
             </Card>
         )
     }
