@@ -215,7 +215,7 @@ export class CurrentlySelectedGenes extends React.Component {
         render() {
             return (
                 <Fragment>
-                    <label as={"h5"}>Current Gene Lists</label>
+                    <label as={"h5"}>Selected Gene Sets</label>
                     <ul>
                     {this.props.currentSelections.selectedGeneLists.length > 0 ? this.props.currentSelections.selectedGeneLists.map(selectedGeneList =>
                                 <li>{selectedGeneList}</li>) :
@@ -230,7 +230,7 @@ export class CurrentlySelectedExpanders extends React.Component {
     render() {
         return (
             <Fragment>
-                <label as={"h5"}>Current Expanders</label>
+                <label as={"h5"}>Selected Expanders</label>
                 <ul>
                     {this.props.currentSelections.selectedExpanders.length > 0 ? this.props.currentSelections.selectedExpanders.map(selectedExpander =>
                             <li>{selectedExpander.name}</li>) :
