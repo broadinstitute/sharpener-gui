@@ -39,4 +39,10 @@ Continue this until all the gene sets that you'd like to transform are selected.
 3. Before running an *Expander*, you can aggregate them into one gene set by pressing "Union" or "Intersection". 
 This step is optional, but it also consolidates all of your results from a given expander into one table.
 
-4. To run an *Expander*, in the panel on the far right you can put values into its input boxes
+4. To run an *Expander*, in the panel on the far right you can put values into its input boxes. If you click on the Expander's name, it becomes selected. It also then fills those boxes with default values if they are available (but it doesn't override your own).
+
+5. If all is well,  a little button saying "Transform Gene Lists" appears under **Expanders**. If all is not well, it tells you what you're missing. If you can transform your gene lists, click that button.
+
+6. Tables giving you your transformed gene sets (one per selected gene set ID) should appear shortly, hopefully with relevant results.
+
+If you want to continue transforming your gene sets, start again, from step (2) or the beginning.
