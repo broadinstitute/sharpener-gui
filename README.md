@@ -1,5 +1,5 @@
 # Gene Sharpener UI - STAR Informatics Prototype 
-# (Pre-Alpha)
+### (Pre-Alpha)
 
 ## Getting Started
 
@@ -29,7 +29,7 @@ and pointing to the gene sharpener at `https://indigo.ncats.io/sharpener/` by de
 
 #### TODO: illustrations pending
 
-1. Create your starting Gene Lists using the "Producer" selector and search box at the top. 
+1. Create your starting Gene Lists using the "Producer" selector and parameters at the top. 
 For example, enter a Gene Symbol (e.g. BRCA1) when selecting "Gene Symbols" from the drop-down.
 
 2. You should now see a table of genes. Click on the Gene List ID or the plus sign on the side of the table's header, to add the gene list to the list of current genes. 
