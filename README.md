@@ -5,13 +5,30 @@
 
 ### Configuring the Application
 
-In the root project directory, copy  `template.env` to `.env` :
+In the root project directory, copy  `template.env` to `.env`:
  
      cp template.env .env
  
- then customize (as necessary).
+then customize (as necessary).
  
- Run ```npm install``` to install the project library dependencies and apply the `.env`.
+Some of the current Javascript packages installed by *npm* appear to have a Python language dependency 
+which tends to be the rather ancient Python version 2.7. The default version of python seen by your command shell 
+should therefore be verified before proceeding any further:
+
+``` 
+python --version
+```
+
+If the version reported is 2.7, then you are likely ok. Otherwise, the use of the 2.7 version of python interpreter 
+may need to be enforced by suitable configuration, as follows:
+ 
+```
+npm config set python python2.7
+```
+
+This command, of course, assumes that you have installed a copy of Python 2.7 with that executable name.
+
+Afterwards, the ```npm install``` command may be run to install the project library dependencies.
 
 ### Running the Application
 
