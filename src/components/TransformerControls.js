@@ -232,7 +232,7 @@ export class CurrentlySelectedGenes extends React.Component {
         render() {
             return (
                 <Fragment>
-                    <label as={"h5"}>Selected Gene Sets</label>
+                    <label as={"h5"}>Selected Gene Lists</label>
                     <ul>
                     {this.props.currentSelections.selectedGeneLists.length > 0 ? this.props.currentSelections.selectedGeneLists.map(selectedGeneList =>
                                 <li>{selectedGeneList}</li>) :
@@ -303,11 +303,11 @@ export class TransformerQuerySender extends React.Component {
 
                             {   !(this.props.currentSelections.selectedGeneLists.length > 0) &&
                                 (this.props.currentSelections.selectedExpanders.length > 0) ?
-                                    "Select Gene Sets as input for your Transformers" :
+                                    "Select Gene Lists as input for your Transformers" :
                                 (this.props.currentSelections.selectedGeneLists.length > 0) &&
                                 !(this.props.currentSelections.selectedExpanders.length > 0) ?
-                                    "Select Transformers for your Gene Sets" :
-                                    "Select Gene Sets and Transformers"}
+                                    "Select Transformers for your Gene Lists" :
+                                    "Select Gene Lists and Transformers"}
 
                         </button> }
                 </div>

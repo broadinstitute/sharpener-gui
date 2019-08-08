@@ -129,14 +129,14 @@ export class GeneTable extends React.Component {
                     <div style={{float: "right", marginRight: "-.7em", display: "inline-block"}}>
                         {'\u00A0'}{'\u00A0'}{'\u00A0'}
                         <button
-                            title={"Toggle selecting this Gene Set for Expander inputs"}
+                            title={"Toggle selecting this Gene List for Expander inputs"}
                             value={this.geneListID}
                             onClick={this.handleOnClick}
                             style={{border: "none", background: "none", fontSize: "large"}}>
                             +
                         </button>
                         <button
-                            title={"Clear this Gene Set from the Gene Feed"}
+                            title={"Clear this Gene List from the Gene Feed"}
                             value={this.geneListID}
                             onClick={this.clearGeneList}
                             style={{border: "none", background: "none", fontSize: "large"}}>
@@ -171,7 +171,8 @@ export class GeneTable extends React.Component {
                                     <BootstrapTable
                                         {...props.baseProps} />
                                     {!(Object.values(props.columnToggleProps.toggles).every((value => value))) ?
-                                        <span style={{fontSize:"small", marginLeft:"1em"}}>Filtered Columns</span> : false}
+                                        <span style={{fontSize:"small", marginLeft:"0.8em"}}>Filtered Columns</span>
+                                    : <span style={{fontSize:"small", marginLeft:"0.8em"}}>Filter Columns</span>}
                                     <GeneTableColumnFilter
                                         {...props.columnToggleProps}/>
                                 </Fragment>}

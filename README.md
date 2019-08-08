@@ -29,20 +29,20 @@ and pointing to the gene sharpener at `https://indigo.ncats.io/sharpener/` by de
 
 #### TODO: illustrations pending
 
-1. Create your starting Gene Sets using the "Producer" selector and search box at the top. 
+1. Create your starting Gene Lists using the "Producer" selector and search box at the top. 
 For example, enter a Gene Symbol (e.g. BRCA1) when selecting "Gene Symbols" from the drop-down.
 
-2. You should now see a table of genes. Click on the Gene Set ID or the plus sign on the side of the table's header, to add the gene set to the list of current genes. 
+2. You should now see a table of genes. Click on the Gene List ID or the plus sign on the side of the table's header, to add the gene list to the list of current genes. 
 
-Continue this until all the gene sets that you'd like to transform are selected.
+Continue this until all the gene lists that you'd like to transform are selected.
     
-3. Before running an *Expander*, you can aggregate them into one gene set by pressing "Union" or "Intersection". 
+3. Before running an *Expander*, you can aggregate them into one gene list by pressing "Union" or "Intersection". 
 This step is optional, but it also consolidates all of your results from a given expander into one table.
 
 4. To run an *Expander*, in the panel on the far right you can put values into its input boxes. If you click on the Expander's name, it becomes selected. It also then fills those boxes with default values if they are available (but it doesn't override your own).
 
 5. If all is well,  a little button saying "Transform Gene Lists" appears under **Expanders**. If all is not well, it tells you what you're missing. If you can transform your gene lists, click that button.
 
-6. Tables giving you your transformed gene sets (one per selected gene set ID) should appear shortly, hopefully with relevant results.
+6. Tables giving you your transformed gene lists (one per selected gene list ID) should appear shortly, hopefully with relevant results.
 
-If you want to continue transforming your gene sets, start again, from step (2) or the beginning.
+If you want to continue transforming your gene lists, start again, from step (2) or the beginning.

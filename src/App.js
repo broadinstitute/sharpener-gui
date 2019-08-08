@@ -316,11 +316,11 @@ class App extends React.Component {
                                 : <MyLoader active={true}/>}
                             {/* Tables of Genes */}
                             <div className={"row"} style={{padding:"15px", paddingTop: "0%"}}>
-                                <h4>Gene Sets</h4>
+                                <h4>Gene Lists</h4>
                                 <div style={{marginLeft: "auto", marginRight: 0}}>
                                     { this.state.gene_list_ids.length > 0 ?
-                                        <button onClick={ this.clearGeneLists }>Clear Gene Sets</button>
-                                        : <button onClick={ this.clearGeneLists } disabled>Clear Gene Sets</button>}
+                                        <button onClick={ this.clearGeneLists }>Clear Gene Lists</button>
+                                        : <button onClick={ this.clearGeneLists } disabled>Clear Gene Lists</button>}
                                     { this.state.recently_cleared_gene_lists.length > 0 ?
                                         <React.Fragment>
                                             {'\u00A0'}{'\u00A0'}<button onClick={ this.undoClearGeneLists }>Undo</button>
@@ -356,12 +356,13 @@ class App extends React.Component {
                                 handleExpanderSelection={ this.updateExpanderSelection }
                                 handleGeneListSelection={ this.updateGeneListSelection }
                                 queryPromise={ this.queryTransformer }/> : <MyLoader active={true}/> }
-                            { this.state.selectedExpanders.length > 0 || this.state.selectedGeneListsByID.length > 0 ?
+                            {/*{ this.state.selectedExpanders.length > 0 || this.state.selectedGeneListsByID.length > 0 ?*/}
                             <button className="btn my-2 my-sm-0"
-                                    style={{padding:"0%", fontSize: "small"}}
+                                    style={{padding:"0%", fontSize: "small", float: "right"}}
                                     onClick={this.clearSelections}>
                                 Clear Selections
-                            </button> : <React.Fragment></React.Fragment>}
+                            </button>
+                            {/*: <React.Fragment></React.Fragment>}*/}
                         </div>
 
                     </div>
