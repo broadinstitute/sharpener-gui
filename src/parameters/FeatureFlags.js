@@ -4,5 +4,8 @@ export const FEATURE_FLAG = {
     },
     notUniqueGeneList: true,
     undoGeneLists: true,
-    emitOperationToLedger: false
+    histories: {
+        showHistories: true,
+        emitOperationToLedger: false
+    }
 };

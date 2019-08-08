@@ -206,7 +206,8 @@ export class AggregationSender extends React.Component {
             return Promise.resolve(this.queryAggregator(this.props.action, this.props.selectedGeneLists))
                 .then(response => response.json())
                 .then(data => {
-                    if (FEATURE_FLAG.emitOperationToLedger) {
+                    // TODO
+                    if (FEATURE_FLAG.histories.emitOperationToLedger) {
 
                     }
                     this.throwbackGeneListID(data.gene_list_id);

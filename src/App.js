@@ -166,7 +166,7 @@ class App extends React.Component {
                                 );
 
                                 // TODO: need to emit query results to UI somehow
-                                if (FEATURE_FLAG.emitOperationToLedger) {
+                                if (FEATURE_FLAG.histories.emitOperationToLedger) {
                                     let time = new Date().getTime();
                                     let stateCopy = {...this.state};
                                     console.log(stateCopy)

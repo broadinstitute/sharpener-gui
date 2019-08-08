@@ -7,7 +7,10 @@ import Card from "react-bootstrap/Card"
 import {MyLoader} from "./ListItem";
 import {Collapse} from "react-collapse"
 
+import {FEATURE_FLAG} from "../parameters/FeatureFlags";
+
 import Select from 'react-select';
+
 
 const SERVICE_URL =  process.env.REACT_APP_SERVICE_URL;
 
@@ -40,7 +43,7 @@ export default class GeneFeed extends React.Component {
             <Fragment>
                 <div className={"row"}>
                     <div className={"col-sm-2"}>
-                        {this.state.geneListIDs.length > 0 ?
+                        {this.state.geneListIDs.length > 0 && FEATURE_FLAG.histories.showHistories ?
                             <Card>
                                 <Card.Header as={"h5"}>
                                     History
