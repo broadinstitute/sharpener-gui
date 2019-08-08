@@ -3,6 +3,7 @@ import InputGroup from 'react-bootstrap/InputGroup'
 import FormControl from 'react-bootstrap/FormControl'
 import Card from 'react-bootstrap/Card'
 import {MyLoader} from "./ListItem";
+import {FEATURE_FLAG} from "../parameters/FeatureFlags";
 
 const Fragment = React.Fragment;
 
@@ -205,7 +206,8 @@ export class AggregationSender extends React.Component {
             return Promise.resolve(this.queryAggregator(this.props.action, this.props.selectedGeneLists))
                 .then(response => response.json())
                 .then(data => {
-                    if (FEATURE_FLAG.emitOperationToLedger) {
+                    // TODO
+                    if (FEATURE_FLAG.histories.emitOperationToLedger) {
 
                     }
                     this.throwbackGeneListID(data.gene_list_id);

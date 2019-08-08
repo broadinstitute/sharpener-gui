@@ -2,6 +2,8 @@
 import React, {Fragment} from 'react';
 import ProducerControls from './components/ProducerControls.js'
 import {MyLoader} from './components/ListItem.js'
+import {FEATURE_FLAG} from "./parameters/FeatureFlags";
+
 // remote components
 // libraries
 import _ from "underscore"
@@ -18,16 +20,6 @@ import BootstrapTable from "react-bootstrap-table-next";
 // TODO: refactor for importing across app
 const FRONTEND_URL =  process.env.REACT_APP_FRONTEND_URL;
 const SERVICE_URL =  process.env.REACT_APP_SERVICE_URL;
-
-// TODO: refactor feature flag into own js file to import across app
-const FEATURE_FLAG = {
-    alwaysUpdateToLatestGeneList: {
-        aggregator: true
-    },
-    notUniqueGeneList: true,
-    undoGeneLists: true,
-    emitOperationToLedger: true
-};
 
 const divStyle = {
     margin:"2.25em"
@@ -127,14 +119,8 @@ class App extends React.Component {
                                     this.setState({gene_list_ids: this.state.gene_list_ids.concat(data.gene_list_id)},
                                         () => {
                                             console.log("new gene list ids", this.state.gene_list_ids, "with", data.gene_list_id);
-                                        });
-                                    // TODO: need to emit query results to UI somehow
-                                    if (FEATURE_FLAG.emitOperationToLedger) {
-                                        let time = new Date().getTime();
-                                        let stateCopy = {...this.state};
-                                        stateCopy.transactionLedger[time][data.gene_list_id] = transformerQuery;
-                                        this.setState(stateCopy)
-                                    }
+
+                                    });
 
                                 } else {
                                     console.log("no gene data received from", transformerQuery);
@@ -179,8 +165,21 @@ class App extends React.Component {
                                     this.state.gene_list_ids
                                 );
 
-                                if (FEATURE_FLAG.emitOperationToLedger) {
-
+                                // TODO: need to emit query results to UI somehow
+                                if (FEATURE_FLAG.histories.emitOperationToLedger) {
+                                    let time = new Date().getTime();
+                                    let stateCopy = {...this.state};
+                                    console.log(stateCopy)
+                                    // no such thing as a create list query
+                                    // stateCopy.transactionLedger[time][data.gene_list_id] = {
+                                    //     name: "create_gene_list",
+                                    //     function: "create",
+                                    //     controls: [
+                                    //         {name: "gene_symbols", value: geneList}
+                                    //     ]
+                                    // };
+                                    // this.setState(stateCopy, () => {
+                                    //     console.log("transaction ledger", JSON.stringify(stateCopy.transactionLedger[time][data.gene_list_id])); })
                                 }
 
                             });
