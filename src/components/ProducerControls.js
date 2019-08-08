@@ -3,6 +3,7 @@ import {TransformerParameter} from "./TransformerControls";
 import InputGroup from "react-bootstrap/InputGroup";
 import FormControl from "react-bootstrap/FormControl";
 import Card from "react-bootstrap/Card";
+import Select from 'react-select';
 
 const SERVICE_URL =  process.env.REACT_APP_SERVICE_URL;
 
@@ -101,16 +102,31 @@ export class ProducerControls extends React.Component {
         return null;
     }
 
+    handleProducerSelect = (args, action) => {
+        console.log(args, action);
+        this.props.handleProducerSelect(args.value);
+    };
+
+
     render() {
+        let options = this.props.producers.map(producer =>
+            Object.assign({}, {label: producer.name, value: producer.name})
+        );
         return (
             <div style={searchBarStyle}>
-                <select id="producer" className="custom-select" onChange={this.props.handleProducerSelect }>
+                <Select id="producer"
+                        className="basic-single"
+                        isSearchable
+                        defaultValue={options[0]}
+                        options={options}
+                        onChange={ this.handleProducerSelect }
+                >
                     {this.props.producers.map((producer) =>
                         <option key={producer.name} value={producer.name}>
                             {producer.name}
                         </option>
                     )}
-                </select>
+                </Select>
                 <div style={inputStyle}>
                     <div className="form-inline" onKeyPress={this.handleKeyPress}>
                         {

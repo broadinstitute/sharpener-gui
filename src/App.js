@@ -130,8 +130,8 @@ class App extends React.Component {
                         })
     };
 
-    handleProducerSelect = (event) => {
-        const selectedProducer = this.state.producers.filter(producer => { return producer.name === event.target.value})[0];
+    handleProducerSelect = (producerName) => {
+        const selectedProducer = this.state.producers.filter(producer => { return producer.name === producerName})[0];
         this.setState({selectedProducer: selectedProducer}, () => {
             console.log("you changed your producer how exciting", selectedProducer); });
     };
