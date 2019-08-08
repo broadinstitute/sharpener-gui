@@ -124,37 +124,22 @@ export class GeneTable extends React.Component {
                              id={"table-header-".concat(this.props.geneListID)}
                              key={this.props.geneListID}  // collision unlikely
                              onClick={this.handleOnClickTableHeader}>
-                    <button style={{border: "none", background: "none",}}
+                    <button style={{border: "none", background: "none", margin:"-0.8em"}}
                             onClick={this.handleOnClick}>{this.geneListID}</button>
-                    <span>({this.state.geneTableData.length} gene{this.state.geneTableData.length > 1 ? "s" : this.state.geneTableData.length <= 0 ? "s" : ''})</span>
-                    {'\u00A0'}{'\u00A0'}{'\u00A0'}{'\u00A0'}{'\u00A0'}{'\u00A0'}
-                    {
-                        this.state.geneTableData.length > 0 && this.state.geneTableColumns.length > 0 ?
-                            <ToolkitProvider
-                                keyField={"gene_id"}
-                                name={this.geneListID}
-                                data={this.state.geneTableData}
-                                columns={this.state.geneTableColumns}
-                                exportCSV>
-                                { props =>
-                                    <ExportCSVButton style={{padding: "0%", border: "none", underline:}} {...props.csvProps}>Export</ExportCSVButton>}
-
-                            </ToolkitProvider>
-                            : <Fragment/>
-                    }
                     <div style={{float: "right", marginRight: "-.7em", display: "inline-block"}}>
+                        {'\u00A0'}{'\u00A0'}{'\u00A0'}
                         <button
                             title={"Toggle selecting this Gene Set for Expander inputs"}
                             value={this.geneListID}
                             onClick={this.handleOnClick}
-                            style={{border: "none", background: "none", fontSize: "x-large"}}>
+                            style={{border: "none", background: "none", fontSize: "large"}}>
                             +
                         </button>
                         <button
                             title={"Clear this Gene Set from the Gene Feed"}
                             value={this.geneListID}
                             onClick={this.clearGeneList}
-                            style={{border: "none", background: "none", fontSize: "x-large"}}>
+                            style={{border: "none", background: "none", fontSize: "large"}}>
                             &times;
                         </button>
                     </div>
@@ -170,7 +155,8 @@ export class GeneTable extends React.Component {
                             name={this.geneListID}
                             data={this.state.geneTableData}
                             columns={this.state.geneTableColumns}
-                            columnToggle>
+                            columnToggle
+                            exportCSV>
 
                             {/* The way they're coding this is that the presence or absence of a prop
                             in ToolkitProvider, induces some additional props, which are injected
@@ -178,6 +164,10 @@ export class GeneTable extends React.Component {
 
                             {props =>
                                 <Fragment>
+                                    <div>
+                                        <span className={"btn"}>{this.state.geneTableData.length} gene{this.state.geneTableData.length > 1 ? "s" : this.state.geneTableData.length <= 0 ? "s" : ''}</span>
+                                        <ExportCSVButton style={{border: "none", textDecoration: "underline", float: "right"}} {...props.csvProps}>Export</ExportCSVButton>
+                                    </div>
                                     <BootstrapTable
                                         {...props.baseProps} />
                                     {/*{!(Object.values(props.columnToggleProps.toggles).every((value => value))) ?*/}
