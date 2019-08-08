@@ -15,16 +15,18 @@ import GeneTable from './components/GeneFeed.js';
 import Card from "react-bootstrap/Card";
 import BootstrapTable from "react-bootstrap-table-next";
 
-
+// TODO: refactor for importing across app
 const FRONTEND_URL =  process.env.REACT_APP_FRONTEND_URL;
 const SERVICE_URL =  process.env.REACT_APP_SERVICE_URL;
 
+// TODO: refactor feature flag into own js file to import across app
 const FEATURE_FLAG = {
     alwaysUpdateToLatestGeneList: {
         aggregator: true
     },
     notUniqueGeneList: true,
-    undoGeneLists: true
+    undoGeneLists: true,
+    emitOperationToLedger: true
 };
 
 const divStyle = {
@@ -60,7 +62,12 @@ class App extends React.Component {
 
             // transformer query
             selectedGeneListsByID: [],
-            selectedExpanders: []
+            selectedExpanders: [],
+
+            // transaction history
+                // list of dates -> geneListID -> query
+            transactionLedger: []
+
         };
         this.handleTextChange = this.handleTextChange.bind(this);
     }
@@ -80,8 +87,7 @@ class App extends React.Component {
                         const defaultProducer = {
                             name: "Gene Symbols",
                             function: "producer",
-                            parameters: [{name: "gene symbol", type: "string"}], // TODO: can we always assume producers have a single parameter for input?
-                            genes: [],
+                            parameters: [{name: "gene symbol", type: "list"}], // TODO: can we always assume producers have a single parameter for input?
                             // TODO: Gene ID sources/types returned? Link up with Biolink Schema's context/JSON-LD?
                         };
                         this.setState({selectedProducer: defaultProducer});
@@ -116,13 +122,20 @@ class App extends React.Component {
                             if (data === undefined || data === null || data.length === 0 ) {
                                 throw "Data is undefined or not there"
                             } else {
-                                // TODO: need to emit query results to UI somehow
                                 // Should be the same thing that emits status of query being run/loading?
                                 if (data.genes && data.genes.length > 0) {
                                     this.setState({gene_list_ids: this.state.gene_list_ids.concat(data.gene_list_id)},
                                         () => {
                                             console.log("new gene list ids", this.state.gene_list_ids, "with", data.gene_list_id);
                                         });
+                                    // TODO: need to emit query results to UI somehow
+                                    if (FEATURE_FLAG.emitOperationToLedger) {
+                                        let time = new Date().getTime();
+                                        let stateCopy = {...this.state};
+                                        stateCopy.transactionLedger[time][data.gene_list_id] = transformerQuery;
+                                        this.setState(stateCopy)
+                                    }
+
                                 } else {
                                     console.log("no gene data received from", transformerQuery);
                                 }
@@ -152,6 +165,7 @@ class App extends React.Component {
                     throw "Data is undefined or not there"
                 } else {
                     console.log(data);
+
                     // log the gene list
                     if (FEATURE_FLAG.notUniqueGeneList) {
                         this.setState({gene_list_ids: this.state.gene_list_ids.concat([data.gene_list_id])},
@@ -161,9 +175,14 @@ class App extends React.Component {
                                     data.gene_list_id
                                 );
                                 console.log(
-                                    "new gene ids given input ".concat(geneList),
+                                    "new gene ids given input",
                                     this.state.gene_list_ids
                                 );
+
+                                if (FEATURE_FLAG.emitOperationToLedger) {
+
+                                }
+
                             });
                     } else {
                         this.setState({gene_list_ids: [data.gene_list_id]} ,
@@ -178,6 +197,7 @@ class App extends React.Component {
                                 );
                             });
                     }
+
                 }
             })
             .catch(error => {
@@ -298,9 +318,6 @@ class App extends React.Component {
                 {/*</div>*/}
                 <div className="container-fluid">
                     <div className="row">
-                    </div>
-
-                    <div className="row">
                         {/* Gene Lists */}
                         <div className="col-sm-9">
                             <h3>Producers</h3>
@@ -330,7 +347,6 @@ class App extends React.Component {
                                         </React.Fragment>
                                     }
                                 </div>
-
                             </div>
                             {this.state.gene_list_ids ?
                                 <React.Fragment>

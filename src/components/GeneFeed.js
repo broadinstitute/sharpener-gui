@@ -37,20 +37,34 @@ export default class GeneFeed extends React.Component {
     render () {
         // feed order is going to be run each render
         return (
-            <div>
-                {this.state.geneListIDs.length > 0 ? this.state.geneListIDs.slice(0).reverse().map((geneListID) =>
-                    <Fragment>
-                        <GeneTable
-                            key={ geneListID }
-                            geneListID={ geneListID }
-                            clearGeneListHandler={ this.props.clearGeneListHandler }
-                            handleGeneListSelection={ this.props.handleGeneListSelection }
-                            handleGeneSelection={ this.props.handleGeneSelection }
-                        /><br/>
-                    </Fragment>
-                    ) : <MyLoader active={true}/>
-                }
-            </div>
+            <Fragment>
+                <div className={"row"}>
+                    <div className={"col-sm-2"}>
+                        {this.state.geneListIDs.length > 0 ?
+                            <Card>
+                                <Card.Header as={"h5"}>
+                                    History
+                                </Card.Header>
+                                {}
+                            </Card>
+                        : <Fragment/>}
+                    </div>
+                    <div className={"col-sm-10"}>
+                        {this.state.geneListIDs.length > 0 ? this.state.geneListIDs.slice(0).reverse().map((geneListID) =>
+                            <Fragment>
+                                <GeneTable
+                                    key={ geneListID }
+                                    geneListID={ geneListID }
+                                    clearGeneListHandler={ this.props.clearGeneListHandler }
+                                    handleGeneListSelection={ this.props.handleGeneListSelection }
+                                    handleGeneSelection={ this.props.handleGeneSelection }
+                                /><br/>
+                            </Fragment>
+                            ) : <MyLoader active={true}/>
+                        }
+                    </div>
+                </div>
+            </Fragment>
         )
     }
 }
@@ -62,7 +76,7 @@ const GeneTableColumnFilter = ({columns, onColumnToggle, toggles}) => {
     return (
         <Fragment>
             <Select
-                placeholder={"Filter Columns..."}
+                placeholder={"Filtered Columns..."}
                 defaultValue={[]}
                 isMulti
                 name="columns"
@@ -171,8 +185,8 @@ export class GeneTable extends React.Component {
                                     <BootstrapTable
                                         {...props.baseProps} />
                                     {!(Object.values(props.columnToggleProps.toggles).every((value => value))) ?
-                                        <span style={{fontSize:"small", marginLeft:"0.8em"}}>Filtered Columns</span>
-                                    : <span style={{fontSize:"small", marginLeft:"0.8em"}}>Filter Columns</span>}
+                                        <span style={{fontSize:"small", marginLeft:"0.75em"}}>Filtered Columns</span>
+                                    : <span style={{fontSize:"small", marginLeft:"0.75em"}}>Select columns below to filter them</span>}
                                     <GeneTableColumnFilter
                                         {...props.columnToggleProps}/>
                                 </Fragment>}
