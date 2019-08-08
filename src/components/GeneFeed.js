@@ -45,7 +45,11 @@ export default class GeneFeed extends React.Component {
                                 <Card.Header as={"h5"}>
                                     History
                                 </Card.Header>
-                                {}
+                                <ul>
+                                    {this.state.geneListIDs.slice(0).reverse().map(geneListID =>
+                                         <li key={geneListID}> {geneListID} </li>
+                                    )}
+                                </ul>
                             </Card>
                         : <Fragment/>}
                     </div>
@@ -180,9 +184,11 @@ export class GeneTable extends React.Component {
                                 <Fragment>
                                     <div>
                                         <span className={"btn"}>{this.state.geneTableData.length} gene{this.state.geneTableData.length > 1 ? "s" : this.state.geneTableData.length <= 0 ? "s" : ''}</span>
+                                        {/*TODO: Refactor -> https://stackoverflow.com/a/53558566 */}
                                         <ExportCSVButton style={{border: "none", textDecoration: "underline", float: "right"}} {...props.csvProps}>Export</ExportCSVButton>
                                     </div>
                                     <BootstrapTable
+                                        wrapperClasses="table-responsive"
                                         {...props.baseProps} />
                                     {!(Object.values(props.columnToggleProps.toggles).every((value => value))) ?
                                         <span style={{fontSize:"small", marginLeft:"0.75em"}}>Filtered Columns</span>
