@@ -4,21 +4,21 @@
 
 ### Configuring the Application
 
-Run ```npm install``` to install the project library dependencies.
-
 In the root project directory, copy  `template.env` to `.env` :
  
      cp template.env .env
  
  then customize (as necessary).
+ 
+ Run ```npm install``` to install the project library dependencies and apply the `.env`.
 
 ### Running the Application
 
-Type 
+In the project root, run this command: 
 
 ```npm start``` 
 
-This should bring up the web application in your web browser.
+This should bring up the application in your web browser.
 The React Deployment Server should now be running, and you should be able to see the main page.
 
 The project is configured for the app to be deployed to `localhost:3000` 

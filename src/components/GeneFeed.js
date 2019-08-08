@@ -7,6 +7,8 @@ import Card from "react-bootstrap/Card"
 import {MyLoader} from "./ListItem";
 import {Collapse} from "react-collapse"
 
+import Select from 'react-select';
+
 const SERVICE_URL =  process.env.REACT_APP_SERVICE_URL;
 
 // practically speaking all this component does or should do is showcase gene tables in chronological order (soonest to farthest)
@@ -37,18 +39,55 @@ export default class GeneFeed extends React.Component {
         return (
             <div>
                 {this.state.geneListIDs.length > 0 ? this.state.geneListIDs.slice(0).reverse().map((geneListID) =>
+                    <Fragment>
                         <GeneTable
                             key={ geneListID }
                             geneListID={ geneListID }
                             clearGeneListHandler={ this.props.clearGeneListHandler }
                             handleGeneListSelection={ this.props.handleGeneListSelection }
                             handleGeneSelection={ this.props.handleGeneSelection }
-                        />
+                        /><br/>
+                    </Fragment>
                     ) : <MyLoader active={true}/>
                 }
             </div>
         )
     }
+}
+
+const GeneTableColumnFilter = ({columns, onColumnToggle, toggles}) => {
+    // https://react-bootstrap-table.github.io/react-bootstrap-table2/docs/basic-column-toggle.html
+    // https://react-select.com/home
+    console.log("toggles", toggles);
+    return (
+        <Fragment>
+            <Select
+                placeholder={"Filter Columns..."}
+                defaultValue={[]}
+                isMulti
+                name="columns"
+                options={ columns.map(gtc => {return {value: gtc.dataField, label: gtc.text}}) }  // done
+                className="basic-multi-select"
+                classNamePrefix="select"
+                isClearable={false}
+                onChange={ (args, action) => {
+                    console.log(args, action);
+                    if (action.action === "select-option") {
+                        onColumnToggle(action.option.value);
+                    } else if (action.action === "remove-value" || action.action === "pop-value" ) {
+                        onColumnToggle(action.removedValue.value);
+                    }
+                    // TODO:
+                    else if (action.action === "clear") {
+                        Object.keys(toggles).forEach((toggleKey) => {
+                           toggles[toggleKey] = true;
+                        });
+                        console.log(toggles);
+                    }
+                } }
+            />
+        </Fragment>
+    )
 }
 
 export class GeneTable extends React.Component {
@@ -72,47 +111,82 @@ export class GeneTable extends React.Component {
         // https://github.com/facebook/react/issues/5625
         const target = e.target;
         if (target.id !== "table-header-".concat(this.props.geneListID)) {  // equivalent to Card.Header id, see render
-            return ; // child was clicked, ignore onClick
+            return; // child was clicked, ignore onClick
         }
         this.setState({isOpened: !this.state.isOpened}, console.log("open?", this.state.isOpened))
     };
 
     render() {
-        // TODO replace with different more flexible table library
         return (
             <Card>
+                {/* Header Segment */}
                 <Card.Header as={"h6"}
                              id={"table-header-".concat(this.props.geneListID)}
                              key={this.props.geneListID}  // collision unlikely
-                             onClick={ this.handleOnClickTableHeader }>
-                    <button style={{ border: "none", background:"none",}} onClick={this.handleOnClick}>{this.geneListID}</button>
-                    <span>has {this.state.geneTableData.length} gene{this.state.geneTableData.length > 1 ? "s" : this.state.geneTableData.length <= 0 ? "s" : ''}</span>
-                    <div style={{float:"right", marginRight:"-.7em", display: "inline-block"}}>
+                             onClick={this.handleOnClickTableHeader}>
+                    <button style={{border: "none", background: "none",}}
+                            onClick={this.handleOnClick}>{this.geneListID}</button>
+                    <span>({this.state.geneTableData.length} gene{this.state.geneTableData.length > 1 ? "s" : this.state.geneTableData.length <= 0 ? "s" : ''})</span>
+                    {'\u00A0'}{'\u00A0'}{'\u00A0'}{'\u00A0'}{'\u00A0'}{'\u00A0'}
+                    {
+                        this.state.geneTableData.length > 0 && this.state.geneTableColumns.length > 0 ?
+                            <ToolkitProvider
+                                keyField={"gene_id"}
+                                name={this.geneListID}
+                                data={this.state.geneTableData}
+                                columns={this.state.geneTableColumns}
+                                exportCSV>
+                                { props =>
+                                    <ExportCSVButton style={{padding: "0%", border: "none", underline:}} {...props.csvProps}>Export</ExportCSVButton>}
+
+                            </ToolkitProvider>
+                            : <Fragment/>
+                    }
+                    <div style={{float: "right", marginRight: "-.7em", display: "inline-block"}}>
                         <button
                             title={"Toggle selecting this Gene Set for Expander inputs"}
-                            value={ this.geneListID }
-                            onClick={ this.handleOnClick }
-                            style={{ border: "none", background:"none", fontSize: "large"}}>
+                            value={this.geneListID}
+                            onClick={this.handleOnClick}
+                            style={{border: "none", background: "none", fontSize: "x-large"}}>
                             +
                         </button>
                         <button
                             title={"Clear this Gene Set from the Gene Feed"}
-                            value={ this.geneListID }
-                            onClick={ this.clearGeneList }
-                            style={{border: "none", background:"none", fontSize: "large"}}>
+                            value={this.geneListID}
+                            onClick={this.clearGeneList}
+                            style={{border: "none", background: "none", fontSize: "x-large"}}>
                             &times;
                         </button>
                     </div>
                 </Card.Header>
-                <Collapse isOpened={this.state.isOpened}>
-                    {/*TODO: this thing has an embedded margin style that is preventing the Collapse animation from being as smooth as it should be*/}
-                    <BootstrapTable
-                        keyField={this.keyField}
-                        name={this.geneListID}
-                        data={this.state.geneTableData}
-                        columns={this.state.geneTableColumns}
-                    />
-                </Collapse>
+
+                {/* Table Segment */}
+                {this.state.geneTableData.length > 0 && this.state.geneTableColumns.length > 0 ?
+                    <Collapse isOpened={this.state.isOpened}>
+                        {/*TODO: BootstrapTable has an embedded margin style that is preventing the Collapse animation from being as smooth as it should be*/}
+                        {/*TODO: Eliminate Bootstrap |- Eliminate Bootstrap Table*/}
+                        <ToolkitProvider
+                            keyField={"gene_id"}
+                            name={this.geneListID}
+                            data={this.state.geneTableData}
+                            columns={this.state.geneTableColumns}
+                            columnToggle>
+
+                            {/* The way they're coding this is that the presence or absence of a prop
+                            in ToolkitProvider, induces some additional props, which are injected
+                            into the child components to be used for expected behavior*/}
+
+                            {props =>
+                                <Fragment>
+                                    <BootstrapTable
+                                        {...props.baseProps} />
+                                    {/*{!(Object.values(props.columnToggleProps.toggles).every((value => value))) ?*/}
+                                    {/*    "Filtered Columns" : "Filter columns"}*/}
+                                    <GeneTableColumnFilter
+                                        {...props.columnToggleProps}/>
+                                </Fragment>}
+                        </ToolkitProvider>
+                    </Collapse> : <Fragment/>}
             </Card>
         )
     }
@@ -120,7 +194,6 @@ export class GeneTable extends React.Component {
     componentDidMount() {
         this.getGeneListAndSetupGeneTable(this.geneListID);
     }
-
 
     /* EVENT HANDLING */
     handleOnClick = () => {
@@ -134,17 +207,17 @@ export class GeneTable extends React.Component {
             _.uniq(this.state.geneList.map((current_gene) => current_gene.attributes, [])
                 .reduce((attributes_list, current_gene_attributes) => attributes_list.concat(current_gene_attributes), [])  // flatten list of depth one
                 .map(attribute => attribute.name));
-                //.concat(["gene_id"]);  // interpret gene_id as a column  TODO: DEPRECATED -- it needs to be handled specially
+        //.concat(["gene_id"]);  // interpret gene_id as a column  TODO: DEPRECATED -- it needs to be handled specially
 
         let geneTableColumns =
             this.makeTableColumns(geneListAttributes);
 
         let geneTableData =
             this.state.geneList
-                .map(gene => gene.attributes.concat([{ name: "gene_id", value: gene["gene_id"] }]))
+                .map(gene => gene.attributes.concat([{name: "gene_id", value: gene["gene_id"]}]))
                 .map((geneAttributesList) => {
                     let geneAttributesObject = {};
-                    for (let i = 0 ; i < geneAttributesList.length; i++) {
+                    for (let i = 0; i < geneAttributesList.length; i++) {
                         geneAttributesObject[geneAttributesList[i].name] = geneAttributesList[i].value
                     }
                     return geneAttributesObject;
@@ -158,7 +231,7 @@ export class GeneTable extends React.Component {
         console.dir("setting up gene table");
 
         let aggregationQuery = {
-            gene_list_ids:  [ geneListID ],
+            gene_list_ids: [geneListID],
             operation: "intersection"  // self-intersection ~~~ identity
         };
 
@@ -171,14 +244,28 @@ export class GeneTable extends React.Component {
             },
             body: JSON.stringify(aggregationQuery)
         })
-        .then(response => response.json())
-        .then(data => {
-            // guarantee to have the gene list before running
-            this.setState({ geneList: data.genes },
-                () => {
-                this.populateGeneTable();
-            })
-        });
+            .then(response => response.json())
+            .then(data => {
+                // guarantee to have the gene list before running
+                this.setState({geneList: data.genes},
+                    () => {
+                        this.populateGeneTable();
+                    })
+            });
+    };
+
+    listAbbrevation = (cell) => {
+        // TODO: make this test more robust
+        if (cell) {
+            let potentialList = cell.split(', ');
+            if (potentialList.length > 1) {
+                console.log(cell, "is a  list");
+                const cellList = potentialList;
+                return <div>{cellList[0]}...</div>
+            } else {
+                return cell;
+            }
+        }
     };
 
     makeTableColumns = (attributeList) => {
@@ -194,20 +281,14 @@ export class GeneTable extends React.Component {
                         headerStyle: {  textTransform: "capitalize" },
                         // TODO: for now we're enabling all input to be placed in the search field
                         // THIS IS TO ENABLE INTERACTION WITH PRODUCERS; BUT SHOULD BE FLAGGED FOR CHANGE
+                        formatter: this.listAbbrevation,
                         events: {
                             onClick: (e, column, columnIndex, row, rowIndex) => {
                                 console.log("clicking gene_id ", row[column.dataField]);
-                                this.props.handleGeneSelection(row[column.dataField]);
+                                // TODO:
+                                // this.props.handleGeneSelection(row[column.dataField]);
                             }
                         },
-                        headerEvents: {
-                            events: {
-                                onClick: (e, column, columnIndex, row, rowIndex) => {
-                                    console.log("clicking gene_id ", row[column.dataField]);
-                                    this.props.handleGeneSelection(row[column.dataField]);
-                                }
-                            }
-                        }
                     }
             }).concat([
                 {
@@ -217,17 +298,10 @@ export class GeneTable extends React.Component {
                     events: {
                         onClick: (e, column, columnIndex, row, rowIndex) => {
                             console.log("clicking gene_id ", row[column.dataField]);
-                            this.props.handleGeneSelection(row[column.dataField]);
+                            // TODO
+                            // this.props.handleGeneSelection(row[column.dataField]);
                         }
                     },
-                    headerEvents: {
-                        events: {
-                            onClick: (e, column, columnIndex, row) => {
-                                console.log("clicking gene_id ", row[column.dataField]);
-                                this.props.handleGeneSelection(row[column.dataField]);
-                            }
-                        }
-                    }
                 }
             ])
         )

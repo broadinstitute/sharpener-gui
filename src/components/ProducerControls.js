@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Fragment} from 'react';
 import {TransformerParameter} from "./TransformerControls";
 import InputGroup from "react-bootstrap/InputGroup";
 import FormControl from "react-bootstrap/FormControl";
@@ -8,9 +8,11 @@ const SERVICE_URL =  process.env.REACT_APP_SERVICE_URL;
 
 const searchBarStyle = {
     marginTop: "18px",
-    marginLeft: "0px",
-    marginRight: "15px",
-    marginBottom: "20px",
+};
+
+const inputStyle = {
+    marginTop: "10px",
+    marginBottom: "26px",
 };
 
 export class ProducerControls extends React.Component {
@@ -57,7 +59,11 @@ export class ProducerControls extends React.Component {
                 Promise.resolve(this.queryProducer(producerQuery))
                     .then(response => response.json())
                     .then(data => {
-                        console.log("response", data);
+                        if (data === undefined || data === null || data.length === 0 ) {
+                            throw "Data is undefined or not there"
+                        } else {
+                            console.log("response", data);
+                        }
                     });
             } else if (this.state.selectedProducer.name === "Gene Symbols") {
                 let geneList = parameterIndexControls[0].value.split(",");
@@ -76,7 +82,6 @@ export class ProducerControls extends React.Component {
     handleKeyPress = event => {
         if (event.key === 'Enter') {
             event.preventDefault(); // this will result in an "event undefined" error, but will prevent page refresh
-            // this.props.handleGeneListCreation();
 
             // TODO: clear search text?
         }
@@ -99,40 +104,34 @@ export class ProducerControls extends React.Component {
     render() {
         return (
             <div style={searchBarStyle}>
-                <form className="form-inline" onKeyPress={this.handleKeyPress}>
-                    <select id="producer" onChange={this.props.handleProducerSelect }>
-                        {this.props.producers.map((producer) =>
-                            <option key={producer.name} value={producer.name}>
-                                {producer.name}
-                            </option>
-                        )}
-                    </select>
-
-                    {
-                        this.state.selectedProducer.parameters
-                            .map(parameter => {
-                                return ( <TransformerParameter key={parameter.name} id={parameter.name} parameter={parameter}
-                                                               action={this.handleProducerParameterChange}/> )
-                            })
-                    }
-
-                    {/*<input*/}
-                    {/*    type="search"*/}
-                    {/*    className="form-control mr-sm-10"*/}
-                    {/*    value={this.props.searchText}*/}
-                    {/*    onChange={this.props.handleTextChange}*/}
-                    {/*    placeholder=""  // TODO -- producer dependent*/}
-                    {/*    aria-label="Produce Gene Set"*/}
-                    {/*    id="search"*/}
-                    {/*    onKeyPress={this.handleKeyPress}*/}
-                    {/*/>*/}
-                    <button
-                        type="button"
-                        onClick={ this.handleProducingGenes }
-                        className="btn btn-outline-success my-2 my-sm-0">
-                        Produce Gene Set
-                    </button>
-                </form>
+                <select id="producer" className="custom-select" onChange={this.props.handleProducerSelect }>
+                    {this.props.producers.map((producer) =>
+                        <option key={producer.name} value={producer.name}>
+                            {producer.name}
+                        </option>
+                    )}
+                </select>
+                <div style={inputStyle}>
+                    <div className="form-inline" onKeyPress={this.handleKeyPress}>
+                        {
+                            this.state.selectedProducer.parameters
+                                .map(parameter => {
+                                    return (
+                                    <Fragment>
+                                        <TransformerParameter key={parameter.name} id={parameter.name} parameter={parameter}
+                                                                   action={this.handleProducerParameterChange}/>{'\u00A0'}{'\u00A0'}
+                                    </Fragment> )
+                                })
+                        }
+                        <button
+                            style={{marginLeft: "auto", marginRight:"0%"}}
+                            type="button"
+                            onClick={ this.handleProducingGenes }
+                            className="btn btn-outline-success">
+                            Produce Gene Set
+                        </button>
+                    </div>
+                </div>
             </div>
     );
   }

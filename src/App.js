@@ -1,5 +1,5 @@
 // local components
-import React from 'react';
+import React, {Fragment} from 'react';
 import ProducerControls from './components/ProducerControls.js'
 import {MyLoader} from './components/ListItem.js'
 // remote components
@@ -55,7 +55,7 @@ class App extends React.Component {
             selectedProducer: null,
 
             // gene view state
-            gene_list_ids: ["LQuc2bN6fE"],
+            gene_list_ids: [],
             recently_cleared_gene_lists: [],
 
             // transformer query
@@ -113,10 +113,20 @@ class App extends React.Component {
                         })
                         .then(response => response.json())
                         .then(data => {
-                            this.setState({gene_list_ids: this.state.gene_list_ids.concat(data.gene_list_id)},
-                                () => {
-                                        console.log("new gene list ids", this.state.gene_list_ids, "with", data.gene_list_id);
-                                });
+                            if (data === undefined || data === null || data.length === 0 ) {
+                                throw "Data is undefined or not there"
+                            } else {
+                                // TODO: need to emit query results to UI somehow
+                                // Should be the same thing that emits status of query being run/loading?
+                                if (data.genes && data.genes.length > 0) {
+                                    this.setState({gene_list_ids: this.state.gene_list_ids.concat(data.gene_list_id)},
+                                        () => {
+                                            console.log("new gene list ids", this.state.gene_list_ids, "with", data.gene_list_id);
+                                        });
+                                } else {
+                                    console.log("no gene data received from", transformerQuery);
+                                }
+                            }
                         })
     };
 
@@ -138,7 +148,7 @@ class App extends React.Component {
             })
             .then(response => response.json())
             .then(data => {
-                if (data === undefined || data.length === 0) {
+                if (data === undefined || data === null || data.length === 0 ) {
                     throw "Data is undefined or not there"
                 } else {
                     console.log(data);
@@ -308,7 +318,9 @@ class App extends React.Component {
                             <div className={"row"} style={{padding:"15px", paddingTop: "0%"}}>
                                 <h4>Gene Sets</h4>
                                 <div style={{marginLeft: "auto", marginRight: 0}}>
-                                    <button onClick={ this.clearGeneLists }>Clear Gene Sets</button>
+                                    { this.state.gene_list_ids.length > 0 ?
+                                        <button onClick={ this.clearGeneLists }>Clear Gene Sets</button>
+                                        : <button onClick={ this.clearGeneLists } disabled>Clear Gene Sets</button>}
                                     { this.state.recently_cleared_gene_lists.length > 0 ?
                                         <React.Fragment>
                                             {'\u00A0'}{'\u00A0'}<button onClick={ this.undoClearGeneLists }>Undo</button>
