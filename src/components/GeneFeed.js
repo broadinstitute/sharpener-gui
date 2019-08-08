@@ -171,7 +171,7 @@ export class GeneTable extends React.Component {
                                     <BootstrapTable
                                         {...props.baseProps} />
                                     {!(Object.values(props.columnToggleProps.toggles).every((value => value))) ?
-                                        <span style={{fontSize:"small", marginLeft:"0.5em"}}>Filtered Columns</span> : false}
+                                        <span style={{fontSize:"small", marginLeft:"1em"}}>Filtered Columns</span> : false}
                                     <GeneTableColumnFilter
                                         {...props.columnToggleProps}/>
                                 </Fragment>}
