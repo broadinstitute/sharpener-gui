@@ -6,6 +6,6 @@ export const FEATURE_FLAG = {
     undoGeneLists: true,
     histories: {
         showHistories: true,
-        emitOperationToLedger: false
+        emitOperationToLedger: true
     }
 };

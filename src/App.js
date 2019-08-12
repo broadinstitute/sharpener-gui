@@ -17,7 +17,6 @@ import GeneTable from './components/GeneFeed.js';
 import Card from "react-bootstrap/Card";
 import BootstrapTable from "react-bootstrap-table-next";
 
-// TODO: refactor for importing across app
 const FRONTEND_URL =  process.env.REACT_APP_FRONTEND_URL;
 const SERVICE_URL =  process.env.REACT_APP_SERVICE_URL;
 
@@ -154,7 +153,7 @@ class App extends React.Component {
 
                     // log the gene list
                     if (FEATURE_FLAG.notUniqueGeneList) {
-                        this.setState({gene_list_ids: this.state.gene_list_ids.concat([data.gene_list_id])},
+                        this.setState({ gene_list_ids: this.state.gene_list_ids.concat([data.gene_list_id]) },
                             () => {
                                 console.log(
                                     "gene list id for input ".concat(geneList),
@@ -169,17 +168,28 @@ class App extends React.Component {
                                 if (FEATURE_FLAG.histories.emitOperationToLedger) {
                                     let time = new Date().getTime();
                                     let stateCopy = {...this.state};
-                                    console.log(stateCopy)
+                                    console.log(stateCopy);
                                     // no such thing as a create list query
-                                    // stateCopy.transactionLedger[time][data.gene_list_id] = {
-                                    //     name: "create_gene_list",
-                                    //     function: "create",
-                                    //     controls: [
-                                    //         {name: "gene_symbols", value: geneList}
-                                    //     ]
-                                    // };
-                                    // this.setState(stateCopy, () => {
-                                    //     console.log("transaction ledger", JSON.stringify(stateCopy.transactionLedger[time][data.gene_list_id])); })
+                                    // so we have to emulate it
+                                    Object.assign(
+                                        stateCopy.transactionLedger,
+                                        {
+                                            [time]: {
+                                                [data.gene_list_id]: {
+                                                    name: "create_gene_list",
+                                                    function: "create",
+                                                    controls: [
+                                                        {name: "gene_symbols", value: geneList}
+                                                    ]
+                                                }
+                                            }
+                                        }
+                                    );
+
+                                    JSON.stringify(stateCopy.transactionLedger);
+                                    this.setState(stateCopy, () => {
+                                        console.log("transaction ledger",
+                                            JSON.stringify(stateCopy.transactionLedger[time][data.gene_list_id])); })
                                 }
 
                             });
@@ -352,6 +362,7 @@ class App extends React.Component {
                                     {/*<h6>Previous Gene Sets</h6>*/}
                                     <GeneFeed
                                         geneListIDs={ this.state.gene_list_ids }
+                                        transactionHistory={this.state.transactionLedger}
                                         handleGeneListSelection={ this.updateGeneListSelection }
                                         handleGeneSelection={ this.updateText }
                                         clearGeneListHandler={ this.clearGeneListHandler }

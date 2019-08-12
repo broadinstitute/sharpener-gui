@@ -11,7 +11,6 @@ import {FEATURE_FLAG} from "../parameters/FeatureFlags";
 
 import Select from 'react-select';
 
-
 const SERVICE_URL =  process.env.REACT_APP_SERVICE_URL;
 
 // practically speaking all this component does or should do is showcase gene tables in chronological order (soonest to farthest)
@@ -20,6 +19,7 @@ export default class GeneFeed extends React.Component {
         super(props);
         this.state = {
             geneListIDs: props.geneListIDs,
+            transactionHistory: props.transactionHistory
         }
     }
 
@@ -42,6 +42,7 @@ export default class GeneFeed extends React.Component {
         return (
             <Fragment>
                 <div className={"row"}>
+
                     <div className={"col-sm-2"}>
                         {this.state.geneListIDs.length > 0 && FEATURE_FLAG.histories.showHistories ?
                             <Card>
@@ -49,13 +50,17 @@ export default class GeneFeed extends React.Component {
                                     History
                                 </Card.Header>
                                 <ul>
-                                    {this.state.geneListIDs.slice(0).reverse().map(geneListID =>
-                                         <li key={geneListID}> {geneListID} </li>
-                                    )}
+                                    {
+                                        Object.keys(this.state.transactionHistory)
+
+                                            // .slice(0).reverse().map(geneListID =>
+                                            //  <li key={geneListID}> {geneListID} </li> )
+                                    }
                                 </ul>
                             </Card>
                         : <Fragment/>}
                     </div>
+
                     <div className={"col-sm-10"}>
                         {this.state.geneListIDs.length > 0 ? this.state.geneListIDs.slice(0).reverse().map((geneListID) =>
                             <Fragment>
@@ -79,7 +84,6 @@ export default class GeneFeed extends React.Component {
 const GeneTableColumnFilter = ({columns, onColumnToggle, toggles}) => {
     // https://react-bootstrap-table.github.io/react-bootstrap-table2/docs/basic-column-toggle.html
     // https://react-select.com/home
-    console.log("toggles", toggles);
     return (
         <Fragment>
             <Select
