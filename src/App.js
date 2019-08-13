@@ -3,6 +3,7 @@ import React, {Fragment} from 'react';
 import ProducerControls from './components/ProducerControls.js'
 import {MyLoader} from './components/ListItem.js'
 import {FEATURE_FLAG} from "./parameters/FeatureFlags";
+import {FRONTEND_URL, SERVICE_URL} from "./parameters/EndpointURLs"
 
 // remote components
 // libraries
@@ -17,8 +18,6 @@ import GeneTable from './components/GeneFeed.js';
 import Card from "react-bootstrap/Card";
 import BootstrapTable from "react-bootstrap-table-next";
 
-const FRONTEND_URL =  process.env.REACT_APP_FRONTEND_URL;
-const SERVICE_URL =  process.env.REACT_APP_SERVICE_URL;
 
 const divStyle = {
     margin:"2.25em"
@@ -37,96 +36,9 @@ class App extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {
-            // TODO: initialize the producer and transformer info lists from the sharpeners?
-            // these should default to a false-y value to allow us to check for their full presence
-            producers: null,
-            expanders: null,
-            transformers: null,
 
-            // gene list creation state
-            selectedProducer: null,
-
-            // gene view state
-            gene_list_ids: [],
-            recently_cleared_gene_lists: [],
-
-            // transformer query
-            selectedGeneListsByID: [],
-            selectedExpanders: [],
-
-            // transaction history
-                // list of dates -> geneListID -> query
-            transactionLedger: []
-
-        };
         this.handleTextChange = this.handleTextChange.bind(this);
     }
-
-    getTransformers = () => {
-        console.log("get transformers");
-        fetch(SERVICE_URL.concat('/transformers'))
-            .then(response => response.json())
-            .then(response => { console.log(response); return response; })
-            .then(data => {
-                if (data === undefined || data.length === 0) {
-                    throw "No data or undefined data";
-                } else {
-                    this.setState({transformers: data},
-                        () => {
-                        console.log("received", this.state.transformers);
-                        const defaultProducer = {
-                            name: "Gene Symbols",
-                            function: "producer",
-                            parameters: [{name: "gene symbol", type: "list"}], // TODO: can we always assume producers have a single parameter for input?
-                            // TODO: Gene ID sources/types returned? Link up with Biolink Schema's context/JSON-LD?
-                        };
-                        this.setState({selectedProducer: defaultProducer});
-                        const onlyProducers = this.state.transformers.filter((item) => { return item['function'] === 'producer' });
-                        this.setState({producers: [defaultProducer].concat(onlyProducers)});
-
-                        const onlyExpanders =  this.state.transformers.filter((item) => { return item['function'] === 'expander' });
-                        this.setState({ expanders: [].concat(onlyExpanders) });
-                    });
-
-                }
-                return data;
-            })
-            .catch(error => {
-                console.log(error);
-            });
-    };
-
-    // DONE - RC2
-    queryTransformer = (transformerQuery) => {
-        // remember: returning fetch, a Promise, doesn't return its result, but rather just the promise
-        return fetch(SERVICE_URL.concat('/transform'), {
-                            method: "POST",
-                            headers: {
-                                'Accept': 'application/json',
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify(transformerQuery)
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data === undefined || data === null || data.length === 0 ) {
-                                throw "Data is undefined or not there"
-                            } else {
-                                // Should be the same thing that emits status of query being run/loading?
-                                if (data.genes && data.genes.length > 0) {
-                                    this.setState({gene_list_ids: this.state.gene_list_ids.concat(data.gene_list_id)},
-                                        () => {
-                                            console.log("new gene list ids", this.state.gene_list_ids, "with", data.gene_list_id);
-
-                                    });
-
-                                } else {
-                                    console.log("no gene data received from", transformerQuery);
-                                }
-                            }
-                        })
-    };
 
     handleProducerSelect = (producerName) => {
         const selectedProducer = this.state.producers.filter(producer => { return producer.name === producerName})[0];
@@ -274,16 +186,6 @@ class App extends React.Component {
         console.log("clearing gene list", e.target.value);
         const geneListID = e.target.value;
         this.clearGeneList(geneListID);
-    };
-
-    clearGeneList = (clearedGeneListID) => {
-        const tempGeneLists = this.state.gene_list_ids.slice(0);
-        this.setState({gene_list_ids: tempGeneLists.filter(el => el !== clearedGeneListID)});
-        this.setState({selectedGeneListsByID: this.state.selectedGeneListsByID.filter(el => el !== clearedGeneListID)});
-
-        if (FEATURE_FLAG.undoGeneLists) {
-            this.updateUndoStack([clearedGeneListID])
-        }
     };
 
     clearGeneLists = () => {

@@ -185,22 +185,6 @@ export class AggregationSender extends React.Component {
         this.throwbackGeneListID = props.handleOnClick;
     }
 
-    queryAggregator = (action, selectedGeneLists) => {
-        let aggregationQuery = {
-            operation: action,
-            gene_list_ids: selectedGeneLists
-        };
-
-        return fetch(this.SERVICE_URL.concat("/aggregate"), {
-                method: "POST",
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(aggregationQuery)
-            })
-    };
-
     promiseAggregation = () => {
         if (this.props.selectedGeneLists && this.props.selectedGeneLists.length > 0) {
             return Promise.resolve(this.queryAggregator(this.props.action, this.props.selectedGeneLists))
