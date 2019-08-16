@@ -120,12 +120,6 @@ export default class TransformerControls extends React.Component {
             )).then(resolved => { console.log("query complete"); });
     };
 
-    onAggregate = (newAggregationGeneListID) => {
-        this.props.handleGeneListSelection(newAggregationGeneListID);
-    };
-
-
-
     render() {
         // form has to wrap every transformer even if not all of them are contributing to the extant query
         return (
@@ -143,7 +137,7 @@ export default class TransformerControls extends React.Component {
                             <AggregatorControls
                                 currentSelections={ { selectedGeneLists: this.props.selectedGeneLists, selectedExpanders: this.props.selectedExpanders } }
                                 actions={["union", "intersection"]}
-                                handleOnClick={ this.onAggregate }
+                                aggregateGenes={ this.props.aggregateGenes }
                             />
                         </div>
 
@@ -171,7 +165,7 @@ export class AggregatorControls extends React.Component {
                         this.props.actions.map(operation =>
                             <AggregationSender
                                 selectedGeneLists={this.props.currentSelections.selectedGeneLists}
-                                handleOnClick={this.props.handleOnClick}
+                                aggregateGenes={this.props.aggregateGenes}
                                 action={operation}/>) : <div/> }
                 </div>
             </Fragment> )
@@ -179,32 +173,12 @@ export class AggregatorControls extends React.Component {
 }
 
 export class AggregationSender extends React.Component {
-    constructor(props) {
-        super(props);
-        this.SERVICE_URL =  process.env.REACT_APP_SERVICE_URL;
-        this.throwbackGeneListID = props.handleOnClick;
-    }
-
-    promiseAggregation = () => {
-        if (this.props.selectedGeneLists && this.props.selectedGeneLists.length > 0) {
-            return Promise.resolve(this.queryAggregator(this.props.action, this.props.selectedGeneLists))
-                .then(response => response.json())
-                .then(data => {
-                    // TODO
-                    if (FEATURE_FLAG.histories.emitOperationToLedger) {
-
-                    }
-                    this.throwbackGeneListID(data.gene_list_id);
-                });
-        }
-    };
-
     render() {
         return (
         <Fragment>
             <button
                 type="button"
-                onClick={ this.promiseAggregation }
+                onClick={ () => this.props.aggregateGenes(this.props.action) }
                 // className="btn btn-outline-success my-2 my-sm-0"
                 style={{marginLeft: "auto", marginRight: "0%"}}
             >

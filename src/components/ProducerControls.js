@@ -133,10 +133,8 @@ export class ProducerControls extends React.Component {
                             this.state.selectedProducer.parameters
                                 .map(parameter => {
                                     return (
-                                    <Fragment>
                                         <TransformerParameter key={parameter.name} id={parameter.name} parameter={parameter}
-                                                                   action={this.handleProducerParameterChange}/>{'\u00A0'}{'\u00A0'}
-                                    </Fragment> )
+                                                                   action={this.handleProducerParameterChange}/> )
                                 })
                         }
                         <button

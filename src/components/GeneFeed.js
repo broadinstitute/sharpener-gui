@@ -67,7 +67,7 @@ export default class GeneFeed extends React.Component {
                                 <GeneTable
                                     key={ geneListID }
                                     geneListID={ geneListID }
-                                    clearGeneListHandler={ this.props.clearGeneListHandler }
+                                    clearGeneList={ this.props.clearGeneList }
                                     handleGeneListSelection={ this.props.handleGeneListSelection }
                                     handleGeneSelection={ this.props.handleGeneSelection }
                                 /><br/>
@@ -120,8 +120,6 @@ export class GeneTable extends React.Component {
         super(props);
         this.keyField = 'gene_id';
         this.geneListID = props.geneListID;
-        this.clearGeneList = props.clearGeneListHandler;
-
         this.state = {
             geneList: null,
             geneTableColumns: [{dataName: ""}],
@@ -162,8 +160,8 @@ export class GeneTable extends React.Component {
                         </button>
                         <button
                             title={"Clear this Gene List from the Gene Feed"}
-                            value={this.geneListID}
-                            onClick={this.clearGeneList}
+                            value={ this.geneListID }
+                            onClick={ (e) => { return this.props.clearGeneList(e.target.value) } }
                             style={{border: "none", background: "none", fontSize: "large"}}>
                             &times;
                         </button>
@@ -176,7 +174,7 @@ export class GeneTable extends React.Component {
                         {/*TODO: BootstrapTable has an embedded margin style that is preventing the Collapse animation from being as smooth as it should be*/}
                         {/*TODO: Eliminate Bootstrap |- Eliminate Bootstrap Table*/}
                         <ToolkitProvider
-                            keyField={"gene_id"}
+                            keyField={this.keyField}
                             name={this.geneListID}
                             data={this.state.geneTableData}
                             columns={this.state.geneTableColumns}
