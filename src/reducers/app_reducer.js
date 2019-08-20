@@ -13,7 +13,8 @@ import {
     CLEAR_SELECTIONS,
     CLEAR_ALL_GENE_LISTS,
     CLEAR_SINGLE_GENE_LIST,
-    UNDO_LAST_CLEAR
+    UNDO_LAST_CLEAR,
+    RECORD_SHARPENER_ACTION
 } from "../actions"
 
 const defaultState = {
@@ -51,6 +52,7 @@ const defaultState = {
 };
 
 export default function(state=defaultState, action) {
+    console.log(action.type);
     switch(action.type) {
         case GET_TRANSFORMERS:
             return {
@@ -63,22 +65,22 @@ export default function(state=defaultState, action) {
         case CREATE_GENE_LIST:
             return {
                 ...state,
-                gene_list_ids: state.gene_list_ids.concat([action.payload.creation.gene_list_id])
+                gene_list_ids: state.gene_list_ids.concat([action.payload.results.gene_list_id])
             };
         case PRODUCE_GENES:
             return {
                 ...state,
-                gene_list_ids: state.gene_list_ids.concat([action.payload.production.gene_list_id])
+                gene_list_ids: state.gene_list_ids.concat([action.payload.results.gene_list_id])
             };
         case TRANSFORM_GENES:
             return {
                 ...state,
-                gene_list_ids: state.gene_list_ids.concat([action.payload.transformation.gene_list_id])
+                gene_list_ids: state.gene_list_ids.concat([action.payload.results.gene_list_id])
             };
         case AGGREGATE_GENES:
             return {
                 ...state,
-                gene_list_ids: state.gene_list_ids.concat([action.payload.aggregation.gene_list_id])
+                gene_list_ids: state.gene_list_ids.concat([action.payload.results.gene_list_id])
             };
         case GET_EXPANDERS_FROM_TRANSFORMERS:
             return {
@@ -134,6 +136,11 @@ export default function(state=defaultState, action) {
                 ...state,
                 gene_list_ids: action.payload.gene_list_ids,
                 recently_cleared_gene_lists: action.payload.recently_cleared_gene_lists
+            };
+        case RECORD_SHARPENER_ACTION:
+            return {
+                ...state,
+                transactionLedger: state.transactionLedger.concat([action.payload])
             };
         default:  // do nothing
             return state;

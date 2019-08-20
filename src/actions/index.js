@@ -18,12 +18,12 @@ export const CLEAR_SELECTIONS = 'CLEAR_SELECTIONS';
 export const CLEAR_SINGLE_GENE_LIST = 'CLEAR_SINGLE_GENE_LIST';
 export const CLEAR_ALL_GENE_LISTS = 'CLEAR_ALL_GENE_LISTS';
 export const UNDO_LAST_CLEAR = 'UNDO_LAST_CLEAR';
+export const RECORD_SHARPENER_ACTION = 'RECORD_SHARPENER_ACTION';
 
 export function getTransformers(continuation = (result) => result) {
     return (dispatch) => {
         const requestTransformers = fetch(SERVICE_URL.concat('/transformers'))
             .then(response => response.json())
-            .then(response => { console.log(response); return response; })
             .then(data => {
                 if (data === undefined || data.length === 0) {
                     throw "No data or undefined data";
@@ -67,34 +67,44 @@ export function getProducersFromTransformers(transformers) {
 }
 
 export function createGeneList(geneSymbolList) {
-    const requestGeneListID = fetch(SERVICE_URL.concat("create_gene_list"),
-        {
-            method: "POST",
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(geneSymbolList)
-        })
-        .then(response => { console.log(response); return response; })
-        .then(response => response.json())
-        .then(data => {
-            return { creation: {
+    return (dispatch) => {
+        const requestGeneListID = fetch(SERVICE_URL.concat("create_gene_list"),
+            {
+                method: "POST",
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(geneSymbolList)
+            })
+            .then(response => {
+                console.log(response);
+                return response;
+            })
+            .then(response => response.json())
+            .then(data => {
+                return {
+                    results: {
                         gene_list_id: data.gene_list_id,
-                        genes: data.genes }
-        }})
-        .catch(error => {
-            console.error(error)
-        });
+                        genes: data.genes
+                    },
+                    query: geneSymbolList
+                }
+            })
+            .catch(error => {
+                console.error(error)
+            });
 
-    return {
-        type: CREATE_GENE_LIST,
-        payload: requestGeneListID
+        return dispatch({
+            type: CREATE_GENE_LIST,
+            payload: requestGeneListID
+        })
     }
 }
 
 export function produceGenes(productionQuery) {
-    const requestProduction = fetch(SERVICE_URL.concat('/transform'), {
+    return (dispatch) => {
+        const requestProduction = fetch(SERVICE_URL.concat('/transform'), {
             method: "POST",
             headers: {
                 'Accept': 'application/json',
@@ -102,56 +112,72 @@ export function produceGenes(productionQuery) {
             },
             body: JSON.stringify(productionQuery)
         })
-        .then(response => { console.log(response); return response; })
-        .then(response => response.json())
-        .then(data => {
-            if (data === undefined || data === null || data.length === 0 ) {
-                throw "Data is undefined or not there"
-            } else {
-                if (data.genes && data.genes.length > 0) {
-                    return {
-                        production: {
-                            gene_list_id: data.gene_list_id,
-                            genes: data.genes
-                        }
-                    };
+            .then(response => {
+                console.log(response);
+                return response;
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data === undefined || data === null || data.length === 0) {
+                    throw "Data is undefined or not there"
                 } else {
-                    console.error("no gene data received from", productionQuery);
+                    if (data.genes && data.genes.length > 0) {
+                        return {
+                            results: {
+                                gene_list_id: data.gene_list_id,
+                                genes: data.genes
+                            },
+                            query: productionQuery
+                        };
+                    } else {
+                        console.error("no gene data received from", productionQuery);
+                    }
                 }
-            }
+            });
+        return dispatch({
+            type: PRODUCE_GENES,
+            payload: requestProduction
         });
-    return {
-        type: PRODUCE_GENES,
-        payload: requestProduction
     }
 }
 
 export function transformGenes(transformerQuery) {
-    const requestTransformation = fetch(SERVICE_URL.concat('/transform'), {
-        method: "POST",
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(transformerQuery)
-    })
-    .then(response => { console.log(response); return response; })
-    .then(response => response.json())
-    .then(data => {
-        if (data === undefined || data === null || data.length === 0 ) {
-            throw "Data is undefined or not there"
-        } else {
-            return { transformation: {
-                        gene_list_id: data.gene_list_id,
-                        genes: data.genes }
-        }
-    }})
-    .catch(error => { console.error(error); });
+    return (dispatch) => {
+        const requestTransformation = fetch(SERVICE_URL.concat('/transform'), {
+            method: "POST",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(transformerQuery)
+        })
+            .then(response => {
+                console.log(response);
+                return response;
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data === undefined || data === null || data.length === 0) {
+                    throw "Data is undefined or not there"
+                } else {
+                    return {
+                        results: {
+                            gene_list_id: data.gene_list_id,
+                            genes: data.genes
+                        },
+                        query: transformerQuery
+                    }
+                }
+            })
+            .catch(error => {
+                console.error(error);
+            });
 
-    return {
+        return dispatch({
             type: TRANSFORM_GENES,
             payload: requestTransformation
-        }
+        })
+    }
 }
 
 export function aggregateGenes(operation) {
@@ -176,11 +202,12 @@ export function aggregateGenes(operation) {
                 .then(response => response.json())
                 .then(data => {
                     return {
-                        aggregation: {
+                        results: {
                             gene_list_id: data.gene_list_id,
                             genes: data.genes
                         },
-                        operation: operation
+                        operation: operation,
+                        query: aggregationQuery
                     }
                 });
 
