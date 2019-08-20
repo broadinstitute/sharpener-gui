@@ -41,40 +41,19 @@ export default class GeneFeed extends React.Component {
         // feed order is going to be run each render
         return (
             <Fragment>
-                <div className={"row"}>
-
-                    <div className={"col-sm-2"}>
-                        {this.state.geneListIDs.length > 0 && FEATURE_FLAG.histories.showHistories ?
-                            <Card>
-                                <Card.Header as={"h5"}>
-                                    History
-                                </Card.Header>
-                                <ul>
-                                    {
-                                        Object.keys(this.state.transactionHistory)
-
-                                            // .slice(0).reverse().map(geneListID =>
-                                            //  <li key={geneListID}> {geneListID} </li> )
-                                    }
-                                </ul>
-                            </Card>
-                        : <Fragment/>}
-                    </div>
-
-                    <div className={"col-sm-10"}>
-                        {this.state.geneListIDs.length > 0 ? this.state.geneListIDs.slice(0).reverse().map((geneListID) =>
-                            <Fragment>
-                                <GeneTable
-                                    key={ geneListID }
-                                    geneListID={ geneListID }
-                                    clearGeneList={ this.props.clearGeneList }
-                                    handleGeneListSelection={ this.props.handleGeneListSelection }
-                                    handleGeneSelection={ this.props.handleGeneSelection }
-                                /><br/>
-                            </Fragment>
-                            ) : <MyLoader active={true}/>
-                        }
-                    </div>
+                <div className={"col-sm-10"}>
+                    {this.state.geneListIDs.length > 0 ? this.state.geneListIDs.slice(0).reverse().map((geneListID) =>
+                        <Fragment>
+                            <GeneTable
+                                key={ geneListID }
+                                geneListID={ geneListID }
+                                clearGeneList={ this.props.clearGeneList }
+                                handleGeneListSelection={ this.props.handleGeneListSelection }
+                                handleGeneSelection={ this.props.handleGeneSelection }
+                            /><br/>
+                        </Fragment>
+                        ) : <MyLoader active={true}/>
+                    }
                 </div>
             </Fragment>
         )

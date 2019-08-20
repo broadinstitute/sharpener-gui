@@ -3,6 +3,7 @@ import {FEATURE_FLAG} from "../parameters/FeatureFlags";
 import {store} from "../store";
 
 // general app actions
+export const GET_GENE_LIST_BY_ID = 'GET_GENE_LIST_BY_ID';
 export const GET_TRANSFORMERS = 'GET_TRANSFORMERS';
 export const CREATE_GENE_LIST = 'CREATE_GENE_LIST';
 export const PRODUCE_GENES = 'PRODUCE_GENES';
@@ -18,6 +19,20 @@ export const CLEAR_SELECTIONS = 'CLEAR_SELECTIONS';
 export const CLEAR_SINGLE_GENE_LIST = 'CLEAR_SINGLE_GENE_LIST';
 export const CLEAR_ALL_GENE_LISTS = 'CLEAR_ALL_GENE_LISTS';
 export const UNDO_LAST_CLEAR = 'UNDO_LAST_CLEAR';
+
+export function getGeneListByID(geneListID) {
+    return (dispatch) => {
+        const requestGenes = fetch(SERVICE_URL.concat('/gene_list').concat("/"+geneListID))
+                .then(response => response.json())
+                .then(data => {
+                    return data
+                });
+        return dispatch({
+            type: GET_GENE_LIST_BY_ID,
+            payload: requestGenes
+        });
+    }
+}
 
 export function getTransformers(continuation = (result) => result) {
     return (dispatch) => {

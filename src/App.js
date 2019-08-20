@@ -25,6 +25,7 @@ import Spinner from "./elements/Spinner/Spinner";
 import ProducerControls from './components/ProducerControls.js'
 import TransformerControls from "./components/TransformerControls";
 import GeneFeed from "./components/GeneFeed";
+import GenePivot from "./components/GenePivot";
 
 // app configurations
 import {FEATURE_FLAG} from "./parameters/FeatureFlags";
@@ -34,6 +35,7 @@ import {FRONTEND_URL, SERVICE_URL} from "./parameters/EndpointURLs"
 import './App.css';
 import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
 import 'font-awesome/css/font-awesome.min.css';
+import {History} from "./components/GeneHistories";
 
 const divStyle = {
     margin:"2.25em"
@@ -87,13 +89,17 @@ class App extends React.Component {
                         </div>
                         {this.props.gene_list_ids ?
                             <React.Fragment>
-                                {/*<h6>Previous Gene Sets</h6>*/}
-                                <GeneFeed
-                                    geneListIDs={ this.props.gene_list_ids }
-                                    transactionHistory={this.props.transactionLedger}
-                                    handleGeneListSelection={ this.props.toggleGeneListSelection }
-                                    clearGeneList={ this.props.clearSingleGeneList }
-                                />
+                                <GenePivot geneListIDs={ this.props.gene_list_ids }/>
+                                <div className={"row"}>
+                                    <History transactionHistory={ this.props.transactionHistory }/>
+                                    {/*<h6>Previous Gene Sets</h6>*/}
+                                    <GeneFeed
+                                        geneListIDs={ this.props.gene_list_ids }
+                                        transactionHistory={this.props.transactionLedger}
+                                        handleGeneListSelection={ this.props.toggleGeneListSelection }
+                                        clearGeneList={ this.props.clearSingleGeneList }
+                                    />
+                                </div>
                             </React.Fragment>
                             : <Spinner/> }
                     </div>
