@@ -2,6 +2,9 @@ import * as d3 from 'd3'
 // TODO:
 // https://towardsdatascience.com/react-d3-the-macaroni-and-cheese-of-the-data-visualization-world-12bafde1f922
 
+// use these for application actions
+// https://github.com/couchand/d3-redux
+
 /*CONFIGURATION DATA*/
 
 const drawGraph = (props) => {
@@ -385,6 +388,7 @@ const drawGraph = (props) => {
         .on('keydown', keydown)
         .on('keyup', keyup);
     restart();
-}
+
+};
 
 export default drawGraph;
