@@ -8,9 +8,6 @@ import * as d3 from 'd3'
 /*CONFIGURATION DATA*/
 
 const drawGraph = (props) => {
-    // set up SVG for D3
-    const width = props.width;
-    const height = props.height;
     // set up initial nodes and links
     //  - nodes are known by 'id', not by index in array.
     //  - reflexive edges are indicated on the node (as a bold black circle).
@@ -32,7 +29,14 @@ const drawGraph = (props) => {
 
     const colors = d3.scaleOrdinal(d3.schemeCategory10);
 
+    // Responsive width/height
+    // https://stackoverflow.com/a/9539361
+
     d3.select(".viz > *").remove();
+
+    let width = props.width;
+    let height = props.height;
+
     const svg = d3.select('.viz')
         .append('svg')
         .on('contextmenu', () => { d3.event.preventDefault(); })
