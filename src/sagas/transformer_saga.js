@@ -11,9 +11,10 @@ function* recordSharpenerAction(action) {
     yield put({
         type: RECORD_SHARPENER_ACTION,
         payload: {
+            type: action.type,
             gene_list_id: action.payload.results.gene_list_id,
             query: action.payload.query,
-            timestamp: Date.now(),  // TODO: should this be done inside of the action, for immediacy/sync?
+            timestamp: Date.now()  // TODO: should this be done inside of the action, for immediacy/sync?
         }
     })
 }

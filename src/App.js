@@ -88,15 +88,19 @@ class App extends React.Component {
                             </div>
                         </div>
                         {this.props.gene_list_ids ?
-                            <div className={"row"}>
-                                {/*<h6>Previous Gene Sets</h6>*/}
-                                <GeneHistory geneListIDs={ this.props.gene_list_ids } transactionHistory={this.props.transactionLedger}/>
-                                <GeneFeed
-                                    geneListIDs={ this.props.gene_list_ids }
-                                    handleGeneListSelection={ this.props.toggleGeneListSelection }
-                                    clearGeneList={ this.props.clearSingleGeneList }
-                                />
-                            </div>
+                            <Fragment>
+                                <div className={"row"}>
+                                    <GeneHistory geneListIDs={ this.props.gene_list_ids } transactionHistory={this.props.transactionLedger}/>
+                                </div>
+                                <div className={"row"}>
+                                    {/*<h6>Previous Gene Sets</h6>*/}
+                                    <GeneFeed
+                                        geneListIDs={ this.props.gene_list_ids }
+                                        handleGeneListSelection={ this.props.toggleGeneListSelection }
+                                        clearGeneList={ this.props.clearSingleGeneList }
+                                    />
+                                </div>
+                            </Fragment>
                             : <Spinner/> }
                     </div>
 
