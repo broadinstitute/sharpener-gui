@@ -1,7 +1,4 @@
 import * as d3 from 'd3'
-
-import "./graph.css"
-
 // TODO:
 // https://towardsdatascience.com/react-d3-the-macaroni-and-cheese-of-the-data-visualization-world-12bafde1f922
 
@@ -9,7 +6,6 @@ import "./graph.css"
 // https://github.com/couchand/d3-redux
 
 /*CONFIGURATION DATA*/
-
 
 const drawGraph = (props) => {
     // set up initial nodes and links
@@ -81,8 +77,8 @@ const drawGraph = (props) => {
         .attr('id', 'end-arrow')
         .attr('viewBox', '0 -5 10 10')
         .attr('refX', 6)
-        // .attr('markerWidth', MARKER_WIDTH)
-        // .attr('markerHeight', MARKER_HEIGHT)
+        .attr('markerWidth', 3)
+        .attr('markerHeight', 3)
         .attr('orient', 'auto')
         .append('svg:path')
         .attr('d', 'M0,-5L10,0L0,5')
@@ -92,8 +88,8 @@ const drawGraph = (props) => {
         .attr('id', 'start-arrow')
         .attr('viewBox', '0 -5 10 10')
         .attr('refX', 4)
-        // .attr('markerWidth', MARKER_WIDTH)
-        // .attr('markerHeight', MARKER_HEIGHT)
+        .attr('markerWidth', 3)
+        .attr('markerHeight', 3)
         .attr('orient', 'auto')
         .append('svg:path')
         .attr('d', 'M10,-5L0,0L10,5')
