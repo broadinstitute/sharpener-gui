@@ -13,6 +13,7 @@ function* recordSharpenerAction(action) {
         payload: {
             gene_list_id: action.payload.results.gene_list_id,
             query: action.payload.query,
+            type: action.type,
             timestamp: Date.now(),  // TODO: should this be done inside of the action, for immediacy/sync?
         }
     })

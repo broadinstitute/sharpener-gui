@@ -35,9 +35,6 @@ Components
 export default class TransformerControls extends React.Component {
     constructor(props) {
         super(props);
-
-        console.log("Expander Controls", props.expanders);
-
         this.state = {
             transformerControls : {}  // these aren't query controls specifically since not all transformers might be selected while a control is being filled TODO: sane?
         };
@@ -92,8 +89,6 @@ export default class TransformerControls extends React.Component {
         // yeah this could be simpler -- it's only complicated because it's defined for the general case
 
         let transformerSelectionPairs = cartesian(this.props.selectedExpanders, this.props.selectedGeneLists);  // https://stackoverflow.com/a/1316389
-        console.log(transformerSelectionPairs);
-
         // Test: just take the first list and transformer, see if we can get what we need back
 
         Promise.all(transformerSelectionPairs.map(pair => {
@@ -117,7 +112,7 @@ export default class TransformerControls extends React.Component {
 
                 return this.queryTransformer(transformerQuery)
             }
-            )).then(resolved => { console.log("query complete"); });
+            ));
     };
 
     render() {
@@ -291,10 +286,6 @@ export class TransformerList extends React.Component{
         this.transformers = props.transformers;
         this.handleTransformerSelection = props.handleTransformerSelection;
         this.throwbackExpanderIndex = props.throwbackExpanderIndex;
-
-        console.log(this.transformers); // check
-        console.log(this.handleTransformerSelection); // check
-        console.log(this.throwbackExpanderIndex); // check
 
         this.state = {
             // TODO: refactor to Redux

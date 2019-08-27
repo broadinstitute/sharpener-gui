@@ -63,7 +63,7 @@ class App extends React.Component {
                             <ProducerControls
                                 selectedProducer={this.props.selectedProducer}
                                 producers={this.props.producers}
-                                queryPromise={this.props.transformGenes}
+                                queryPromise={this.props.produceGenes}
                                 handleGeneListCreation={this.props.createGeneList}
                                 handleProducerSelect={this.props.selectProducer}/>
                             : <Spinner/>}
@@ -87,10 +87,10 @@ class App extends React.Component {
                                 }
                             </div>
                         </div>
+                        <GeneHistory geneListIDs={ this.props.gene_list_ids } transactionLedger={this.props.transactionLedger}/>
                         {this.props.gene_list_ids ?
                             <div className={"row"}>
                                 {/*<h6>Previous Gene Sets</h6>*/}
-                                <GeneHistory geneListIDs={ this.props.gene_list_ids } transactionHistory={this.props.transactionLedger}/>
                                 <GeneFeed
                                     geneListIDs={ this.props.gene_list_ids }
                                     handleGeneListSelection={ this.props.toggleGeneListSelection }

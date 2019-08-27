@@ -1,126 +1,228 @@
-import React, {useEffect, useRef, useState, useLayoutEffect} from "react"
+import React, {useEffect, useRef, useState, useLayoutEffect, Fragment} from "react"
 import ReactDOM from 'react-dom';
 import {FEATURE_FLAG} from "../parameters/FeatureFlags";
 import Card from "react-bootstrap/Card";
-import drawGraph from "../elements/D3/Graph/graph";
 import {SizeMe} from "react-sizeme";
 
-// ugh why am i writing this way
-const ledgerTo = (type) => {
-    switch(type) {
-        case "node":
-        case "nodes":
-            return (transactionLedger) => [];
-        case "edge":
-        case "edges":
-        case "link":
-        case "links":
-            return (transactionLedger) => [];
-        default:
-            return [];
-
-    }
-}
+// graph imports
+import Node1 from "../elements/node1/node1"
+import DagreD3 from "../elements/dagreD3/dagreD3";
+import {AGGREGATE_GENES, CREATE_GENE_LIST, PRODUCE_GENES, TRANSFORM_GENES} from "../actions";
+import {tap} from "../helpers";
 
 export default class GeneHistory extends React.Component {
     constructor(props) {
         super(props);
+        this.state = {
+            transactionLedgerHash: hashCode(JSON.stringify(props.transactionLedger)),
+            network: { nodes: [] }
+        };
     }
+
+    componentDidMount() {
+        this.setState({ network: {
+                nodes: tap(convertGraphSchema(
+                    ledgerTo("nodes")(this.props.transactionLedger),
+                    ledgerTo("edges")(this.props.transactionLedger)
+                ))
+        }}, () => {
+            console.log(this.state.network);
+        })
+    }
+
+    static getDerivedStateFromProps(nextProps, prevState) {
+        console.log(
+            "node/edge calcs",
+            nextProps.transactionLedger,
+            ledgerTo("nodes")(nextProps.transactionLedger),
+            ledgerTo("edges")(nextProps.transactionLedger)
+        );
+
+        // detect need for network recalculation
+        if ( hashCode(JSON.stringify(nextProps.transactionLedger)) !== prevState.transactionLedgerHash ) {
+            return {
+                    transactionLedgerHash: hashCode(JSON.stringify(nextProps.transactionLedger)),
+                    network: {
+                        nodes: tap(
+                            convertGraphSchema(
+                                ledgerTo("nodes")(nextProps.transactionLedger),
+                                ledgerTo("edges")(nextProps.transactionLedger)
+                            )
+                        )
+                    }
+            }
+        }
+    }
+
+    nodesOnClick = (id, el) => {
+        console.log(id, el)
+    };
+
+    nodesOnEnter = (id, el) => {
+
+    };
+
+    nodesOnExit = (id, el) => {
+
+    };
 
     render() {
         return (
-            <div className={"col-sm-2"}>
+            <div className={"col-sm-10"}>
                 {this.props.geneListIDs.length > 0 && FEATURE_FLAG.histories.showHistories ?
                     <Card>
                         <Card.Header as={"h5"}>
                             History
                         </Card.Header>
-                        <ul>
-                            {
-                                JSON.stringify(this.props.transactionHistory)
-
-                                // .slice(0).reverse().map(geneListID =>
-                                //  <li key={geneListID}> {geneListID} </li> )
-                            }
-                        </ul>
                         <SizeMe>
-                            {({size}) =>
-                                <GeneTransformerGraph
-                                    nodes={ledgerTo("nodes")(this.props.transactionHistory)}
-                                    links={ledgerTo("nodes")(this.props.transactionHistory)}
-                                    width={size.width}
-                                    height={size.height}
-                                />}
+                            {({size}) => (
+                                <DagreD3
+                                    enableZooming={true}
+                                    centerGraph={true}
+                                    svgStyle={{width: size.width, height:size.height}}
+                                    ref={this.graph}
+                                    nodesOnClick={this.nodesOnClick}
+                                    nodesOnHover={this.nodesOnEnter}
+                                    nodesOnExit={this.nodesOnExit}>
+
+                                    {/* the above event handlers (nodesOnClick and nodesOnHover) are going to be for shared container state. nodes handle
+                                    their own presentational events and actions (to allow for distinctions between nodes
+                                    that aren't how they are handled by the application)*/}
+
+                                    {this.state.network.nodes.map((el) => {
+                                        // render node type properly
+                                        if (el.elementType === "node1") {
+                                            return <Node1 {...el}/>
+                                        }
+                                    })}
+
+                                </DagreD3>
+                            )
+                            }
                         </SizeMe>
                     </Card>
                     : <React.Fragment/>}
             </div>
         )
     }
+
 }
 
-class GraphTest extends React.Component {
-    constructor(props) {
-        super(props);
-    }
-
-    handleResize(e) {
-        let elem = ReactDOM.findDOMNode(this);
-        let width = elem.offsetWidth;
-
-        this.setState({
-            parentWidth: width
-        });
-    }
-
-    componentDidMount() {
-        if(this.props.width === '100%') {
-            window.addEventListener('resize', this.handleResize);
-        }
-        this.handleResize();
-    }
-
-    componentWillUnmount() {
-        if(this.props.width === '100%') {
-            window.removeEventListener('resize', this.handleResize);
+const flatten = function(arr, result = []) {
+    for (let i = 0, length = arr.length; i < length; i++) {
+        const value = arr[i];
+        if (Array.isArray(value)) {
+            flatten(value, result);
+        } else {
+            result.push(value);
         }
     }
+    return result;
+};
 
-    render() {
-        let { width, height, margin, xScale, yScale, xAxis, ...props } = this.props;
+// TODO: this should be an idempotent transformer whenever the data is the same?
+const ledgerTo = (type) => {
+    const transformationClassName = {
+        [CREATE_GENE_LIST]: "creator",
+        [PRODUCE_GENES]: "producer",
+        [TRANSFORM_GENES]: "expander",  // TODO contractor
+        [AGGREGATE_GENES]: "union"  // TODO intersection
+    };
 
-        // Determine the right graph width to use if it's set to be responsive
-        if(width === '100%') {
-            width = this.state.parentWidth || 400;
-        }
+    switch(type) {
+        case "nodes":
+            return (transactionLedger) => transactionLedger.reduce((node_list, transaction) => {
+                switch(transaction.type) {
+                    case CREATE_GENE_LIST:
+                        return node_list.concat([
+                            { id: transaction.gene_list_id, type: transformationClassName[transaction.type] }
+                        ]);
+                    case PRODUCE_GENES:
+                        return node_list.concat([
+                            { id: transaction.gene_list_id, type: transformationClassName[transaction.type] }
+                        ]);
+                    case TRANSFORM_GENES:
+                        return node_list.concat([
+                            { id: transaction.gene_list_id, type: transformationClassName[transaction.type] }
+                        ]);
+                    case AGGREGATE_GENES:
+                        return node_list.concat([
+                            { id: transaction.gene_list_id, type: transformationClassName[transaction.type] },
+                            // ...transaction.query.gene_list_ids.map(
+                            //     input_gene_list_id => ( { id: input_gene_list_id } )
+                            // )
+                        ]);
+                }
+            }, []);
+        case "edges":
+            return (transactionLedger) => transactionLedger.reduce((edge_list, transaction) => {
+                switch(transaction.type) {
+                    case CREATE_GENE_LIST:
+                    case PRODUCE_GENES:
+                        return edge_list;
+                    case TRANSFORM_GENES:
+                        return edge_list.concat([
+                            {
+                                source: transaction.query.gene_list_id,
+                                target: transaction.gene_list_id,
+                            }
+                        ]);
+                    case AGGREGATE_GENES:
+                        return edge_list.concat([
+                            ...transaction.query.gene_list_ids.map(
+                                input_gene_list_id => ({ source: input_gene_list_id, target: transaction.gene_list_id })
+                            )
+                        ]);
+                }
+            }, []);
+        default:
+            return [];
 
-        // Set scale ranges
-        xScale && xScale.range([0, width - (margin.left + margin.right)]);
-        yScale && yScale.range([height - (margin.top + margin.bottom), 0]);
-
-        return (
-            <div>
-
-            </div>
-        );
     }
-}
+};
 
-// container component for dimensions
-// https://stackoverflow.com/a/57272554
-//https://github.com/codesuki/react-d3-components/issues/9
-// const GeneTransformerHistory = props => {
-//     return (
-//         <div ref={targetRef}>
-//             <GeneTransformerGraph nodes={props.nodes} links={props.links}
-//                                   width={dimensions.width} height={dimensions.height}/>
-//         </div>
-//     );
-// };
+const hashCode = (string) => {
+    let hash = 0;
+    if (string.length === 0) {
+        return hash;
+    }
+    for (let i = 0; i < string.length; i++) {
+        const char = string.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash; // Convert to 32bit integer
+    }
+    return hash;
+};
 
-const GeneTransformerGraph = (props) => {
-    useEffect(() => {
-        drawGraph(props);
-    }, [props.nodes, props.links]);
-    return <div className={"viz"}/>;
+const convertGraphSchema = (nodes, edges) => {
+    //
+    // IN: nodes, edges
+    // OUT:
+    //     {
+    //         id: str,
+    //         type: str,
+    //         title: str,
+    //         connection: [
+    //             {
+    //                 id: str,
+    //                 label: str
+    //             }
+    //         ]
+    //     }
+    //
+    console.log("nodes", nodes, "edges", edges);
+    return nodes.map(node => (
+        tap({
+            id: node.id,
+            elementType: "node1",  // TODO: hardcoded... for now
+            transformerType: node.type,
+            title: node.id,  // TODO: work on something better
+            connection: edges.filter(edge => edge.source === node.id).map(edge => (
+                {
+                    id: edge.target
+                    // label: operation producing the edge?!?
+                }
+            ))
+        })
+    ))
 };
