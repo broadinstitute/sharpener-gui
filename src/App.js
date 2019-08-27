@@ -24,9 +24,9 @@ import {tap} from './helpers'
 // local components
 import Spinner from "./elements/Spinner/Spinner";
 import ProducerControls from './components/ProducerControls.js'
-import TransformerControls from "./components/TransformerControls";
+import TransformerControls from "./components/TransformerControls/TransformerControls";
 import GeneFeed from "./components/GeneFeed";
-import GeneHistory from "./components/GeneHistory";
+import TransformerHistory from "./components/TransformerHistory/TransformerHistory";
 
 // app configurations
 import {FEATURE_FLAG} from "./parameters/FeatureFlags";
@@ -67,27 +67,31 @@ class App extends React.Component {
                                 handleGeneListCreation={this.props.createGeneList}
                                 handleProducerSelect={this.props.selectProducer}/>
                             : <Spinner/>}
+                        <div className={"row"}>
+                            <TransformerHistory geneListIDs={ this.props.gene_list_ids } transactionLedger={this.props.transactionLedger}/>
+                        </div><br/>
                         {/* Tables of Genes */}
-                        <div className={"row"} style={{padding:"15px", paddingTop: "0%"}}>
-                            <h4>Gene Lists</h4>
-                            <div style={{marginLeft: "auto", marginRight: 0}}>
-                                {/* Clear Gene Tables */}
-                                { this.props.gene_list_ids.length > 0 ?
-                                    <button onClick={ this.props.clearAllGeneLists }>Clear Gene Lists</button>
-                                    : <button disabled>Clear Gene Lists</button>}
-                                { this.props.recently_cleared_gene_lists.length > 0 ?
-                                    <React.Fragment>
-                                        {'\u00A0'}{'\u00A0'}
-                                        <button onClick={ this.props.undoLastClear }>Undo</button>
-                                    </React.Fragment> :
-                                    <React.Fragment>
-                                        {'\u00A0'}{'\u00A0'}
-                                        <button disabled>Undo</button>
-                                    </React.Fragment>
-                                }
+                        { this.props.gene_list_ids.length > 0 ?
+                            <div className={"row"}>
+                                <h3 style={{paddingLeft: "15px"}}>Gene Lists</h3>
+                                <div style={{marginLeft: "auto", marginRight: 0}}>
+                                    {/* Clear Gene Tables */}
+                                    { this.props.gene_list_ids.length > 0 ?
+                                        <button onClick={ this.props.clearAllGeneLists }>Clear Gene Lists</button>
+                                        : <button disabled>Clear Gene Lists</button>}
+                                    { this.props.recently_cleared_gene_lists.length > 0 ?
+                                        <React.Fragment>
+                                            {'\u00A0'}{'\u00A0'}
+                                            <button onClick={ this.props.undoLastClear }>Undo</button>
+                                        </React.Fragment> :
+                                        <React.Fragment>
+                                            {'\u00A0'}{'\u00A0'}
+                                            <button disabled>Undo</button>
+                                        </React.Fragment>
+                                    }
+                                </div>
                             </div>
-                        </div>
-                        <GeneHistory geneListIDs={ this.props.gene_list_ids } transactionLedger={this.props.transactionLedger}/>
+                        : <Fragment/>}
                         {this.props.gene_list_ids ?
                             <div className={"row"}>
                                 {/*<h6>Previous Gene Sets</h6>*/}

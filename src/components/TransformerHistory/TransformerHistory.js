@@ -8,7 +8,7 @@ import {SizeMe} from "react-sizeme";
 import Node1 from "../elements/node1/node1"
 import DagreD3 from "../elements/dagreD3/dagreD3";
 import {AGGREGATE_GENES, CREATE_GENE_LIST, PRODUCE_GENES, TRANSFORM_GENES} from "../actions";
-import {tap} from "../helpers";
+import {properCase, tap} from "../helpers";
 
 export default class GeneHistory extends React.Component {
     constructor(props) {
@@ -132,22 +132,28 @@ const ledgerTo = (type) => {
     switch(type) {
         case "nodes":
             return (transactionLedger) => transactionLedger.reduce((node_list, transaction) => {
+                const defaultNode = {
+                    id: transaction.gene_list_id,
+                    count: transaction.count,
+                    type: transformationClassName[transaction.type]
+                };
+
                 switch(transaction.type) {
                     case CREATE_GENE_LIST:
                         return node_list.concat([
-                            { id: transaction.gene_list_id, type: transformationClassName[transaction.type] }
+                            Object.assign({}, defaultNode)
                         ]);
                     case PRODUCE_GENES:
                         return node_list.concat([
-                            { id: transaction.gene_list_id, type: transformationClassName[transaction.type] }
+                            Object.assign({}, defaultNode)
                         ]);
                     case TRANSFORM_GENES:
                         return node_list.concat([
-                            { id: transaction.gene_list_id, type: transformationClassName[transaction.type] }
+                            Object.assign({}, defaultNode)
                         ]);
                     case AGGREGATE_GENES:
                         return node_list.concat([
-                            { id: transaction.gene_list_id, type: transformationClassName[transaction.type] },
+                            Object.assign({}, defaultNode)
                             // ...transaction.query.gene_list_ids.map(
                             //     input_gene_list_id => ( { id: input_gene_list_id } )
                             // )
@@ -165,12 +171,13 @@ const ledgerTo = (type) => {
                             {
                                 source: transaction.query.gene_list_id,
                                 target: transaction.gene_list_id,
+                                label: properCase(transaction.query.name)
                             }
                         ]);
                     case AGGREGATE_GENES:
                         return edge_list.concat([
                             ...transaction.query.gene_list_ids.map(
-                                input_gene_list_id => ({ source: input_gene_list_id, target: transaction.gene_list_id })
+                                input_gene_list_id => ({ source: input_gene_list_id, target: transaction.gene_list_id, label: properCase(transaction.query.operation) })
                             )
                         ]);
                 }
@@ -216,11 +223,12 @@ const convertGraphSchema = (nodes, edges) => {
             id: node.id,
             elementType: "node1",  // TODO: hardcoded... for now
             transformerType: node.type,
+            count: node.count,
             title: node.id,  // TODO: work on something better
             connection: edges.filter(edge => edge.source === node.id).map(edge => (
                 {
-                    id: edge.target
-                    // label: operation producing the edge?!?
+                    id: edge.target,
+                    label: edge.label
                 }
             ))
         })

@@ -2,8 +2,11 @@ import React from 'react';
 import InputGroup from 'react-bootstrap/InputGroup'
 import FormControl from 'react-bootstrap/FormControl'
 import Card from 'react-bootstrap/Card'
-import {MyLoader} from "./ListItem";
-import {FEATURE_FLAG} from "../parameters/FeatureFlags";
+import {MyLoader} from "../ListItem";
+import {FEATURE_FLAG} from "../../parameters/FeatureFlags";
+import {properCase} from "../../helpers";
+
+import "./TransformerControls.css"
 
 const Fragment = React.Fragment;
 
@@ -16,9 +19,6 @@ const transformerMenuStyle = {
     marginBottom: "20px",
 };
 
-const transformerInputStyle = {
-    fontWeight: "bold"
-};
 
 let indexNameOf = (schemaName) => {
     // convert the value of a given expander name to a unique ID usable by XML conventions, plus our React State
@@ -415,7 +415,7 @@ export class TransformerItem extends React.Component {
     render() {
         return (
             <Card>
-                <Card.Header as={"h6"} onClick={ this.onClickHandleSelection }>{this.transformer.name}</Card.Header>
+                <Card.Header as={"h6"} onClick={ this.onClickHandleSelection }>{properCase(this.transformer.name)}</Card.Header>
                 <div id={"expander-".concat(indexNameOf(this.transformer.name))}>
                     {Object.keys(this.state.parameterIndex).map(parameterIndexKey => {
                         return <TransformerParameter id={ parameterIndexKey }
@@ -461,13 +461,13 @@ export class TransformerParameter extends React.Component {
         return (
             <InputGroup>
                 <InputGroup.Prepend>
-                    <InputGroup.Text>{ this.parameter.name }</InputGroup.Text>
+                    <InputGroup.Text>{ properCase(this.parameter.name) }</InputGroup.Text>
                 </InputGroup.Prepend>
                     <FormControl id={ this.id }
-                                 placeholder={ this.parameter.default ? this.parameter.default : this.parameter.type }
+                                 className={"transformer-parameter"}
+                                 placeholder={ this.parameter.default ? this.parameter.default : properCase(this.parameter.type) }
                                  value={ this.state.value }
-                                 onChange={ this.handleParameterValueChange }
-                                 style={ transformerInputStyle }/>
+                                 onChange={ this.handleParameterValueChange }/>
 
             </InputGroup>
         )

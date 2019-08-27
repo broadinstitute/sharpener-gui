@@ -10,6 +10,7 @@ import {Collapse} from "react-collapse"
 import {FEATURE_FLAG} from "../parameters/FeatureFlags";
 
 import Select from 'react-select';
+import {pluralize, properCase} from "../helpers";
 
 const SERVICE_URL =  process.env.REACT_APP_SERVICE_URL;
 
@@ -41,7 +42,7 @@ export default class GeneFeed extends React.Component {
         // feed order is going to be run each render
         return (
             <Fragment>
-                    <div className={"col-sm-10"}>
+                    <div className={"col-sm-12"}>
                         {this.state.geneListIDs.length > 0 ? this.state.geneListIDs.slice(0).reverse().map((geneListID) =>
                             <Fragment>
                                 <GeneTable
@@ -70,12 +71,14 @@ const GeneTableColumnFilter = ({columns, onColumnToggle, toggles}) => {
                 defaultValue={[]}
                 isMulti
                 name="columns"
-                options={ columns.map(gtc => {return {value: gtc.dataField, label: gtc.text}}) }  // done
+                options={ columns.map(gtc => {return {value: gtc.dataField, label: formatHeader(properCase(gtc.text))}}) }  // done
                 className="basic-multi-select"
                 classNamePrefix="select"
                 isClearable={false}
                 onChange={ (args, action) => {
-                    console.log(args, action);
+                    if (action.action === "create-option") {
+
+                    }
                     if (action.action === "select-option") {
                         onColumnToggle(action.option.value);
                     } else if (action.action === "remove-value" || action.action === "pop-value" ) {
@@ -92,7 +95,7 @@ const GeneTableColumnFilter = ({columns, onColumnToggle, toggles}) => {
             />
         </Fragment>
     )
-}
+};
 
 export class GeneTable extends React.Component {
     constructor(props) {
@@ -167,18 +170,20 @@ export class GeneTable extends React.Component {
                             {props =>
                                 <Fragment>
                                     <div>
-                                        <span className={"btn"}>{this.state.geneTableData.length} gene{this.state.geneTableData.length > 1 ? "s" : this.state.geneTableData.length <= 0 ? "s" : ''}</span>
+                                        <span className={"btn"}>{pluralize(this.state.geneTableData.length, "gene")}</span>
                                         {/*TODO: Refactor -> https://stackoverflow.com/a/53558566 */}
                                         <ExportCSVButton style={{border: "none", textDecoration: "underline", float: "right"}} {...props.csvProps}>Export</ExportCSVButton>
                                     </div>
                                     <BootstrapTable
                                         wrapperClasses="table-responsive"
                                         {...props.baseProps} />
-                                    {!(Object.values(props.columnToggleProps.toggles).every((value => value))) ?
+
+                                    { !(Object.values(props.columnToggleProps.toggles).every((value => value))) ?
                                         <span style={{fontSize:"small", marginLeft:"0.75em"}}>Filtered Columns</span>
-                                    : <span style={{fontSize:"small", marginLeft:"0.75em"}}>Select columns below to filter them</span>}
+                                    :   <span style={{fontSize:"small", marginLeft:"0.75em"}}>Select columns below to filter them</span> }
                                     <GeneTableColumnFilter
-                                        {...props.columnToggleProps}/>
+                                        {...props.columnToggleProps}
+                                    />
                                 </Fragment>}
                         </ToolkitProvider>
                     </Collapse> : <Fragment/>}
@@ -264,15 +269,13 @@ export class GeneTable extends React.Component {
     };
 
     makeTableColumns = (attributeList) => {
-        let formatHeader = (gla) => {
-            return gla.replace(/_/g, " ").replace(/Id/gi, "ID");
-        };
+
         return (
             attributeList
                 .map(gla => {
                     return {
                         dataField: gla,
-                        text: formatHeader(gla),
+                        text: formatHeader(properCase(gla)),
                         headerStyle: {  textTransform: "capitalize" },
                         // TODO: for now we're enabling all input to be placed in the search field
                         // THIS IS TO ENABLE INTERACTION WITH PRODUCERS; BUT SHOULD BE FLAGGED FOR CHANGE
@@ -288,7 +291,7 @@ export class GeneTable extends React.Component {
             }).concat([
                 {
                     dataField: "gene_id",
-                    text: formatHeader("gene_id"),
+                    text: formatHeader(properCase("gene_id")),
                     headerStyle: {  textTransform: "capitalize" },
                     events: {
                         onClick: (e, column, columnIndex, row, rowIndex) => {
@@ -303,3 +306,11 @@ export class GeneTable extends React.Component {
     };
 
 }
+
+let formatHeader = (gla) => {
+    return gla.replace(/_/g, " ")
+        .replace(/Id/gi, "ID")
+        .replace(/Hgnc/gi, "HGNC")
+        .replace(/Mygene/gi, "MyGene")
+        .replace(/Mim/gi, "MIM");
+};
