@@ -4,7 +4,7 @@ import FormControl from 'react-bootstrap/FormControl'
 import Card from 'react-bootstrap/Card'
 import {MyLoader} from "../ListItem";
 import {FEATURE_FLAG} from "../../parameters/FeatureFlags";
-import {properCase} from "../../helpers";
+import {properCase, formatHeader} from "../../helpers";
 
 import "./TransformerControls.css"
 
@@ -461,7 +461,7 @@ export class TransformerParameter extends React.Component {
         return (
             <InputGroup>
                 <InputGroup.Prepend>
-                    <InputGroup.Text>{ properCase(this.parameter.name) }</InputGroup.Text>
+                    <InputGroup.Text>{ formatHeader(properCase(this.parameter.name)) }</InputGroup.Text>
                 </InputGroup.Prepend>
                     <FormControl id={ this.id }
                                  className={"transformer-parameter"}

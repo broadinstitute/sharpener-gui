@@ -1,5 +1,5 @@
 import React, {Fragment} from 'react';
-import {TransformerParameter} from "./TransformerControls";
+import {TransformerParameter} from "./TransformerControls/TransformerControls";
 import InputGroup from "react-bootstrap/InputGroup";
 import FormControl from "react-bootstrap/FormControl";
 import Card from "react-bootstrap/Card";
@@ -133,8 +133,10 @@ export class ProducerControls extends React.Component {
                             this.state.selectedProducer.parameters
                                 .map(parameter => {
                                     return (
-                                        <TransformerParameter key={parameter.name} id={parameter.name} parameter={parameter}
-                                                                   action={this.handleProducerParameterChange}/> )
+                                        <TransformerParameter key={parameter.name}
+                                                              id={parameter.name}
+                                                              parameter={parameter}
+                                                              action={this.handleProducerParameterChange}/> )
                                 })
                         }
                         <button

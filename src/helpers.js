@@ -22,3 +22,11 @@ export const pluralize = (length, word) => {
 export const underscoreToSpaces = (string) => {
     return string.split('_').join(' ');
 }
+
+export const formatHeader = (gla) => {
+    return gla.replace(/_/g, " ")
+        .replace(/Id/gi, "ID")
+        .replace(/Hgnc/gi, "HGNC")
+        .replace(/Mygene/gi, "MyGene")
+        .replace(/Mim/gi, "MIM");
+};
