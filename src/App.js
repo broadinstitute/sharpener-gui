@@ -16,7 +16,8 @@ import {
     transformGenes,
     selectProducer,
     toggleExpanderSelection,
-    toggleGeneListSelection
+    toggleGeneListSelection,
+    differentiateGeneLists
 } from "./actions"
 import {store} from "./store";
 import {tap} from './helpers'
@@ -33,7 +34,7 @@ import {FEATURE_FLAG} from "./parameters/FeatureFlags";
 import {FRONTEND_URL, SERVICE_URL} from "./parameters/EndpointURLs"
 
 // stylesheets
-import './App.css';
+import './style/App.css';
 import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
 import 'font-awesome/css/font-awesome.min.css';
 
@@ -68,15 +69,20 @@ class App extends React.Component {
                                 handleProducerSelect={this.props.selectProducer}/>
                             : <Spinner/>}
                         <div className={"row"}>
-                            <TransformerHistory geneListIDs={ this.props.gene_list_ids } transactionLedger={this.props.transactionLedger}/>
+                            <TransformerHistory
+                                geneListIDs={ this.props.gene_list_ids }
+                                clearGeneList={ this.props.clearSingleGeneList }
+                                handleGeneListSelection={ this.props.toggleGeneListSelection }
+                                differenceGenes={ this.props.differentiateGeneLists }
+                                transactionLedger={this.props.transactionLedger}/>
                         </div><br/>
                         {/* Tables of Genes */}
-                        { this.props.gene_list_ids.length > 0 ?
+                        { this.props.selectedGeneListsByID.length > 0 ?
                             <div className={"row"}>
                                 <h3 style={{paddingLeft: "15px"}}>Gene Lists</h3>
-                                <div style={{marginLeft: "auto", marginRight: 0}}>
+                                <div style={{marginLeft: "auto", marginRight: "15px"}}>
                                     {/* Clear Gene Tables */}
-                                    { this.props.gene_list_ids.length > 0 ?
+                                    { this.props.selectedGeneListsByID.length > 0 ?
                                         <button onClick={ this.props.clearAllGeneLists }>Clear Gene Lists</button>
                                         : <button disabled>Clear Gene Lists</button>}
                                     { this.props.recently_cleared_gene_lists.length > 0 ?
@@ -96,7 +102,7 @@ class App extends React.Component {
                             <div className={"row"}>
                                 {/*<h6>Previous Gene Sets</h6>*/}
                                 <GeneFeed
-                                    geneListIDs={ this.props.gene_list_ids }
+                                    geneListIDs={ this.props.selectedGeneListsByID }
                                     handleGeneListSelection={ this.props.toggleGeneListSelection }
                                     clearGeneList={ this.props.clearSingleGeneList }
                                 />
@@ -150,7 +156,8 @@ const mapDispatchToProps = {
     transformGenes,
     selectProducer,
     toggleExpanderSelection,
-    toggleGeneListSelection
+    toggleGeneListSelection,
+    differentiateGeneLists
 };
 
 export default connect(

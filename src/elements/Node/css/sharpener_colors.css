@@ -1,10 +1,13 @@
 /* https://www.color-hex.com/color/6495ed */
 .creator, .producer {
     background-color: #edbc64;
+
 }
 .expander, .contractor {
-    background-color: #6495ed;
+    background-color: #ed6495;
+
 }
 .union, .intersection {
-    background-color: #ed6495;
+    background-color: #6495ed;
+
 }

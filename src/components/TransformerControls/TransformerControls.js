@@ -4,7 +4,7 @@ import FormControl from 'react-bootstrap/FormControl'
 import Card from 'react-bootstrap/Card'
 import {MyLoader} from "../ListItem";
 import {FEATURE_FLAG} from "../../parameters/FeatureFlags";
-import {properCase, formatHeader} from "../../helpers";
+import {properCase, formatAbbreviations} from "../../helpers";
 
 import "./TransformerControls.css"
 
@@ -49,7 +49,6 @@ export default class TransformerControls extends React.Component {
         let stateCopy = { ...this.state };
         stateCopy.transformerControls[expanderIndexName] = expanderControls;
         this.setState(stateCopy, () => {
-            console.log("transformerControls with expanderIndex update ", this.state.transformerControls);
             // no throwback
         });
     };
@@ -303,8 +302,7 @@ export class TransformerList extends React.Component{
                 transformer: expander,
                 controls: {}
             };
-            this.setState(stateCopy,
-                () => { console.log("expanderIndex ", this.state.expanderIndex); });
+            this.setState(stateCopy);
         });
     }
 
@@ -312,7 +310,6 @@ export class TransformerList extends React.Component{
         let stateCopy = { ...this.state };
         stateCopy.expanderIndex[indexNameOf(expanderName)]["controls"][parameterIndexName] = parameterIndexValues;
         this.setState(stateCopy, () => {
-            console.log("expanderIndex with controls now", this.state.expanderIndex);
             this.throwbackExpanderIndex(indexNameOf(expanderName), this.state.expanderIndex[indexNameOf(expanderName)]);
         });
     };
@@ -381,7 +378,6 @@ export class TransformerItem extends React.Component {
         let stateCopy = { ...this.state };
         stateCopy.parameterIndex[parameterIndexName].value = newParameterValue;
         this.setState(stateCopy, () => {
-            console.log("new parameter value ".concat(newParameterValue).concat(" equal to"), this.state.parameterIndex[parameterIndexName]);
             // this "throwback" is put into the setState callback to guarantee synchrony (setState is asynchronous)
             this.throwbackParameterValues(this.transformer.name, parameterIndexName, this.state.parameterIndex[parameterIndexName]);
         });
@@ -397,7 +393,6 @@ export class TransformerItem extends React.Component {
                 let stateCopy = { ...this.state };
                 stateCopy.parameterIndex[parameterIndexName].value = stateCopy.parameterIndex[parameterIndexName].parameter.default;
                 this.setState(stateCopy,() => {
-                    console.log("update parameterIndex with default values of ".concat(parameterIndexName), this.state.parameterIndex);
                     this.throwbackParameterValues(this.transformer.name, parameterIndexName, this.state.parameterIndex[parameterIndexName]);
                 });
             }
@@ -461,7 +456,7 @@ export class TransformerParameter extends React.Component {
         return (
             <InputGroup>
                 <InputGroup.Prepend>
-                    <InputGroup.Text>{ formatHeader(properCase(this.parameter.name)) }</InputGroup.Text>
+                    <InputGroup.Text>{ formatAbbreviations(properCase(this.parameter.name)) }</InputGroup.Text>
                 </InputGroup.Prepend>
                     <FormControl id={ this.id }
                                  className={"transformer-parameter"}

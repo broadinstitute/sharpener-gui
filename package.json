@@ -45,7 +45,11 @@
     "redux-promise": "^0.6.0",
     "redux-saga": "^1.0.5",
     "redux-thunk": "^2.3.0",
-    "underscore": "^1.9.1"
+    "underscore": "^1.9.1",
+    "jquery": "^3.4.1",
+    "jquery-ui": "^1.12.1",
+    "tipsy": "^1.0.0",
+    "react-tipsy": "^0.6.2"
   },
   "devDependencies": {},
   "scripts": {

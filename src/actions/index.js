@@ -1,6 +1,8 @@
 import {SERVICE_URL} from "../parameters/EndpointURLs";
 import {FEATURE_FLAG} from "../parameters/FeatureFlags";
 import {store} from "../store";
+import _ from "lodash";
+
 
 /*
     Application Actions
@@ -22,6 +24,7 @@ export const CLEAR_SELECTIONS = 'CLEAR_SELECTIONS';
 export const CLEAR_SINGLE_GENE_LIST = 'CLEAR_SINGLE_GENE_LIST';
 export const CLEAR_ALL_GENE_LISTS = 'CLEAR_ALL_GENE_LISTS';
 export const UNDO_LAST_CLEAR = 'UNDO_LAST_CLEAR';
+export const DIFFERENCE_GENE_LISTS = 'DIFFERENCE_GENE_LISTS';
 export const RECORD_SHARPENER_ACTION = 'RECORD_SHARPENER_ACTION';
 
 export function getTransformers(continuation = (result) => result) {
@@ -222,7 +225,6 @@ export function aggregateGenes(operation) {
     }
 }
 
-// TODO: refactor to Thunk
 export function displayNewGeneList(gene_list_id) {
     return (dispatch, getState) => {
         // get store
@@ -353,94 +355,67 @@ export function undoLastClear() {
     }
 }
 
+export function differentiateGeneLists(gene_list_id_left, gene_list_id_right) {
+    return (dispatch) => {
+        const requestLeftGenes =
+            fetch(SERVICE_URL.concat("/gene_list").concat("/"+gene_list_id_left),
+                {
+                    method: "GET",
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    return { gene_list_id: data.gene_list_id, genes: data.genes }
+                })
+                .catch(error => {
+                    console.error(error)
+                });
+
+        const requestRightGenes =
+            fetch(SERVICE_URL.concat("/gene_list").concat("/"+gene_list_id_right),
+                {
+                    method: "GET",
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    return { gene_list_id: data.gene_list_id, genes: data.genes }
+                })
+                .catch(error => {
+                    console.error(error)
+                });
+
+
+        const differenceGenes = Promise.all(requestLeftGenes, requestRightGenes).then(results => {
+            const difference = _.difference(...results.map(result => result.genes));
+            const leftResidual = _.difference(results[0], difference);
+            const rightResidual = _.difference(results[1], difference);
+            return {
+                difference: difference,
+                left: {
+                    id: results[0].gene_list_id,
+                    residual: leftResidual
+                },
+                right: {
+                    id: results[1].gene_list_id,
+                    residual: rightResidual
+                }
+            }
+        });
+
+        return dispatch({
+            type: DIFFERENCE_GENE_LISTS,
+            payload: differenceGenes
+        });
+    }
+}
+
 /*
     Graph Actions
  */
-
-export const FETCH_NETWORKS = 'FETCH_NETWORKS';
-export const FETCH_NETWORK = 'FETCH_NETWORK';
-export const SELECT_NODE = 'SELECT_NODE';
-
-export const CREATE_POST = 'CREATE_POSTS';
-export const DELETE_POST = 'DELETE_POST';
-
-const ROOT_URL = 'http://reduxblog.herokuapp.com/api';
-const API_KEY = '?key=123456qwerty098765';
-
-export function selectNode(node) {
-    return {
-        type: SELECT_NODE,
-        payload: node
-    }
-}
-
-export function fetchNetworks() {
-
-    const movies = [
-        {id: 1, name: "Matrix"}
-    ];
-
-    return {
-        type: FETCH_NETWORKS,
-        payload: movies
-    };
-}
-
-export function fetchNetwork(id) {
-
-    var nodes = [
-        {id: 0, highlighted : false, reflexive: false, type: "person", name: "John"},
-        {id: 1, highlighted : false, reflexive: false, type: "person", name: "Eddie"},
-        {id: 3, highlighted : false, reflexive: false, type: "person", name: "Mariana"},
-        {id: 4, highlighted : false, reflexive: false, type: "person", name: "Lauren"},
-        {id: 5, highlighted : false, reflexive: false, type: "person", name: "George"},
-        {id: 6, highlighted : false, reflexive: false, type: "movie", name: "Matrix I"},
-        {id: 7, highlighted : true, reflexive: false, type: "person", name: "Keanu"},
-        {id: 8, highlighted : true, reflexive: false, type: "movie", name: "Matrix II"},
-        {id: 9, highlighted : true, reflexive: false, type: "movie", name: "Matrix III"}
-    ];
-
-    var links = [
-        {sourceIndex: 0, targetIndex: 2, left: false, right: true},
-        {sourceIndex: 0, targetIndex: 3, left: false, right: true},
-        {sourceIndex: 0, targetIndex: 4, left: false, right: true},
-        {sourceIndex: 1, targetIndex: 2, left: false, right: true},
-        {sourceIndex: 1, targetIndex: 3, left: false, right: true},
-        {sourceIndex: 1, targetIndex: 4, left: false, right: true},
-        {sourceIndex: 3, targetIndex: 5, left: false, right: true},
-        {sourceIndex: 4, targetIndex: 5, left: false, right: true},
-        {sourceIndex: 6, targetIndex: 7, left: false, right: true},
-        {sourceIndex: 6, targetIndex: 8, left: false, right: true}
-    ];
-
-    const graph = {
-        nodes: [{id: "RtdNdLJlCK"}, {id: "A9FbgqOD79"}, {id: "nZL2QYoSxh"}],
-        links: [{source: "RtdNdLJlCK", target: "A9FbgqOD79"},
-            {source: "RtdNdLJlCK", target: "nZL2QYoSxh"},
-            {source: "A9FbgqOD79", target: "nZL2QYoSxh"}]
-    }
-
-    return {
-        type: FETCH_NETWORK,
-        payload: { nodes: graph.nodes, links: graph.links }
-    };
-}
-
-
-export function createPost(props) {
-    const request = fetch(`${ROOT_URL}/posts${API_KEY}`, props);
-
-    return {
-        type: CREATE_POST,
-        payload: request
-    }
-}
-
-export function deletePost(id) {
-    const request = fetch(`${ROOT_URL}/posts/${id}${API_KEY}`);
-
-    return {
-        type: DELETE_POST,
-        payload: request
-    };
-}

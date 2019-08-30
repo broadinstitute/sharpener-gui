@@ -14,7 +14,8 @@ import {
     CLEAR_ALL_GENE_LISTS,
     CLEAR_SINGLE_GENE_LIST,
     UNDO_LAST_CLEAR,
-    RECORD_SHARPENER_ACTION
+    RECORD_SHARPENER_ACTION,
+    DIFFERENCE_GENE_LISTS
 } from "../actions"
 
 const defaultState = {
@@ -52,7 +53,7 @@ const defaultState = {
 };
 
 export default function(state=defaultState, action) {
-    console.log(action.type);
+    console.log("reducing", action.type);
     switch(action.type) {
         case GET_TRANSFORMERS:
             return {
@@ -142,6 +143,9 @@ export default function(state=defaultState, action) {
                 ...state,
                 transactionLedger: state.transactionLedger.concat([action.payload])
             };
+        case DIFFERENCE_GENE_LISTS:
+            // it's a query: do nothing
+            return state;
         default:  // do nothing
             return state;
     }

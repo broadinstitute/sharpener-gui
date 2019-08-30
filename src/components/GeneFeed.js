@@ -10,7 +10,7 @@ import {Collapse} from "react-collapse"
 import {FEATURE_FLAG} from "../parameters/FeatureFlags";
 
 import Select from 'react-select';
-import {pluralize, properCase} from "../helpers";
+import {pluralize, properCase, formatAbbreviations} from "../helpers";
 
 const SERVICE_URL =  process.env.REACT_APP_SERVICE_URL;
 
@@ -71,7 +71,7 @@ const GeneTableColumnFilter = ({columns, onColumnToggle, toggles}) => {
                 defaultValue={[]}
                 isMulti
                 name="columns"
-                options={ columns.map(gtc => {return {value: gtc.dataField, label: formatHeader(properCase(gtc.text))}}) }  // done
+                options={ columns.map(gtc => {return {value: gtc.dataField, label: formatAbbreviations(properCase(gtc.text))}}) }  // done
                 className="basic-multi-select"
                 classNamePrefix="select"
                 isClearable={false}
@@ -275,7 +275,7 @@ export class GeneTable extends React.Component {
                 .map(gla => {
                     return {
                         dataField: gla,
-                        text: formatHeader(properCase(gla)),
+                        text: formatAbbreviations(properCase(gla)),
                         headerStyle: {  textTransform: "capitalize" },
                         // TODO: for now we're enabling all input to be placed in the search field
                         // THIS IS TO ENABLE INTERACTION WITH PRODUCERS; BUT SHOULD BE FLAGGED FOR CHANGE
@@ -291,7 +291,7 @@ export class GeneTable extends React.Component {
             }).concat([
                 {
                     dataField: "gene_id",
-                    text: formatHeader(properCase("gene_id")),
+                    text: formatAbbreviations(properCase("gene_id")),
                     headerStyle: {  textTransform: "capitalize" },
                     events: {
                         onClick: (e, column, columnIndex, row, rowIndex) => {
@@ -306,11 +306,3 @@ export class GeneTable extends React.Component {
     };
 
 }
-
-let formatHeader = (gla) => {
-    return gla.replace(/_/g, " ")
-        .replace(/Id/gi, "ID")
-        .replace(/Hgnc/gi, "HGNC")
-        .replace(/Mygene/gi, "MyGene")
-        .replace(/Mim/gi, "MIM");
-};

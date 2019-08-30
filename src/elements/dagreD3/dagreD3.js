@@ -6,24 +6,25 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import './dagreD3.css'
 import _ from 'lodash'
 
+import ReactDOMServer from 'react-dom/server'
+import {tap} from "../../helpers";
 
 const DEFAULT_PARAMS = {
     nodesep: 100,
     edgesep: 80,
     rankdir: 'TB',
     ranker: 'network-simplex',
-}
+};
 
 class DagreD3React extends Component {
     constructor(props) {
-        super(props)
+        super(props);
 
-        this.zoomed = this.zoomed.bind(this)
+        this.zoomed = this.zoomed.bind(this);
         this.keyDown = this.keyDown.bind(this);
         this.keyUp = this.keyUp.bind(this);
         this.svgRef = React.createRef();
         this.groupRef = React.createRef();
-
 
     }
 
@@ -56,8 +57,6 @@ class DagreD3React extends Component {
         const nodesToRemove = _.difference(oldNodesIds, newNodesIds);
         nodesToRemove.forEach(el => this.graph.removeNode(el));
 
-        this.addNodes();
-        this.addLines();
         this.updateGraph();
     }
 
@@ -81,14 +80,18 @@ class DagreD3React extends Component {
 
     addNodes() {
         this.props.children.forEach((node) => {
-            this.graph.setNode(node.props.id,{
-                elementType: node.props.type,
-                label: renderToStaticMarkup(node),
-                labelType: "html",
-                style: reactToCSS(node.props.style),
-                padding: 0
-            })
-        })
+            const {id, ...data} = node.props;
+            console.log("data", data);
+            this.graph.setNode(id,
+                { // TODO: why isn't this a spread of properties
+                    elementType: data.elementType,
+                    data: data,
+                    label: ReactDOMServer.renderToStaticMarkup(node),
+                    labelType: "html",
+                    style: reactToCSS(data.style),
+                    padding: 0
+                })
+        });
     }
 
     addLines() {
@@ -106,26 +109,49 @@ class DagreD3React extends Component {
         })
     }
 
+    addEdgeClickListener() {
+        tap(this.svg.selectAll("g.edgePath")).on('click', (line) => {
+            console.log("line", line);
+        });
+    }
+
     addNodeClickListener() {
         if (this.props.nodesOnClick) {
             this.svg.selectAll(".node").on('click', (id) => {
                 const el = this.graph.node(id);
-                this.props.nodesOnClick(id, el);
-            })
+                const coords = {
+                    groupX: this.x,
+                    groupY: this.y,
+                };
+                this.props.nodesOnClick(id, el, coords);
+            });
         }
     }
 
     addNodeHoverListener() {
-        if (this.props.nodesOnHover) {
+        if (this.props.nodesOnEnter) {
             this.svg.selectAll(".node").on('mouseover', (id) => {
                 const el = this.graph.node(id);
-                this.props.nodesOnHover(id, el);
+                const rect = d3.select(el.elem).selectAll("g > rect.label-container").filter(":first-child");
+                const rectDimensions = {
+                    height: rect.attr("height"),
+                    width: rect.attr("width")
+                };
+                const coords = {
+                    groupX: this.x,
+                    groupY: this.y,
+                };
+                this.props.nodesOnEnter(id, el, coords, rectDimensions);
             });
         }
         if (this.props.nodesOnExit) {
             this.svg.selectAll(".node").on('mouseout', (id) => {
                 const el = this.graph.node(id);
-                this.props.nodesOnExit(id, el);
+                const coords = {
+                    groupX: this.x,
+                    groupY: this.y,
+                };
+                this.props.nodesOnExit(id, el, coords);
             })
         }
     }
@@ -135,14 +161,18 @@ class DagreD3React extends Component {
             // .scaleExtent([1 / 2, 4])
             .on("zoom", this.zoomed);
         this.graph = new dagreD3.graphlib.Graph().setGraph(DEFAULT_PARAMS);
-        this.addNodes();
-        this.addLines();
         this.svg = d3.select(this.svgRef.current);
         this.svgGroup = d3.select(this.groupRef.current);
+
+        this.addNodes();
+        this.addLines();
         this.graphRender = new dagreD3.render();
         this.renderGraph();
 
+        this.addTooltips();
+
         if (this.props.centerGraph) {
+
             this.centerGraph()
         }
         this.setSvgHeight();
@@ -151,31 +181,42 @@ class DagreD3React extends Component {
         this.addNodeHoverListener();
     }
 
+    addTooltips = () => {
+
+    };
+
     renderGraph() {
         this.graphRender(this.svgGroup, this.graph)
     }
 
     updateGraph() {
+        this.addNodes();
+        this.addLines();
+
         // scale to 1 and then back to the previous scale *bugfix
         this.svgGroup.attr("transform", "translate(" + this.x + ", " + this.y + ") scale(" + 1 + ")");
         this.graphRender(this.svgGroup, this.graph);
+
+        this.addTooltips();
+
         this.svgGroup.attr("transform", "translate(" + this.x + ", " + this.y + ") scale(" + this.k + ")");
         this.setSvgHeight();
         this.addNodeClickListener();
         this.addNodeHoverListener();
-
     }
 
     centerGraph() {
         this.svgNode = this.svg.node();
         this.x = (this.svgNode.getBoundingClientRect().width - this.graph.graph().width) / 2;
-        this.y = 50
-        this.k = 1
+        this.y = 50;
+        // this.x = 0;
+        // this.y = 0;
+        this.k = 1;
         this.svgGroup.attr("transform", "translate(" + this.x + ", " + this.y + ") ");
     }
 
     setSvgHeight() {
-        this.graphHeight = this.graph.graph().height
+        this.graphHeight = this.graph.graph().height;
         this.svgNode.setAttribute("height", this.props.height ? this.props.height : this.graphHeight + 2 * 50);
     }
 
@@ -192,20 +233,20 @@ class DagreD3React extends Component {
     render() {
         return (
             <div>
-                <svg
-                    className="svgtest"
-                    style={this.props.svgStyle}
-                    ref={this.svgRef}
-                >
-                    {this.renderTitleBox()}
-
-                    <g
-                        ref={this.groupRef}
-                    ></g>
+                <svg className="svgtest"
+                     style={this.props.svgStyle}
+                     ref={this.svgRef}>
+                    <g ref={this.groupRef}/>
                 </svg>
             </div>
         )
     }
 }
+
+// Tooltip = () => (
+//     <p style={{visibility: "false"}}>
+//         Hello
+//     </p>
+// );
 
 export default DagreD3React
