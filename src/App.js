@@ -26,7 +26,7 @@ import {tap} from './helpers'
 import Spinner from "./elements/Spinner/Spinner";
 import ProducerControls from './components/ProducerControls.js'
 import TransformerControls from "./components/TransformerControls/TransformerControls";
-import GeneFeed from "./components/GeneFeed";
+import GeneFeed from "./components/GeneFeed/GeneFeed";
 import TransformerHistory from "./components/TransformerHistory/TransformerHistory";
 
 // app configurations
@@ -37,7 +37,6 @@ import {FRONTEND_URL, SERVICE_URL} from "./parameters/EndpointURLs"
 import './style/App.css';
 import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
 import 'font-awesome/css/font-awesome.min.css';
-import {History} from "./components/GeneHistories";
 
 const divStyle = {
     margin:"2.25em"

@@ -4,6 +4,7 @@ import InputGroup from "react-bootstrap/InputGroup";
 import FormControl from "react-bootstrap/FormControl";
 import Card from "react-bootstrap/Card";
 import Select from 'react-select';
+import _ from "underscore"
 
 const SERVICE_URL =  process.env.REACT_APP_SERVICE_URL;
 
@@ -74,7 +75,7 @@ export class ProducerControls extends React.Component {
     };
 
     static parseGeneSymbolList(geneSymbolListString) {
-        return geneSymbolListString.split(/[\r\n, ]+/).filter(el => el !== '' && el !== ' ');
+        return _.uniq(geneSymbolListString.split(/[\r\n, ]+/).filter(el => el !== '' && el !== ' '));
     }
 
     handleProducerParameterChange = (e) => {
