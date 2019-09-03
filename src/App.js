@@ -56,8 +56,7 @@ class App extends React.Component {
         return (
             <div className="container-fluid">
                 <div className="row">
-                    {/* Gene Lists */}
-                    <div className="col-sm-9">
+                    <div className="col-sm-3" style={{transformerMenuStyle}}>
                         <h3>Producers</h3>
                         {/* Producer Components */}
                         {this.props.producers ?
@@ -68,6 +67,25 @@ class App extends React.Component {
                                 handleGeneListCreation={this.props.createGeneList}
                                 handleProducerSelect={this.props.selectProducer}/>
                             : <Spinner/>}
+                        <h3>Expanders</h3>
+                        {this.props.expanders && this.props.expanders.length > 0 ?
+                            <TransformerControls
+                                expanders={ this.props.expanders }
+                                selectedGeneLists={ this.props.selectedGeneListsByID }
+                                selectedExpanders={ this.props.selectedExpanders }
+                                handleExpanderSelection={ this.props.toggleExpanderSelection }
+                                handleGeneListSelection={ this.props.toggleGeneListSelection }
+                                queryPromise={ this.props.transformGenes }
+                                aggregateGenes={ this.props.aggregateGenes }
+                            /> : <Spinner/> }
+                        <button className="btn my-2 my-sm-0"
+                                style={{padding:"0%", fontSize: "small", float: "right"}}
+                                onClick={this.props.clearSelections}>
+                            Clear Selections
+                        </button>
+                    </div>
+                    {/* Gene Lists */}
+                    <div className="col-sm-9">
                         <div className={"row"}>
                             <TransformerHistory
                                 geneListIDs={ this.props.gene_list_ids }
@@ -108,26 +126,6 @@ class App extends React.Component {
                                 />
                             </div>
                             : <Spinner/> }
-                    </div>
-
-                    <div className="col-sm-3" style={{transformerMenuStyle}}>
-
-                        <h3>Expanders</h3>
-                        {this.props.expanders && this.props.expanders.length > 0 ?
-                            <TransformerControls
-                                expanders={ this.props.expanders }
-                                selectedGeneLists={ this.props.selectedGeneListsByID }
-                                selectedExpanders={ this.props.selectedExpanders }
-                                handleExpanderSelection={ this.props.toggleExpanderSelection }
-                                handleGeneListSelection={ this.props.toggleGeneListSelection }
-                                queryPromise={ this.props.transformGenes }
-                                aggregateGenes={ this.props.aggregateGenes }
-                            /> : <Spinner/> }
-                        <button className="btn my-2 my-sm-0"
-                                style={{padding:"0%", fontSize: "small", float: "right"}}
-                                onClick={this.props.clearSelections}>
-                            Clear Selections
-                        </button>
                     </div>
 
                 </div>

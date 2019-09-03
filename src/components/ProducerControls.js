@@ -67,11 +67,15 @@ export class ProducerControls extends React.Component {
                         }
                     });
             } else if (this.state.selectedProducer.name === "Gene Symbols") {
-                let geneList = parameterIndexControls[0].value.split(",");
+                let geneList = ProducerControls.parseGeneSymbolList(parameterIndexControls[0].value);
                 this.handleGeneListCreation(geneList);
             }
         }
     };
+
+    static parseGeneSymbolList(geneSymbolListString) {
+        return geneSymbolListString.split(/[\r\n, ]+/).filter(el => el !== '' && el !== ' ');
+    }
 
     handleProducerParameterChange = (e) => {
         let parameterIndexName = e.target.id;
@@ -106,6 +110,7 @@ export class ProducerControls extends React.Component {
         console.log(args, action);
         this.props.handleProducerSelect(args.value);
     };
+
 
 
     render() {
