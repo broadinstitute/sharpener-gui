@@ -19,7 +19,7 @@ export const ProducerTooltip = (props) => {
                             {props.inputs.map(
                                 gene_symbol =>
                                     <Fragment>
-                                        <span>{gene_symbol}</span> 
+                                        <span>{gene_symbol}</span><br/>
                                     </Fragment>
                             )}
                         </React.Fragment>

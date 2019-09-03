@@ -14,6 +14,7 @@ import {store} from "../../store";
 import App from "../../App";
 import ProducerNode from "../../elements/ProducerNode/ProducerNode";
 import TransfomerNode from "../../elements/TransformerNode/TransfomerNode";
+import AggregatorNode from "../../elements/AggregatorNode/AggregatorNode";
 
 const transactionClassName = {
     [CREATE_GENE_LIST]: "creator",
@@ -139,8 +140,13 @@ export default class TransformerHistory extends React.Component {
                                                 return (
                                                     <ProducerNode {...el}/>
                                                 );
+                                            case("filter"):
+                                            case("contractor"):
                                             case("expander"):
                                                 return (<TransfomerNode {...el}/>);
+                                            case("union"):
+                                            case("intersection"):
+                                                return (<AggregatorNode {...el}/>);
                                             default:
                                                 return (<Node {...el}/>);
                                         }

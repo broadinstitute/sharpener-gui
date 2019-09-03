@@ -4,13 +4,13 @@ import BootstrapTable from "react-bootstrap-table-next"
 import ToolkitProvider, { CSVExport } from 'react-bootstrap-table2-toolkit';
 const { ExportCSVButton } = CSVExport;
 import Card from "react-bootstrap/Card"
-import {MyLoader} from "./ListItem";
+import {MyLoader} from "../ListItem";
 import {Collapse} from "react-collapse"
 
-import {FEATURE_FLAG} from "../parameters/FeatureFlags";
+import {FEATURE_FLAG} from "../../parameters/FeatureFlags";
 
 import Select from 'react-select';
-import {pluralize, properCase, formatAbbreviations} from "../helpers";
+import {pluralize, properCase, formatAbbreviations} from "../../helpers";
 
 const SERVICE_URL =  process.env.REACT_APP_SERVICE_URL;
 
@@ -45,6 +45,7 @@ export default class GeneFeed extends React.Component {
                     <div className={"col-sm-12"}>
                         {this.state.geneListIDs.length > 0 ? this.state.geneListIDs.slice(0).reverse().map((geneListID) =>
                             <Fragment>
+                                {/* TODO https://dbushell.com/demos/tables/rt_05-01-12.html */}
                                 <GeneTable
                                     key={ geneListID }
                                     geneListID={ geneListID }
