@@ -4,9 +4,11 @@ import FormControl from 'react-bootstrap/FormControl'
 import Card from 'react-bootstrap/Card'
 import {MyLoader} from "../ListItem";
 import {FEATURE_FLAG} from "../../parameters/FeatureFlags";
-import {properCase, formatAbbreviations} from "../../helpers";
+import {properCase, formatAbbreviations, pluralize} from "../../helpers";
 
 import "./TransformerControls.css"
+import Select from "react-select";
+import {toggleExpanderSelection} from "../../actions";
 
 const Fragment = React.Fragment;
 
@@ -21,10 +23,6 @@ const transformerMenuStyle = {
 
 
 let indexNameOf = (schemaName) => {
-    // convert the value of a given expander name to a unique ID usable by XML conventions, plus our React State
-    // NOTE: This operation is destructive to the name because we can't recover capital letters
-    // TODO: this approach assumes names of expanders are unique
-    // TODO: uh... what if I just use the names? hm.
     return schemaName.toLowerCase().replace(/ /g, "-");
 };
 
@@ -36,6 +34,7 @@ export default class TransformerControls extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            shownExpanders: [],
             transformerControls : {}  // these aren't query controls specifically since not all transformers might be selected while a control is being filled TODO: sane?
         };
 
@@ -48,35 +47,11 @@ export default class TransformerControls extends React.Component {
     updateTransformerControls = (expanderIndexName, expanderControls) => {
         let stateCopy = { ...this.state };
         stateCopy.transformerControls[expanderIndexName] = expanderControls;
-        this.setState(stateCopy, () => {
-            // no throwback
-        });
+        this.setState(stateCopy);
     };
 
     queryTransformers = () => {
-        // DONE: do we always have access to the latest selected gene lists and selected expanders?
-        // DONE: do we always have access to the latest expander states?
-            // PO: Expanders are searched for and added programatically (through props),
-            // to prevent scaling out too wide by tracking a tonne of expanders + parameters changes through state modifications?
-
-        /* the first approach: aggregate upstream */
-
-        // TODO: Actually do this approach (it's probably more efficient but also a bigger implementation right now)
-        // helpful for understanding promise chaining: https://stackoverflow.com/a/36877743
-        // step one:
-            // aggregation
-                // why aggregation first? because it's cheap and fast
-                // if we were to not aggregate first then we expand out the number of parallel asynchronous
-                // requests we're making, which is a headache for both server and client
-        // step two:
-            // apply expander requests onto the resultant aggregator set (in sync with it)
-        // step three:
-            // return the set as a gene ID to the main App (which should trigger downstream rendering)
-            // this should be taken care of through our callback
-
-
-
-        /* The other approach: iterate over a bunch of independent queries */
+        /* TODO: Sound? Approach: iterate over a bunch of independent queries */
 
         // This takes the selected expanders and genelists, and returns an aggregate of all of the results
         // that come from applying each selected transformer to each selected gene list
@@ -114,37 +89,64 @@ export default class TransformerControls extends React.Component {
             ));
     };
 
+    static getDerivedStateFromProps(nextProps, prevState) {
+        if (nextProps.selectedExpanders !== prevState.shownExpanders) {
+            return {
+                shownExpanders: nextProps.selectedExpanders
+            }
+        }
+        return null;
+    }
+
     render() {
+        let options = this.props.expanders.map(expander =>
+            Object.assign({}, {label: properCase(expander.name), value: expander})
+        );
+
         // form has to wrap every transformer even if not all of them are contributing to the extant query
         return (
             <div>
                 <TransformerQuerySender
                     currentSelections={ { selectedGeneLists: this.props.selectedGeneLists, selectedExpanders: this.props.selectedExpanders } }
                     onClickCallback={ this.queryTransformers }/>
-                <div className={"container"}>
-                    <div className={"row"}>
-                        <div className="col-xs-8">
-                            <CurrentlySelectedGenes
-                                currentSelections={ { selectedGeneLists: this.props.selectedGeneLists, selectedExpanders: this.props.selectedExpanders } } />
-                            </div> {'\u00A0'}{'\u00A0'}{'\u00A0'}{'\u00A0'}{'\u00A0'}{'\u00A0'}{'\u00A0'}{'\u00A0'}{'\u00A0'}{'\u00A0'}{'\u00A0'}
-                        <div className="col-xs-4">
-                            <AggregatorControls
-                                currentSelections={ { selectedGeneLists: this.props.selectedGeneLists, selectedExpanders: this.props.selectedExpanders } }
-                                actions={["union", "intersection"]}
-                                aggregateGenes={ this.props.aggregateGenes }
-                            />
-                        </div>
 
-                    </div>
-                </div>
-                <CurrentlySelectedExpanders
-                    currentSelections={ { selectedGeneLists: this.props.selectedGeneLists, selectedExpanders: this.props.selectedExpanders } } />
-                {this.props.expanders ?
-                    <TransformerList
-                        transformers={ this.props.expanders }
-                        handleTransformerSelection={ this.props.handleExpanderSelection }
-                        throwbackExpanderIndex={ this.updateTransformerControls }/>
-                        : <MyLoader active={true}/> }
+                <Select id="expander-select"
+                        isMulti
+                        className="basic-multi-select"
+                        isSearchable
+                        defaultValue={[]}
+                        options={options}
+                        onChange={
+                            (args, action) => {
+                                if (action.action === "create-option") {
+
+                                }
+                                if (action.action === "select-option") {
+                                    // onColumnToggle(action.option.value);
+                                    console.log(args, action);
+                                    this.props.handleExpanderSelection(action.option.value)
+                                } else if (action.action === "remove-value" || action.action === "pop-value") {
+                                    // onColumnToggle(action.removedValue.value);
+                                    this.props.handleExpanderSelection(action.removedValue.value)
+                                }
+                                // TODO:
+                                else if (action.action === "clear") {
+                                    this.props.clearSelections();
+                                }
+                            }
+                        }>
+
+                    {options.map((expanderOption) => {
+                        return (<option key={expanderOption.value.name} value={expanderOption.value}>
+                                    {expanderOption.label}
+                                </option>)
+                    })}
+                </Select>
+                <TransformerList
+                    transformers={ this.props.expanders }
+                    shownTransformers={ this.state.shownExpanders }
+                    handleTransformerSelection={ this.props.handleExpanderSelection }
+                    throwbackExpanderIndex={ this.updateTransformerControls }/>
             </div>
         )
     }
@@ -198,21 +200,6 @@ export class CurrentlySelectedGenes extends React.Component {
                 </Fragment>
             )
         }
-}
-
-export class CurrentlySelectedExpanders extends React.Component {
-    render() {
-        return (
-            <Fragment>
-                <label as={"h5"}>Selected Expanders</label>
-                <ul>
-                    {this.props.currentSelections.selectedExpanders.length > 0 ? this.props.currentSelections.selectedExpanders.map(selectedExpander =>
-                            <li>{selectedExpander.name}</li>) :
-                        <p>None</p>}
-                </ul>
-            </Fragment>
-        )
-    }
 }
 
 export class TransformerQuerySender extends React.Component {
@@ -285,7 +272,6 @@ export class TransformerList extends React.Component{
         this.transformers = props.transformers;
         this.handleTransformerSelection = props.handleTransformerSelection;
         this.throwbackExpanderIndex = props.throwbackExpanderIndex;
-
         this.state = {
             // TODO: refactor to Redux
             expanderIndex: {}
@@ -314,12 +300,17 @@ export class TransformerList extends React.Component{
         });
     };
 
+    clearExpanderControls = (expanderName) => {
+        return this.updateExpanderControls(expanderName)
+    }
+
     render() {
         return (
             <Fragment>
-                {this.transformers.map(transformer =>
+                {this.transformers.filter(transformer => this.props.shownTransformers.includes(transformer)).map(transformer =>
                     <Fragment>
                         <TransformerItem
+                            key={transformer.name}
                             transformer={ transformer }
                             // TODO: what are the naming conventions for custom props
                             handleTransformerSelection={ this.handleTransformerSelection }
@@ -397,29 +388,51 @@ export class TransformerItem extends React.Component {
                 });
             }
         });
+    };
 
-        // DONE: see TransformerControls
-        // our goal is to store nothing more than the equivalent of an expander ID, so that the parameter values can be programatically found
-        // this means that the state propagating upwards has to be strictly controlled as to be deterministic
-        // it also has to update frequently
-
-        // delegate
-        this.handleTransformerSelection(this.transformer);
+    clearParameters = () => {
+        const parameterIndexNames = Object.keys(this.state.parameterIndex);
+        parameterIndexNames.forEach(parameterIndexName => {
+            if (this.state.parameterIndex[parameterIndexName].value) {
+                let stateCopy = { ...this.state };
+                stateCopy.parameterIndex[parameterIndexName].value = '';
+                this.setState(stateCopy,() => {
+                    this.throwbackParameterValues(this.transformer.name, parameterIndexName, this.state.parameterIndex[parameterIndexName]);
+                });
+            }
+        });
     };
 
     render() {
         return (
-            <Card>
-                <Card.Header as={"h6"} onClick={ this.onClickHandleSelection }>{properCase(this.transformer.name)}</Card.Header>
-                <div id={"expander-".concat(indexNameOf(this.transformer.name))}>
-                    {Object.keys(this.state.parameterIndex).map(parameterIndexKey => {
-                        return <TransformerParameter id={ parameterIndexKey }
-                                                     value = {this.state.parameterIndex[parameterIndexKey].value}
-                                                     parameter = {this.state.parameterIndex[parameterIndexKey].parameter}
-                                                     action = { this.handleParameterValueChange }/>
-                    })}
-                </div>
-            </Card>
+            <Fragment>
+                <Card>
+                    <Card.Header as={"h6"}>
+                        <a style={{display: "inline-block"}}
+                           onClick={ this.onClickHandleSelection }>
+                            {properCase(this.transformer.name)}
+                        </a>
+                        {/* TODO */}
+                        {/*{Object.keys(this.state.parameterIndex).map(parameterIndexKey => this.state.parameterIndex[parameterIndexKey].value).some((parameterValue) => (parameterValue == true)) ?*/}
+                            <button className="btn my-2 my-sm-0"
+                                    style={{padding:"0%", fontSize: "small", float:"right", marginLeft: "auto", margin: "auto", display:"inline-block"}}
+                                    onClick={ this.clearParameters }>
+                                Reset
+                            </button>
+                        {/*: <Fragment/>}*/}
+                    </Card.Header>
+                    <div id={"expander-".concat(indexNameOf(this.transformer.name))}>
+                        {Object.keys(this.state.parameterIndex).map(parameterIndexKey => {
+                            return (<Fragment>
+                                        <TransformerParameter id={ parameterIndexKey }
+                                                              value = {this.state.parameterIndex[parameterIndexKey].value}
+                                                              parameter = {this.state.parameterIndex[parameterIndexKey].parameter}
+                                                              action = { this.handleParameterValueChange }/>
+                                    </Fragment>)
+                        })}
+                    </div>
+                </Card>
+            </Fragment>
         )
     }
 }
@@ -429,7 +442,6 @@ export class TransformerParameter extends React.Component {
         super(props);
         this.id = props.id;
         this.parameter = props.parameter;
-        this.allowedValues = props.allowedValues ? props.allowedValues : "";
         this.handleParameterValueChange = props.action;
 
         this.state = {
@@ -458,12 +470,39 @@ export class TransformerParameter extends React.Component {
                 <InputGroup.Prepend>
                     <InputGroup.Text>{ formatAbbreviations(properCase(this.parameter.name)) }</InputGroup.Text>
                 </InputGroup.Prepend>
-                    <FormControl id={ this.id }
-                                 className={"transformer-parameter"}
-                                 placeholder={ this.parameter.default ? this.parameter.default : properCase(this.parameter.type) }
-                                 value={ this.state.value }
-                                 onChange={ this.handleParameterValueChange }/>
-
+                {!this.parameter.allowed_values ?
+                <FormControl id={ this.id }
+                             className={"transformer-parameter"}
+                             placeholder={ this.parameter.default ? this.parameter.default : this.parameter.type === "list" ? properCase(this.parameter.type)+" of "+this.parameter.name+"s" : properCase(this.parameter.type) }
+                             value={ this.state.value }
+                             onChange={ this.handleParameterValueChange }/>
+                : <FormControl
+                        id={ this.id }
+                        className={"transformer-parameter"}
+                        as={"select"}
+                        onChange={ this.handleParameterValueChange }
+                        defaultValue={this.state.value}>
+                    <option key={"blank"} value={this.state.value}>{this.state.value}</option>
+                    {this.parameter.allowed_values.map(allowed_value => (
+                        <option key={allowed_value} value={allowed_value}>
+                            {properCase(allowed_value)}
+                        </option>
+                    ))}
+                  </FormControl>}
+                {/*<Select*/}
+                {/*    id={"allowed-parameter-"+this.parameter.name}*/}
+                {/*    className="form-control"*/}
+                {/*    style={{display:"block", margin: 0}}*/}
+                {/*    isSearchable*/}
+                {/*    options={this.parameter.allowed_values.map(allowed_value=>({label: properCase(allowed_value), value: allowed_value}))}*/}
+                {/*    defaultValue={this.parameter.allowed_values.map(allowed_value=>({label: properCase(allowed_value), value: allowed_value}))[0]}*/}
+                {/*    onChange={ () => {} }>*/}
+                {/*    {this.parameter.allowed_values.map(allowed_value => (*/}
+                {/*        <option key={allowed_value} value={allowed_value}>*/}
+                {/*            {properCase(allowed_value)}*/}
+                {/*        </option>*/}
+                {/*    ))}*/}
+                {/*</Select>*/}
             </InputGroup>
         )
     }

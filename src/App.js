@@ -24,7 +24,7 @@ import {tap} from './helpers'
 
 // local components
 import Spinner from "./elements/Spinner/Spinner";
-import ProducerControls from './components/ProducerControls.js'
+import ProducerControls from './components/ProducerControls/ProducerControls.js'
 import TransformerControls from "./components/TransformerControls/TransformerControls";
 import GeneFeed from "./components/GeneFeed/GeneFeed";
 import TransformerHistory from "./components/TransformerHistory/TransformerHistory";
@@ -75,14 +75,10 @@ class App extends React.Component {
                                 selectedExpanders={ this.props.selectedExpanders }
                                 handleExpanderSelection={ this.props.toggleExpanderSelection }
                                 handleGeneListSelection={ this.props.toggleGeneListSelection }
+                                clearSelections={ this.props.clearSelections}
                                 queryPromise={ this.props.transformGenes }
                                 aggregateGenes={ this.props.aggregateGenes }
                             /> : <Spinner/> }
-                        <button className="btn my-2 my-sm-0"
-                                style={{padding:"0%", fontSize: "small", float: "right"}}
-                                onClick={this.props.clearSelections}>
-                            Clear Selections
-                        </button>
                     </div>
                     {/* Gene Lists */}
                     <div className="col-sm-9">
