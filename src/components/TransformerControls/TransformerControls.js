@@ -142,6 +142,7 @@ export default class TransformerControls extends React.Component {
                 {this.props.expanders ?
                     <TransformerList
                         transformers={ this.props.expanders }
+                        filters={ this.props.filters }
                         handleTransformerSelection={ this.props.handleExpanderSelection }
                         throwbackExpanderIndex={ this.updateTransformerControls }/>
                         : <MyLoader active={true}/> }
@@ -158,6 +159,7 @@ export class AggregatorControls extends React.Component {
                     { this.props.currentSelections.selectedGeneLists ?
                         this.props.actions.map(operation =>
                             <AggregationSender
+                                key={operation}
                                 selectedGeneLists={this.props.currentSelections.selectedGeneLists}
                                 aggregateGenes={this.props.aggregateGenes}
                                 action={operation}/>) : <div/> }
@@ -283,6 +285,7 @@ export class TransformerList extends React.Component{
     constructor(props) {
         super(props);
         this.transformers = props.transformers;
+        this.filters = props.filters;
         this.handleTransformerSelection = props.handleTransformerSelection;
         this.throwbackExpanderIndex = props.throwbackExpanderIndex;
 
@@ -318,7 +321,7 @@ export class TransformerList extends React.Component{
         return (
             <Fragment>
                 {this.transformers.map(transformer =>
-                    <Fragment>
+                    <Fragment key={transformer.name}>
                         <TransformerItem
                             transformer={ transformer }
                             // TODO: what are the naming conventions for custom props
@@ -326,6 +329,16 @@ export class TransformerList extends React.Component{
                             throwbackParameterValues={ this.updateExpanderControls }/>
                         <br/>
                     </Fragment>)}
+                {this.filters.map(filter =>
+                    <Fragment key={filter.name}>
+                        <TransformerItem
+                            transformer={ filter }
+                            // TODO: what are the naming conventions for custom props
+                            // handleTransformerSelection={ this.handleTransformerSelection }
+                            // throwbackParameterValues={ this.updateExpanderControls }
+                        /><br/>
+                    </Fragment>
+                )}
             </Fragment>
         )
     }
@@ -414,6 +427,7 @@ export class TransformerItem extends React.Component {
                 <div id={"expander-".concat(indexNameOf(this.transformer.name))}>
                     {Object.keys(this.state.parameterIndex).map(parameterIndexKey => {
                         return <TransformerParameter id={ parameterIndexKey }
+                                                     key={ parameterIndexKey }
                                                      value = {this.state.parameterIndex[parameterIndexKey].value}
                                                      parameter = {this.state.parameterIndex[parameterIndexKey].parameter}
                                                      action = { this.handleParameterValueChange }/>

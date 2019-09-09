@@ -1,4 +1,3 @@
-import {useTable} from "react-table";
 import React from "react"
 import {getGeneListByID} from "../actions"
 import {SERVICE_URL} from "../parameters/EndpointURLs";
