@@ -27,41 +27,10 @@ export const CLEAR_ALL_GENE_LISTS = 'CLEAR_ALL_GENE_LISTS';
 export const UNDO_LAST_CLEAR = 'UNDO_LAST_CLEAR';
 export const DIFFERENCE_GENE_LISTS = 'DIFFERENCE_GENE_LISTS';
 export const RECORD_SHARPENER_ACTION = 'RECORD_SHARPENER_ACTION';
-export const FILTER_GENES = 'FILTER_GENES';
-
-export function filterGenes(gene_list_id, gene_symbol) {
-    return (dispatch) => {
-        const removeGenesQuery = {
-            gene_list_id: gene_list_id,
-            controls: [
-                {
-                    name: "remove_genes",
-                    value: gene_symbol
-                }
-            ]
-        };
-        const requestFilter = fetch(SERVICE_URL.concat('/remove_genes_filter'), {
-            method: "POST",
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(removeGenesQuery)
-            })
-            .then(response => response.json())
-            .then(data => {
-                return data
-            });
-        return dispatch({
-            type: FILTER_GENES,
-            payload: requestFilter
-        })
-    }
-}
 
 export function getGeneListByID(geneListID) {
     return (dispatch) => {
-        const requestGenes = fetch(SERVICE_URL.concat('/gene_list'))
+        const requestGenes = fetch(SERVICE_URL.concat('/gene_list').concat("/"+geneListID))
                 .then(response => response.json())
                 .then(data => {
                     return data
@@ -85,7 +54,6 @@ export function getTransformers(continuation = (result) => result) {
                     return continuation({
                         transformers: transformers,
                         expanders: transformers.filter((item) => { return item['function'] === 'expander' }),
-                        filters: transformers.filter((item) => { return item['function'] === 'filter' }),
                         producers: transformers.filter((item) => { return item['function'] === 'producer' })
                     });
                 }

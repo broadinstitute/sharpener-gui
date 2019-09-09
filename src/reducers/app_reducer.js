@@ -15,7 +15,7 @@ import {
     CLEAR_SINGLE_GENE_LIST,
     UNDO_LAST_CLEAR,
     RECORD_SHARPENER_ACTION,
-    DIFFERENCE_GENE_LISTS, FILTER_GENES
+    DIFFERENCE_GENE_LISTS
 } from "../actions"
 
 const defaultState = {
@@ -28,7 +28,6 @@ const defaultState = {
         }
     ],
     expanders: [],
-    filters: [],
     transformers: [],
 
     // gene list creation state
@@ -61,7 +60,6 @@ export default function(state=defaultState, action) {
                 ...state,
                 transformers: state.transformers.concat(action.payload.transformers),
                 expanders: state.expanders.concat(action.payload.expanders),
-                filters: state.expanders.concat(action.payload.filters),
                 producers: state.producers.concat(action.payload.producers),
                 loading: false
             };
@@ -76,11 +74,6 @@ export default function(state=defaultState, action) {
                 gene_list_ids: state.gene_list_ids.concat([action.payload.results.gene_list_id])
             };
         case TRANSFORM_GENES:
-            return {
-                ...state,
-                gene_list_ids: state.gene_list_ids.concat([action.payload.results.gene_list_id])
-            };
-        case FILTER_GENES:
             return {
                 ...state,
                 gene_list_ids: state.gene_list_ids.concat([action.payload.results.gene_list_id])
