@@ -71,6 +71,7 @@ class App extends React.Component {
                         {this.props.expanders && this.props.expanders.length > 0 ?
                             <TransformerControls
                                 expanders={ this.props.expanders }
+                                filters={ this.props.filters }
                                 selectedGeneLists={ this.props.selectedGeneListsByID }
                                 selectedExpanders={ this.props.selectedExpanders }
                                 handleExpanderSelection={ this.props.toggleExpanderSelection }
