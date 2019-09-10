@@ -1,6 +1,10 @@
 /* Hack to enforce horizontal scrolling on tables */
 td, th {
     display: table-cell;
-    width:100px;
-    min-width:100px;
+    width:150px;
+    min-width:150px;
+}
+
+[role=tabpanel] {
+    padding: 0 !important;
 }

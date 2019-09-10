@@ -49,8 +49,8 @@ const defaultState = {
     // transaction history
     // list of dates -> geneListID -> query
     transactionLedger: [],
-    loading: true
-
+    loadingQuery: {},
+    loadingState: false
 };
 
 export default function(state=defaultState, action) {

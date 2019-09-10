@@ -17,14 +17,15 @@ import {
     selectProducer,
     toggleExpanderSelection,
     toggleGeneListSelection,
-    differentiateGeneLists
+    differentiateGeneLists,
+    computeGeneListName
 } from "./actions"
 import {store} from "./store";
 import {tap} from './helpers'
 
 // local components
 import Spinner from "./elements/Spinner/Spinner";
-import ProducerControls from './components/ProducerControls.js'
+import ProducerControls from './components/ProducerControls/ProducerControls.js'
 import TransformerControls from "./components/TransformerControls/TransformerControls";
 import GeneFeed from "./components/GeneFeed/GeneFeed";
 import TransformerHistory from "./components/TransformerHistory/TransformerHistory";
@@ -57,7 +58,6 @@ class App extends React.Component {
             <div className="container-fluid">
                 <div className="row">
                     <div className="col-sm-3" style={{transformerMenuStyle}}>
-                        <h3>Producers</h3>
                         {/* Producer Components */}
                         {this.props.producers ?
                             <ProducerControls
@@ -67,7 +67,7 @@ class App extends React.Component {
                                 handleGeneListCreation={this.props.createGeneList}
                                 handleProducerSelect={this.props.selectProducer}/>
                             : <Spinner/>}
-                        <h3>Expanders</h3>
+                        <h3>Transformers</h3>
                         {this.props.expanders && this.props.expanders.length > 0 ?
                             <TransformerControls
                                 expanders={ this.props.expanders }
@@ -76,20 +76,17 @@ class App extends React.Component {
                                 selectedExpanders={ this.props.selectedExpanders }
                                 handleExpanderSelection={ this.props.toggleExpanderSelection }
                                 handleGeneListSelection={ this.props.toggleGeneListSelection }
+                                clearSelections={ this.props.clearSelections}
                                 queryPromise={ this.props.transformGenes }
                                 aggregateGenes={ this.props.aggregateGenes }
                             /> : <Spinner/> }
-                        <button className="btn my-2 my-sm-0"
-                                style={{padding:"0%", fontSize: "small", float: "right"}}
-                                onClick={this.props.clearSelections}>
-                            Clear Selections
-                        </button>
                     </div>
                     {/* Gene Lists */}
                     <div className="col-sm-9">
                         <div className={"row"}>
                             <TransformerHistory
                                 geneListIDs={ this.props.gene_list_ids }
+                                computeGeneListName={ this.props.computeGeneListName }
                                 clearGeneList={ this.props.clearSingleGeneList }
                                 handleGeneListSelection={ this.props.toggleGeneListSelection }
                                 differenceGenes={ this.props.differentiateGeneLists }
@@ -98,7 +95,7 @@ class App extends React.Component {
                         {/* Tables of Genes */}
                         { this.props.selectedGeneListsByID.length > 0 ?
                             <div className={"row"}>
-                                <h3 style={{paddingLeft: "15px"}}>Gene Lists</h3>
+                                <h3 style={{paddingLeft: "15px"}}>Selected Gene Lists</h3>
                                 <div style={{marginLeft: "auto", marginRight: "15px"}}>
                                     {/* Clear Gene Tables */}
                                     { this.props.selectedGeneListsByID.length > 0 ?
@@ -122,6 +119,7 @@ class App extends React.Component {
                                 {/*<h6>Previous Gene Sets</h6>*/}
                                 <GeneFeed
                                     geneListIDs={ this.props.selectedGeneListsByID }
+                                    computeGeneListName={ this.props.computeGeneListName }
                                     handleGeneListSelection={ this.props.toggleGeneListSelection }
                                     clearGeneList={ this.props.clearSingleGeneList }
                                 />
@@ -156,7 +154,8 @@ const mapDispatchToProps = {
     selectProducer,
     toggleExpanderSelection,
     toggleGeneListSelection,
-    differentiateGeneLists
+    differentiateGeneLists,
+    computeGeneListName
 };
 
 export default connect(

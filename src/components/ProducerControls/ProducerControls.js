@@ -1,10 +1,12 @@
 import React, {Fragment} from 'react';
-import {TransformerParameter} from "./TransformerControls/TransformerControls";
+import {TransformerParameter} from "../TransformerControls/TransformerControls";
 import InputGroup from "react-bootstrap/InputGroup";
 import FormControl from "react-bootstrap/FormControl";
 import Card from "react-bootstrap/Card";
 import Select from 'react-select';
 import _ from "underscore"
+import "./ProducerControls.css"
+
 
 const SERVICE_URL =  process.env.REACT_APP_SERVICE_URL;
 
@@ -120,18 +122,20 @@ export class ProducerControls extends React.Component {
         );
         return (
             <div style={searchBarStyle}>
+                <h3>Producers</h3>
                 <Select id="producer"
                         className="basic-single"
                         isSearchable
                         defaultValue={options[0]}
                         options={options}
-                        onChange={ this.handleProducerSelect }
-                >
+                        onChange={ this.handleProducerSelect }>
+
                     {this.props.producers.map((producer) =>
                         <option key={producer.name} value={producer.name}>
                             {producer.name}
                         </option>
                     )}
+
                 </Select>
                 <div style={inputStyle}>
                     <div className="form-inline" onKeyPress={this.handleKeyPress}>
@@ -146,7 +150,7 @@ export class ProducerControls extends React.Component {
                                 })
                         }
                         <button
-                            style={{marginLeft: "auto", marginRight:"0%"}}
+                            style={{marginTop: "13px", marginLeft: "auto", marginRight:"0%"}}
                             type="button"
                             onClick={ this.handleProducingGenes }
                             className="btn btn-outline-success">

@@ -13,6 +13,30 @@ import "./GeneTable.css"
 
 const SERVICE_URL =  process.env.REACT_APP_SERVICE_URL;
 
+export class GeneReactTable extends React.Component {
+    constructor(props) {
+        super(props);
+    }
+
+    componentDidMount() {}
+
+    static getDerivedStateFromProps(props, state) {
+        if (props.geneListIDs !== state.geneListIDs) {
+            return { geneListIDs: props.geneListIDs };
+        }
+        return null;
+    }
+
+    render() {
+        return (
+            <table>
+                <thead></thead>
+                <tbody></tbody>
+            </table>
+        );
+    }
+}
+
 export default class GeneTable extends React.Component {
     constructor(props) {
         super(props);
@@ -151,7 +175,7 @@ export default class GeneTable extends React.Component {
             if (potentialList.length > 1) {
                 console.log(cell, "is a  list");
                 const cellList = potentialList;
-                return <div>{cellList[0]}...</div>
+                return <div>{_.take(cellList, 4)}...</div>
             } else {
                 return cell;
             }

@@ -71,16 +71,15 @@ export default class GeneTabs extends React.Component {
         const panelTemplate = [];
         geneListIDs.forEach((geneListID, index) => {
             tabsTemplate.push(
-                <Tab key={index+"-tab"}>
-                    {geneListID}
+                <Tab key={index}>
+                    {this.props.computeGeneListName(geneListID).payload}
                 </Tab>);
             panelTemplate.push(
                     <AsyncPanel
-                        key={index+"-panel"}
+                        key={index}
                         loadContent={ this.getGenesForGeneListID(geneListID) }
                         render={content =>
                             <Fragment>
-                                {/*{JSON.stringify(content)}*/}
                                 {content ?
                                     <GeneTable
                                         key={ content.gene_list_id }
@@ -98,7 +97,7 @@ export default class GeneTabs extends React.Component {
         return (
             <div className={"col-sm-12"}>
                 <Tabs activeIndex={activeIndex}
-                      customStyle={customStyle}    >
+                      customStyle={customStyle}>
                     <TabList>
                         {tabsTemplate}
                     </TabList>

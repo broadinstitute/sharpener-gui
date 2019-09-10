@@ -21,7 +21,7 @@ export const pluralize = (length, word) => {
 
 export const underscoreToSpaces = (string) => {
     return string.split('_').join(' ');
-}
+};
 
 export const formatAbbreviations = (gla) => {
     return gla.replace(/_/g, " ")
