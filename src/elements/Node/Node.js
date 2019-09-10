@@ -8,7 +8,7 @@ import "./css/tooltip.css"
 
 import {flatten, pluralize, properCase, tap} from "../../helpers";
 
-import {clearSingleGeneList, differentiateGeneLists} from "../../actions";
+import {clearSingleSelectedGeneList, differentiateGeneLists} from "../../actions";
 
 class Node extends React.Component{
     static tooltip = NodeTooltip;

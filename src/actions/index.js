@@ -397,7 +397,7 @@ export function clearSelections() {
     }
 }
 
-export function clearAllGeneLists() {
+export function clearAllSelectedGeneLists() {
     return (dispatch, getState) => {
         const { app: { gene_list_ids, recently_cleared_gene_lists } } = getState();
         // copy
@@ -407,24 +407,24 @@ export function clearAllGeneLists() {
         return dispatch({
             type: CLEAR_ALL_GENE_LISTS,
             payload: {
-                gene_list_ids: [],  // equal to the unfiltered gene lists
+                selectedGeneListsByID: [],  // equal to the unfiltered gene lists
                 recently_cleared_gene_lists: new_recently_cleared_gene_lists,  // equal to the filtered gene lists
             }
         });
     }
 }
 
-export function clearSingleGeneList(clearedGeneListID) {
+export function clearSingleSelectedGeneList(clearedGeneListID) {
     return (dispatch, getState) => {
-        const { app: { gene_list_ids, recently_cleared_gene_lists } } = getState();
+        const { app: { selectedGeneListsByID, recently_cleared_gene_lists } } = getState();
 
-        let new_gene_list_ids = gene_list_ids.filter(geneListID => geneListID != clearedGeneListID);
+        let new_gene_list_ids = selectedGeneListsByID.filter(geneListID => geneListID != clearedGeneListID);
         let new_recently_cleared_gene_lists = recently_cleared_gene_lists; new_recently_cleared_gene_lists.push(clearedGeneListID);
 
         return dispatch({
             type: CLEAR_ALL_GENE_LISTS,
             payload: {
-                gene_list_ids: new_gene_list_ids,  // equal to the unfiltered gene lists
+                selectedGeneListsByID: new_gene_list_ids,  // equal to the unfiltered gene lists
                 recently_cleared_gene_lists: new_recently_cleared_gene_lists,  // equal to the filtered gene lists
             }
         });
