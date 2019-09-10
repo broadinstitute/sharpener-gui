@@ -52,7 +52,6 @@ export class ProducerControls extends React.Component {
         // if all parameters from parameter index have non-blank values or other truthy values
         let parameterValues = parameterIndexControls.map(parameterIndexControl => parameterIndexControl.value );
         if (parameterValues.every((truthyValue) => (truthyValue !== '' || truthyValue !== null))) {  // yeah
-            console.log("all values truthy");
             // then produce genes
             if (this.state.selectedProducer.name !== "Gene Symbols") {
                 // we produce genes by calling a producer
@@ -154,7 +153,7 @@ export class ProducerControls extends React.Component {
                             type="button"
                             onClick={ this.handleProducingGenes }
                             className="btn btn-outline-success">
-                            Produce Gene Set
+                            Produce Gene List
                         </button>
                     </div>
                 </div>
