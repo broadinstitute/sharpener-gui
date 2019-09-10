@@ -116,7 +116,6 @@ class App extends React.Component {
                         : <Fragment/>}
                         {this.props.gene_list_ids ?
                             <div className={"row"}>
-                                {/*<h6>Previous Gene Sets</h6>*/}
                                 <GeneFeed
                                     geneListIDs={ this.props.selectedGeneListsByID }
                                     computeGeneListName={ this.props.computeGeneListName }
