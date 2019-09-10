@@ -144,14 +144,14 @@ export default class TransformerControls extends React.Component {
                                     {expanderOption.label}
                                 </option>)
                     })}
-                </Select>
+                </Select><br/>
                 <TransformerList
                     transformers={ this.props.expanders }
                     shownTransformers={ this.state.shownExpanders }
                     handleTransformerSelection={ this.props.handleExpanderSelection }
                     throwbackExpanderIndex={ this.updateTransformerControls }/>
 
-                <br/><h4>Filters</h4>
+                <h4>Filters</h4>
                 <TransformerList
                     transformers={ this.props.filters }
                     shownTransformers={ this.state.shownFilters }
@@ -325,7 +325,7 @@ export class TransformerList extends React.Component{
                             transformer={ transformer }
                             // TODO: what are the naming conventions for custom props
                             handleTransformerSelection={ this.handleTransformerSelection }
-                            throwbackParameterValues={ this.updateExpanderControls }/>
+                            throwbackParameterValues={ this.updateExpanderControls }/><br/>
                     </Fragment>)}
             </Fragment>
         )

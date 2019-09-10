@@ -130,13 +130,13 @@ export default function(state=defaultState, action) {
         case CLEAR_ALL_GENE_LISTS:
             return {
                 ...state,
-                gene_list_ids: action.payload.gene_list_ids,
+                selectedGeneListsByID: action.payload.selectedGeneListsByID,
                 recently_cleared_gene_lists: action.payload.recently_cleared_gene_lists
             };
         case CLEAR_SINGLE_GENE_LIST:
             return {
                 ...state,
-                gene_list_ids: action.payload.gene_list_ids,
+                selectedGeneListsByID: action.payload.selectedGeneListsByID,
                 recently_cleared_gene_lists: action.payload.recently_cleared_gene_lists
             };
         case UNDO_LAST_CLEAR:
