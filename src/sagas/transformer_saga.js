@@ -10,6 +10,9 @@ const TRANSFORM_GENES = 'TRANSFORM_GENES';
 const AGGREGATE_GENES = 'AGGREGATE_GENES';
 const RECORD_SHARPENER_ACTION = 'RECORD_SHARPENER_ACTION';
 
+const TRACK_TRANSACTION = 'TRACK_TRANSACTION';
+
+
 function* recordSharpenerAction(action) {
 
     // TODO: refactor out to two actions
@@ -82,11 +85,20 @@ function* recordSharpenerAction(action) {
     })
 }
 
+function* trackTransactionStatus(action) {
+    const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+    wait(10*1000)
+
+}
+
 function* transformerSaga() {
     yield takeEvery(CREATE_GENE_LIST, recordSharpenerAction);
     yield takeEvery(PRODUCE_GENES, recordSharpenerAction);
     yield takeEvery(TRANSFORM_GENES, recordSharpenerAction);
     yield takeEvery(AGGREGATE_GENES, recordSharpenerAction);
+
+    yield takeEvery(PRODUCE_GENES, trackTransactionStatus);
+    yield takeEvery(TRANSFORM_GENES, trackTransactionStatus);
 }
 
 export default transformerSaga;

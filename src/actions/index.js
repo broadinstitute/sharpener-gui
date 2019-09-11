@@ -30,6 +30,7 @@ export const DIFFERENCE_GENE_LISTS = 'DIFFERENCE_GENE_LISTS';
 export const RECORD_SHARPENER_ACTION = 'RECORD_SHARPENER_ACTION';
 export const FILTER_GENES = 'FILTER_GENES';
 export const COMPUTE_GENE_LIST_NAME = 'COMPUTE_GENE_LIST_NAME';
+export const GENES_RECEIVED = 'GENES_RECEIVED';
 
 export function computeGeneListName(geneListID) {
     return (dispatch, getState) => {
@@ -205,7 +206,7 @@ export function createGeneList(geneSymbolList) {
 
 export function produceGenes(productionQuery) {
     return (dispatch) => {
-        const requestProduction = fetch(SERVICE_URL.concat('/transform'), {
+        const requestProduction = fetch(SERVICE_URL.concat('/submit'), {
             method: "POST",
             headers: {
                 'Accept': 'application/json',
@@ -244,7 +245,7 @@ export function produceGenes(productionQuery) {
 
 export function transformGenes(transformerQuery) {
     return (dispatch) => {
-        const requestTransformation = fetch(SERVICE_URL.concat('/transform'), {
+        const requestTransformation = fetch(SERVICE_URL.concat('/submit'), {
             method: "POST",
             headers: {
                 'Accept': 'application/json',
