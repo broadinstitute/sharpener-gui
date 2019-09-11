@@ -5,6 +5,7 @@ import {formatAbbreviations, pluralize, properCase} from "../../helpers";
 import BootstrapTable from "react-bootstrap-table-next";
 import _ from "underscore";
 import ToolkitProvider, { CSVExport } from 'react-bootstrap-table2-toolkit';
+import paginationFactory from 'react-bootstrap-table2-paginator';
 import Select from "react-select";
 const { ExportCSVButton } = CSVExport;
 import {FEATURE_FLAG} from "../../parameters/FeatureFlags";
@@ -83,21 +84,23 @@ export default class GeneTable extends React.Component {
 
                             {props =>
                                 <React.Fragment>
+                                    {/*{ !(Object.values(props.columnToggleProps.toggles).every((value => value))) ?*/}
+                                    {/*    <span style={{fontSize:"small", marginLeft:"0.75em"}}>Filtered Columns</span>*/}
+                                    {/*    :   <span style={{fontSize:"small", marginLeft:"0.75em"}}>Select columns below to filter them</span> }*/}
+                                    <GeneTableColumnFilter
+                                        {...props.columnToggleProps}
+                                    />
                                     <div>
                                         <span className={"btn"}>{pluralize(this.state.geneTableData.length, "gene")}</span>
                                         {/*TODO: Refactor -> https://stackoverflow.com/a/53558566 */}
                                         <ExportCSVButton style={{border: "none", textDecoration: "underline", float: "right"}} {...props.csvProps}>Export</ExportCSVButton>
                                     </div>
                                     <BootstrapTable
-                                        wrapperClasses="table-responsive"
+                                        wrapperClasses={"table-responsive"}
+                                        pagination={ paginationFactory() }
                                         {...props.baseProps} />
 
-                                    { !(Object.values(props.columnToggleProps.toggles).every((value => value))) ?
-                                        <span style={{fontSize:"small", marginLeft:"0.75em"}}>Filtered Columns</span>
-                                        :   <span style={{fontSize:"small", marginLeft:"0.75em"}}>Select columns below to filter them</span> }
-                                    <GeneTableColumnFilter
-                                        {...props.columnToggleProps}
-                                    />
+
                                 </React.Fragment>}
                         </ToolkitProvider>
                     </Collapse> : <React.Fragment/>}
@@ -227,7 +230,7 @@ const GeneTableColumnFilter = ({columns, onColumnToggle, toggles}) => {
     return (
         <React.Fragment>
             <Select
-                placeholder={"Filtered Columns..."}
+                placeholder={"Filter Columns..."}
                 defaultValue={[]}
                 isMulti
                 name="columns"
