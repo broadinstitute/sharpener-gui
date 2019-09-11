@@ -95,7 +95,7 @@ export default class GeneTabs extends React.Component {
         });
         return (
             <div className={"col-sm-12"}>
-                <Tabs customStyle={customStyle} showModalButton={2}>
+                <Tabs customStyle={customStyle} showModalButton={3}>
                     <TabList>
                         {tabsTemplate}
                     </TabList>
