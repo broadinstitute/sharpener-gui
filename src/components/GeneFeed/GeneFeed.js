@@ -90,7 +90,7 @@ export default class GeneTabs extends React.Component {
                             </Fragment>
                         }
                         renderLoading={() => <Spinner/>}
-                        cache={false}/>
+                        cache={true}/>
             );
         });
         return (
