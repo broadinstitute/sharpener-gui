@@ -111,12 +111,13 @@ export default class TransformerHistory extends React.Component {
         return (
             <div className={"col-sm-12"}>
                 <div id={"test-class"} style={{position: "absolute", visibility: "hidden"}}>
+                    <h4>Gene Lists</h4>
                 </div>
                 {this.props.geneListIDs.length > 0 && FEATURE_FLAG.histories.showHistories ?
                     <Card>
-                        <Card.Header as={"h5"}>
-                            Transformations
-                        </Card.Header>
+                        {/*<Card.Header as={"h4"}>*/}
+                        {/*    Transformations*/}
+                        {/*</Card.Header>*/}
                         <SizeMe>
                             {({size}) => (
                                 <DagreD3

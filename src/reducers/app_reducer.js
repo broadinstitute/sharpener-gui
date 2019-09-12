@@ -8,9 +8,11 @@ import {
     GET_PRODUCERS_FROM_TRANSFORMERS,
     DISPLAY_NEW_GENE_LIST,
     SELECT_PRODUCER,
+    CLEAR_SELECTIONS,
     TOGGLE_EXPANDER_SELECTION,
     TOGGLE_GENE_LIST_SELECTION,
-    CLEAR_SELECTIONS,
+    GENES_COMPLETE,
+    GENES_ERROR,
     CLEAR_ALL_GENE_LISTS,
     CLEAR_SINGLE_GENE_LIST,
     UNDO_LAST_CLEAR,
@@ -49,7 +51,7 @@ const defaultState = {
     // transaction history
     // list of dates -> geneListID -> query
     transactionLedger: [],
-    loadingQuery: {},
+    loadingQueryNames: [],
     loading: false
 };
 
@@ -63,7 +65,6 @@ export default function(state=defaultState, action) {
                 expanders: state.expanders.concat(action.payload.expanders),
                 filters: state.expanders.concat(action.payload.filters),
                 producers: state.producers.concat(action.payload.producers),
-                loading: false
             };
         case CREATE_GENE_LIST:
             return {
@@ -76,6 +77,7 @@ export default function(state=defaultState, action) {
             return {
                 ...state,
                 // gene_list_ids: state.gene_list_ids.concat([action.payload.results.gene_list_id]),
+                loadingQueryNames: state.loadingQueryNames.concat(action.payload.query.name),
                 loading: true
             };
         // TODO: loadingRequest ID and the Query Details
@@ -83,9 +85,9 @@ export default function(state=defaultState, action) {
             return {
                 ...state,
                 // gene_list_ids: state.gene_list_ids.concat([action.payload.results.gene_list_id]),
+                loadingQueryNames: state.loadingQueryNames.concat(action.payload.query.name),
                 loading: true
             };
-        // TODO: Filter
         case FILTER_GENES:
             return {
                 ...state,
@@ -102,7 +104,7 @@ export default function(state=defaultState, action) {
             return {
                 ...state,
                 expanders: action.payload.expanders
-            }
+            };
         case GET_PRODUCERS_FROM_TRANSFORMERS:
             return {
                 ...state,
@@ -164,7 +166,18 @@ export default function(state=defaultState, action) {
                 ...state,
                 gene_list_ids: state.gene_list_ids.concat([action.payload.results.gene_list_id]),
                 // loadingRequest: pop out the request id and query title form the loading request index
-                loading: false
+                loadingQueryNames: state.loadingQueryNames.filter(names => names !== action.payload.query.name),
+                loading: state.loadingQueryNames.filter(names => names !== action.payload.query.name).length > 0
+            };
+        case GENES_ERROR:
+            return {
+                ...state,
+                gene_list_ids: state.gene_list_ids.concat([action.payload.results.gene_list_id]),
+                // loadingRequest: pop out the request id and query title form the loading request index
+                loadingQueryNames: state.loadingQueryNames.filter(names => names !== action.payload.query.name),
+                loading: state.loadingQueryNames.filter(names => names !== action.payload.query.name).length > 0,
+                errorQueryNames: action.payload.query.name,
+                error: true
             };
         case DIFFERENCE_GENE_LISTS:
             // it's a query: do nothing

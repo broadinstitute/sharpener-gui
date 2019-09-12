@@ -1,5 +1,5 @@
-import { call, put, takeEvery, takeLatest } from 'redux-saga/effects'
-import {differentiateGeneLists} from "../actions";
+import { race, call, put, takeEvery, takeLatest, take, delay } from 'redux-saga/effects'
+import {differentiateGeneLists, getGeneListByID, getGeneListStatus, receiveGeneList} from "../actions";
 import {SERVICE_URL} from "../parameters/EndpointURLs";
 import _ from "lodash";
 
@@ -9,11 +9,10 @@ const PRODUCE_GENES = 'PRODUCE_GENES';
 const TRANSFORM_GENES = 'TRANSFORM_GENES';
 const AGGREGATE_GENES = 'AGGREGATE_GENES';
 const RECORD_SHARPENER_ACTION = 'RECORD_SHARPENER_ACTION';
+const GENES_RECEIVED = 'GENES_RECEIVED';
 
-const TRACK_TRANSACTION = 'TRACK_TRANSACTION';
-
-
-function* recordSharpenerAction(action) {
+/* Transaction Records */
+function* recordSaga(action) {
 
     // TODO: refactor out to two actions
     let difference = [];
@@ -79,27 +78,18 @@ function* recordSharpenerAction(action) {
                 difference: difference ? difference : []
             },
             count: action.payload.results.genes.length,
-            type: action.type,
+            type: action.payload.type ? action.payload.type : action.type,
             timestamp: Date.now(),  // TODO: should this be done inside of the action, for immediacy/sync?
         }
     })
 }
 
-function* trackTransactionStatus(action) {
-    const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
-    wait(10*1000)
-
+function* recordSagaWatch() {
+    /* TAKE TRANSACTIONS */
+    yield takeEvery(CREATE_GENE_LIST, recordSaga);
+    yield takeEvery(GENES_RECEIVED, recordSaga);
+    yield takeEvery(AGGREGATE_GENES, recordSaga);
 }
 
-function* transformerSaga() {
-    yield takeEvery(CREATE_GENE_LIST, recordSharpenerAction);
-    yield takeEvery(PRODUCE_GENES, recordSharpenerAction);
-    yield takeEvery(TRANSFORM_GENES, recordSharpenerAction);
-    yield takeEvery(AGGREGATE_GENES, recordSharpenerAction);
-
-    yield takeEvery(PRODUCE_GENES, trackTransactionStatus);
-    yield takeEvery(TRANSFORM_GENES, trackTransactionStatus);
-}
-
-export default transformerSaga;
+export default recordSagaWatch;
 
