@@ -18,7 +18,7 @@ import {
     toggleExpanderSelection,
     toggleGeneListSelection,
     differentiateGeneLists,
-    computeGeneListName
+    computeGeneListName, toggleFilterSelection
 } from "./actions"
 import {store} from "./store";
 import {tap} from './helpers'
@@ -26,6 +26,7 @@ import {tap} from './helpers'
 // local components
 import Spinner from "./elements/Spinner/Spinner";
 import ProducerControls from './components/ProducerControls/ProducerControls.js'
+import AggregatorControls from "./components/AggregatorControls/AggregatorControls";
 import TransformerControls from "./components/TransformerControls/TransformerControls";
 import GeneFeed from "./components/GeneFeed/GeneFeed";
 import TransformerHistory from "./components/TransformerHistory/TransformerHistory";
@@ -65,7 +66,7 @@ class App extends React.Component {
             <div className="container-fluid">
                 <div className="row">
                     <div className="col-sm-3" style={{transformerMenuStyle}}>
-                        <h1>Gene Sharpener</h1>
+                        <h1>Gene List Sharpener</h1>
                         <span style={{paddingLeft:"15px", display: "inline-block", margin:"10px 0 10px 0"}}>
                                     {this.props.loading ?
                                         <Fragment>
@@ -82,20 +83,45 @@ class App extends React.Component {
                                 handleGeneListCreation={this.props.createGeneList}
                                 handleProducerSelect={this.props.selectProducer}/>
                             : <Spinner/>}
+
+                        <h4>Expanders</h4>
                         {this.props.expanders && this.props.expanders.length > 0 ?
                             <TransformerControls
                                 style={transformerControlsStyle}
                                 expanders={ this.props.expanders }
-                                filters={ this.props.filters }
                                 selectedGeneLists={ this.props.selectedGeneListsByID }
                                 selectedExpanders={ this.props.selectedExpanders }
                                 handleExpanderSelection={ this.props.toggleExpanderSelection }
                                 handleGeneListSelection={ this.props.toggleGeneListSelection }
                                 clearSelections={ this.props.clearSelections}
                                 queryPromise={ this.props.transformGenes }
-                                aggregateGenes={ this.props.aggregateGenes }
-                            /> : <Spinner/> }
+                            />
+                        : <Spinner/> }
+
+                        <h4>Filters</h4>
+                        {this.props.filters && this.props.filters.length > 0 ?
+                            <TransformerControls
+                                style={transformerControlsStyle}
+                                expanders={ this.props.filters }
+                                selectedGeneLists={ this.props.selectedGeneListsByID }
+                                selectedExpanders={ this.props.selectedFilters }
+                                handleExpanderSelection={ this.props.toggleFilterSelection }
+                                handleGeneListSelection={ this.props.toggleGeneListSelection }
+                                clearSelections={ this.props.clearSelections}
+                                queryPromise={ this.props.transformGenes }
+                            />
+                        : <Spinner/> }
+
+                        <h4>Aggregators</h4>
+                        <AggregatorControls
+                            currentSelections={this.props.selectedGeneLists}
+                            aggregateGenes={ this.props.aggregateGenes }
+                            operations={ ["union", "intersection", "difference", "symmetric difference"] }
+                        /><br/>
+
                     </div>
+
+
                     {/* Gene Lists */}
                     <div className="col-sm-9">
                         <div className={"row"}>
@@ -115,11 +141,11 @@ class App extends React.Component {
                                     {/* Clear Gene Tables */}
                                     { this.props.selectedGeneListsByID.length > 0 ?
                                         <button onClick={ this.props.clearAllGeneLists }>Clear Gene Lists</button>
-                                        : <button disabled>Clear Gene Lists</button>}
+                                        : <button disabled>Clear All Selections</button>}
                                     { this.props.recently_cleared_gene_lists.length > 0 ?
                                         <React.Fragment>
                                             {'\u00A0'}{'\u00A0'}
-                                            <button onClick={ this.props.undoLastClear }>Undo</button>
+                                            <button onClick={ this.props.undoLastClear }>Undo Last Clear</button>
                                         </React.Fragment> :
                                         <React.Fragment>
                                             {'\u00A0'}{'\u00A0'}
@@ -154,18 +180,16 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = {
     getTransformers,
-    getExpandersFromTransformers,
-    getProducersFromTransformers,
     clearAllGeneLists: clearAllSelectedGeneLists,
     clearSingleGeneList: clearSingleSelectedGeneList,
     clearSelections,
     undoLastClear,
     createGeneList,
-    displayNewGeneList,
     produceGenes,
     aggregateGenes,
     transformGenes,
     selectProducer,
+    toggleFilterSelection,
     toggleExpanderSelection,
     toggleGeneListSelection,
     differentiateGeneLists,

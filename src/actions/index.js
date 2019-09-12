@@ -11,22 +11,30 @@ import {properCase} from "../helpers";
 // general app actions
 export const GET_GENE_LIST_BY_ID = 'GET_GENE_LIST_BY_ID';
 export const GET_TRANSFORMERS = 'GET_TRANSFORMERS';
-export const CREATE_GENE_LIST = 'CREATE_GENE_LIST';
-export const PRODUCE_GENES = 'PRODUCE_GENES';
-export const TRANSFORM_GENES = 'TRANSFORM_GENES';
-export const AGGREGATE_GENES = 'AGGREGATE_GENES';
 export const GET_EXPANDERS_FROM_TRANSFORMERS = 'GET_EXPANDERS_FROM_TRANSFORMERS';
 export const GET_PRODUCERS_FROM_TRANSFORMERS = 'GET_PRODUCERS_FROM_TRANSFORMERS';
 export const DISPLAY_NEW_GENE_LIST = 'DISPLAY_NEW_GENE_LIST';
+
+export const PRODUCE_GENES = 'PRODUCE_GENES';
 export const SELECT_PRODUCER = 'SELECT_PRODUCER';
+
+export const TRANSFORM_GENES = 'TRANSFORM_GENES';
 export const TOGGLE_EXPANDER_SELECTION = 'TOGGLE_EXPANDER_SELECTION';
-export const TOGGLE_GENE_LIST_SELECTION = 'TOGGLE_GENE_LIST_SELECTION';
 export const CLEAR_EXPANDER_SELECTIONS = 'CLEAR_EXPANDER_SELECTIONS';
+
+export const FILTER_GENES = 'FILTER_GENES';
+export const TOGGLE_FILTER_SELECTION = 'TOGGLE_FILTER_SELECTION';
+export const CLEAR_FILTER_SELECTIONS = 'CLEAR_FILTER_SELECTIONS';
+
+export const AGGREGATE_GENES = 'AGGREGATE_GENES';
+
+export const CREATE_GENE_LIST = 'CREATE_GENE_LIST';
+export const TOGGLE_GENE_LIST_SELECTION = 'TOGGLE_GENE_LIST_SELECTION';
 export const CLEAR_SINGLE_GENE_LIST = 'CLEAR_SINGLE_GENE_LIST';
 export const CLEAR_ALL_GENE_LISTS = 'CLEAR_ALL_GENE_LISTS';
 export const UNDO_LAST_CLEAR = 'UNDO_LAST_CLEAR';
+
 export const DIFFERENCE_GENE_LISTS = 'DIFFERENCE_GENE_LISTS';
-export const FILTER_GENES = 'FILTER_GENES';
 export const CLEAR_SELECTIONS = 'CLEAR_SELECTIONS';
 export const COMPUTE_GENE_LIST_NAME = 'COMPUTE_GENE_LIST_NAME';
 
@@ -390,7 +398,6 @@ export function selectProducer(producerName) {
     }
 }
 
-// TODO: refactor to Thunk
 export function toggleExpanderSelection(expander) {
     return (dispatch, getState) => {
         // get store
@@ -410,7 +417,25 @@ export function toggleExpanderSelection(expander) {
     }
 }
 
-// TODO: refactor to Thunk
+export function toggleFilterSelection(filter) {
+    return (dispatch, getState) => {
+        // get store
+        const {app: { selectedFilters }} = getState();
+        // return new store state
+        let new_filters;
+        !(selectedFilters.map(prevSelectedFilter => prevSelectedFilter.name).includes(filter.name)) ?
+            new_filters = selectedFilters.concat([filter]) :
+            new_filters = selectedFilters.filter(el => el.name !== filter.name);
+
+        return dispatch({
+            type: TOGGLE_FILTER_SELECTION,
+            payload: {
+                selectedFilters: new_filters
+            }
+        });
+    }
+}
+
 export function toggleGeneListSelection(geneListID) {
     return (dispatch, getState) => {
         const {app: { selectedGeneListsByID } } = getState();

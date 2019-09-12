@@ -9,6 +9,7 @@ import {
     DISPLAY_NEW_GENE_LIST,
     SELECT_PRODUCER,
     CLEAR_SELECTIONS,
+    TOGGLE_FILTER_SELECTION,
     TOGGLE_EXPANDER_SELECTION,
     TOGGLE_GENE_LIST_SELECTION,
     GENES_COMPLETE,
@@ -47,6 +48,7 @@ const defaultState = {
     // transformer query
     selectedGeneListsByID: [],
     selectedExpanders: [],
+    selectedFilters: [],
 
     // transaction history
     // list of dates -> geneListID -> query
@@ -125,7 +127,11 @@ export default function(state=defaultState, action) {
                 ...state,
                 selectedExpanders: action.payload.selectedExpanders
             };
-            // TODO
+        case TOGGLE_FILTER_SELECTION:
+            return {
+                ...state,
+                selectedFilters: action.payload.selectedFilters
+            };
         case TOGGLE_GENE_LIST_SELECTION:
             return {
                 ...state,
@@ -134,8 +140,9 @@ export default function(state=defaultState, action) {
         case CLEAR_SELECTIONS:
             return {
                 ...state,
-                selectedExpanders: action.payload.noExpanders,
-                selectedGeneListsByID: action.payload.noGeneLists
+                selectedExpanders: [],
+                selectedFilters: [],
+                selectedGeneListsByID: []
             };
         case CLEAR_ALL_GENE_LISTS:
             return {

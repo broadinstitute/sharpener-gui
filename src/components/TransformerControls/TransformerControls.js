@@ -108,7 +108,6 @@ export default class TransformerControls extends React.Component {
         // form has to wrap every transformer even if not all of them are contributing to the extant query
         return (
             <div>
-                <h4>Expanders</h4>
                 <Select id="expander-select"
                         isMulti
                         className="basic-multi-select"
@@ -149,48 +148,7 @@ export default class TransformerControls extends React.Component {
                 <TransformerQuerySender
                     currentSelections={ { selectedGeneLists: this.props.selectedGeneLists, selectedExpanders: this.props.selectedExpanders } }
                     onClickCallback={ this.queryTransformers }/><br/>
-                <h4>Filters</h4>
-                <TransformerList
-                    transformers={ this.props.filters }
-                    shownTransformers={ this.state.shownFilters }
-                    handleTransformerSelection={ this.props.handleExpanderSelection }
-                    throwbackExpanderIndex={ this.updateTransformerControls }/>
             </div>
-        )
-    }
-}
-
-export class AggregatorControls extends React.Component {
-    render() {
-        return (
-            <Fragment>
-                <div style={{display: "inline"}}>
-                    { this.props.currentSelections.selectedGeneLists ?
-                        this.props.actions.map(operation =>
-                            <AggregationSender
-                                key={operation}
-                                selectedGeneLists={this.props.currentSelections.selectedGeneLists}
-                                aggregateGenes={this.props.aggregateGenes}
-                                action={operation}/>) : <div/> }
-                </div>
-            </Fragment> )
-    }
-}
-
-export class AggregationSender extends React.Component {
-    render() {
-        return (
-        <Fragment>
-            <button
-                type="button"
-                onClick={ () => this.props.aggregateGenes(this.props.action) }
-                // className="btn btn-outline-success my-2 my-sm-0"
-                style={{marginLeft: "auto", marginRight: "0%"}}
-            >
-                {/* Capitalize the operation label */}
-                {this.props.action.replace(/^[a-z]/g, function(t) { return t.toUpperCase() })}
-            </button>{'\u00A0'}{'\u00A0'}
-        </Fragment>
         )
     }
 }
