@@ -176,7 +176,6 @@ export default class GeneTable extends React.Component {
         if (cell) {
             let potentialList = cell.split(', ');
             if (potentialList.length > 1) {
-                console.log(cell, "is a  list");
                 const cellList = potentialList;
                 return <div>{_.take(cellList, 4)}...</div>
             } else {

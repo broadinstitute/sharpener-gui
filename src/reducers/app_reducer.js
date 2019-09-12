@@ -8,14 +8,16 @@ import {
     GET_PRODUCERS_FROM_TRANSFORMERS,
     DISPLAY_NEW_GENE_LIST,
     SELECT_PRODUCER,
+    CLEAR_SELECTIONS,
     TOGGLE_EXPANDER_SELECTION,
     TOGGLE_GENE_LIST_SELECTION,
-    CLEAR_SELECTIONS,
+    GENES_COMPLETE,
+    GENES_ERROR,
     CLEAR_ALL_GENE_LISTS,
     CLEAR_SINGLE_GENE_LIST,
     UNDO_LAST_CLEAR,
     RECORD_SHARPENER_ACTION,
-    DIFFERENCE_GENE_LISTS, FILTER_GENES
+    DIFFERENCE_GENE_LISTS, FILTER_GENES, COMPUTE_GENE_LIST_NAME, GENES_RECEIVED
 } from "../actions"
 
 const defaultState = {
@@ -49,8 +51,8 @@ const defaultState = {
     // transaction history
     // list of dates -> geneListID -> query
     transactionLedger: [],
-    loadingQuery: {},
-    loadingState: false
+    loadingQueryNames: [],
+    loading: false
 };
 
 export default function(state=defaultState, action) {
@@ -63,38 +65,46 @@ export default function(state=defaultState, action) {
                 expanders: state.expanders.concat(action.payload.expanders),
                 filters: state.expanders.concat(action.payload.filters),
                 producers: state.producers.concat(action.payload.producers),
-                loading: false
             };
         case CREATE_GENE_LIST:
             return {
                 ...state,
-                gene_list_ids: state.gene_list_ids.concat([action.payload.results.gene_list_id])
+                gene_list_ids: state.gene_list_ids.concat([action.payload.results.gene_list_id]),
+                // loading: true
             };
+        // TODO: loadingRequest ID and the Query Details
         case PRODUCE_GENES:
             return {
                 ...state,
-                gene_list_ids: state.gene_list_ids.concat([action.payload.results.gene_list_id])
+                // gene_list_ids: state.gene_list_ids.concat([action.payload.results.gene_list_id]),
+                loadingQueryNames: state.loadingQueryNames.concat(action.payload.query.name),
+                loading: true
             };
+        // TODO: loadingRequest ID and the Query Details
         case TRANSFORM_GENES:
             return {
                 ...state,
-                gene_list_ids: state.gene_list_ids.concat([action.payload.results.gene_list_id])
+                // gene_list_ids: state.gene_list_ids.concat([action.payload.results.gene_list_id]),
+                loadingQueryNames: state.loadingQueryNames.concat(action.payload.query.name),
+                loading: true
             };
         case FILTER_GENES:
             return {
                 ...state,
-                gene_list_ids: state.gene_list_ids.concat([action.payload.results.gene_list_id])
+                gene_list_ids: state.gene_list_ids.concat([action.payload.results.gene_list_id]),
+                // loading: true
             };
         case AGGREGATE_GENES:
             return {
                 ...state,
-                gene_list_ids: state.gene_list_ids.concat([action.payload.results.gene_list_id])
+                gene_list_ids: state.gene_list_ids.concat([action.payload.results.gene_list_id]),
+                // loading: true
             };
         case GET_EXPANDERS_FROM_TRANSFORMERS:
             return {
                 ...state,
                 expanders: action.payload.expanders
-            }
+            };
         case GET_PRODUCERS_FROM_TRANSFORMERS:
             return {
                 ...state,
@@ -150,8 +160,30 @@ export default function(state=defaultState, action) {
                 ...state,
                 transactionLedger: state.transactionLedger.concat([action.payload])
             };
+        case GENES_RECEIVED:
+            // receiving genes means we're not loading anymore
+            return {
+                ...state,
+                gene_list_ids: state.gene_list_ids.concat([action.payload.results.gene_list_id]),
+                // loadingRequest: pop out the request id and query title form the loading request index
+                loadingQueryNames: state.loadingQueryNames.filter(names => names !== action.payload.query.name),
+                loading: state.loadingQueryNames.filter(names => names !== action.payload.query.name).length > 0
+            };
+        case GENES_ERROR:
+            return {
+                ...state,
+                gene_list_ids: state.gene_list_ids.concat([action.payload.results.gene_list_id]),
+                // loadingRequest: pop out the request id and query title form the loading request index
+                loadingQueryNames: state.loadingQueryNames.filter(names => names !== action.payload.query.name),
+                loading: state.loadingQueryNames.filter(names => names !== action.payload.query.name).length > 0,
+                errorQueryNames: action.payload.query.name,
+                error: true
+            };
         case DIFFERENCE_GENE_LISTS:
             // it's a query: do nothing
+            return state;
+        case COMPUTE_GENE_LIST_NAME:
+            // it's a projection: do nothing
             return state;
         default:  // do nothing
             return state;

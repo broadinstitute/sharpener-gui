@@ -4,7 +4,6 @@ import {store} from "../store";
 import _ from "lodash";
 import {properCase} from "../helpers";
 
-
 /*
     Application Actions
  */
@@ -22,14 +21,52 @@ export const DISPLAY_NEW_GENE_LIST = 'DISPLAY_NEW_GENE_LIST';
 export const SELECT_PRODUCER = 'SELECT_PRODUCER';
 export const TOGGLE_EXPANDER_SELECTION = 'TOGGLE_EXPANDER_SELECTION';
 export const TOGGLE_GENE_LIST_SELECTION = 'TOGGLE_GENE_LIST_SELECTION';
-export const CLEAR_SELECTIONS = 'CLEAR_SELECTIONS';
+export const CLEAR_EXPANDER_SELECTIONS = 'CLEAR_EXPANDER_SELECTIONS';
 export const CLEAR_SINGLE_GENE_LIST = 'CLEAR_SINGLE_GENE_LIST';
 export const CLEAR_ALL_GENE_LISTS = 'CLEAR_ALL_GENE_LISTS';
 export const UNDO_LAST_CLEAR = 'UNDO_LAST_CLEAR';
 export const DIFFERENCE_GENE_LISTS = 'DIFFERENCE_GENE_LISTS';
-export const RECORD_SHARPENER_ACTION = 'RECORD_SHARPENER_ACTION';
 export const FILTER_GENES = 'FILTER_GENES';
+export const CLEAR_SELECTIONS = 'CLEAR_SELECTIONS';
 export const COMPUTE_GENE_LIST_NAME = 'COMPUTE_GENE_LIST_NAME';
+
+export const GENES_ERROR = 'GENES_ERROR';
+export const GENES_STATUS = 'GENES_STATUS';
+export const GENES_COMPLETE = 'GENES_COMPLETE';
+export const GENES_RECEIVED = 'GENES_RECEIVED';
+export const RECORD_SHARPENER_ACTION = 'RECORD_SHARPENER_ACTION';
+
+export function receiveGeneList(geneListID, transformerAction) {
+    return (dispatch) => {
+        const requestGeneList = fetch("/gene_list/".concat(geneListID))
+            .then(response => response.json())
+            .then(data => {
+                return {
+                    results: {
+                        gene_list_id: data.gene_list_id,
+                        genes: data.genes
+                    },
+                    type: transformerAction.type,
+                    query: transformerAction.query
+                }
+            });
+        return dispatch({
+            type: GENES_RECEIVED,
+            payload: requestGeneList
+        })
+    }
+}
+
+export function getGeneListStatus(requestID) {
+    return (dispatch) => {
+        const requestStatus = fetch(SERVICE_URL.concat("/status/").concat(requestID))
+            .then(response => response.json());
+        return dispatch({
+            type: GENES_STATUS,
+            payload: requestStatus
+        })
+    }
+}
 
 export function computeGeneListName(geneListID) {
     return (dispatch, getState) => {
@@ -205,7 +242,7 @@ export function createGeneList(geneSymbolList) {
 
 export function produceGenes(productionQuery) {
     return (dispatch) => {
-        const requestProduction = fetch(SERVICE_URL.concat('/transform'), {
+        const requestProduction = fetch(SERVICE_URL.concat('/submit'), {
             method: "POST",
             headers: {
                 'Accept': 'application/json',
@@ -219,20 +256,26 @@ export function produceGenes(productionQuery) {
             })
             .then(response => response.json())
             .then(data => {
+                /*
+                    Shape: Example:
+                    {"request_id":"0LmFtcLjf",
+                     "status":"running",
+                     "gene_list_id":null,
+                     "current_step":null,
+                     "total_steps":null}
+                 */
                 if (data === undefined || data === null || data.length === 0) {
                     throw "Data is undefined or not there"
                 } else {
-                    if (data.genes && data.genes.length > 0) {
+                    // if (data.genes && data.genes.length > 0) {
                         return {
-                            results: {
-                                gene_list_id: data.gene_list_id,
-                                genes: data.genes
-                            },
+                            request_id: data.request_id,
+                            status: data.status,
                             query: productionQuery
-                        };
-                    } else {
-                        console.error("no gene data received from", productionQuery);
-                    }
+                        }
+                    // } else {
+                    //     console.error("no gene data received from", productionQuery);
+                    // }
                 }
             });
         return dispatch({
@@ -244,7 +287,7 @@ export function produceGenes(productionQuery) {
 
 export function transformGenes(transformerQuery) {
     return (dispatch) => {
-        const requestTransformation = fetch(SERVICE_URL.concat('/transform'), {
+        const requestTransformation = fetch(SERVICE_URL.concat('/submit'), {
             method: "POST",
             headers: {
                 'Accept': 'application/json',
@@ -261,11 +304,10 @@ export function transformGenes(transformerQuery) {
                 if (data === undefined || data === null || data.length === 0) {
                     throw "Data is undefined or not there"
                 } else {
+                    // if (data.genes && data.genes.length > 0) {
                     return {
-                        results: {
-                            gene_list_id: data.gene_list_id,
-                            genes: data.genes
-                        },
+                        request_id: data.request_id,
+                        status: data.status,
                         query: transformerQuery
                     }
                 }
@@ -387,12 +429,11 @@ export function toggleGeneListSelection(geneListID) {
     }
 }
 
-export function clearSelections() {
+export function clearExpanderSelections() {
     return {
-        type: CLEAR_SELECTIONS,
+        type: CLEAR_EXPANDER_SELECTIONS,
         payload: {
-            noExpanders: [],
-            noGeneLists: []
+            noExpanders: []
         }
     }
 }

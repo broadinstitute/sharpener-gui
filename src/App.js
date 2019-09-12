@@ -38,6 +38,7 @@ import {FRONTEND_URL, SERVICE_URL} from "./parameters/EndpointURLs"
 import './style/App.css';
 import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
 import 'font-awesome/css/font-awesome.min.css';
+import {InlineSpinner} from "./elements/InlineSpinner/InlineSpinner";
 
 const divStyle = {
     margin:"2.25em"
@@ -58,6 +59,8 @@ class App extends React.Component {
             <div className="container-fluid">
                 <div className="row">
                     <div className="col-sm-3" style={{transformerMenuStyle}}>
+                        <br/>
+                        <br/>
                         {/* Producer Components */}
                         {this.props.producers ?
                             <ProducerControls
@@ -84,6 +87,14 @@ class App extends React.Component {
                     {/* Gene Lists */}
                     <div className="col-sm-9">
                         <div className={"row"}>
+                            <span style={{paddingLeft:"15px", display: "inline-block"}}>
+                                <h1>Gene Sharpener</h1>{'\u00A0'}
+                                {this.props.loading ?
+                                    <Fragment>
+                                        <InlineSpinner/><span>Loading {this.props.loadingQueryNames.join(", ")}</span>
+                                    </Fragment>
+                                    : "No Transformers Running" }
+                            </span><br/>
                             <TransformerHistory
                                 geneListIDs={ this.props.gene_list_ids }
                                 computeGeneListName={ this.props.computeGeneListName }
@@ -95,7 +106,7 @@ class App extends React.Component {
                         {/* Tables of Genes */}
                         { this.props.selectedGeneListsByID.length > 0 ?
                             <div className={"row"}>
-                                <h3 style={{paddingLeft: "15px"}}>Selected Gene Lists</h3>
+                                <h4 style={{paddingLeft: "15px"}}>Selected Gene Lists</h4>
                                 <div style={{marginLeft: "auto", marginRight: "15px"}}>
                                     {/* Clear Gene Tables */}
                                     { this.props.selectedGeneListsByID.length > 0 ?
