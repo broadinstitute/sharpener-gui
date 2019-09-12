@@ -121,7 +121,7 @@ export class ProducerControls extends React.Component {
         );
         return (
             <div style={searchBarStyle}>
-                <h3>Producers</h3>
+                <h4>Producers</h4>
                 <Select id="producer"
                         className="basic-single"
                         isSearchable

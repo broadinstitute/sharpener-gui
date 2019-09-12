@@ -110,10 +110,9 @@ export default class TransformerHistory extends React.Component {
     render() {
         return (
             <div className={"col-sm-12"}>
-                <div id={"test-class"} style={{position: "absolute", visibility: "hidden"}}>
-                    <h4>Gene Lists</h4>
-                </div>
                 {this.props.geneListIDs.length > 0 && FEATURE_FLAG.histories.showHistories ?
+                    <React.Fragment>
+                    <h4>Gene Lists</h4>
                     <Card>
                         {/*<Card.Header as={"h4"}>*/}
                         {/*    Transformations*/}
@@ -158,6 +157,7 @@ export default class TransformerHistory extends React.Component {
                             }
                         </SizeMe>
                     </Card>
+                    </React.Fragment>
                     : <React.Fragment/>}
             </div>
         )

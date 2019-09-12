@@ -49,6 +49,12 @@ const transformerMenuStyle = {
     marginBottom: "20px",
 };
 
+const transformerControlsStyle = {
+    overflowY: "scroll",
+};
+
+
+
 class App extends React.Component {
     componentDidMount() {
         this.props.getTransformers(tap);
@@ -59,8 +65,14 @@ class App extends React.Component {
             <div className="container-fluid">
                 <div className="row">
                     <div className="col-sm-3" style={{transformerMenuStyle}}>
-                        <br/>
-                        <br/>
+                        <h1>Gene Sharpener</h1>
+                        <span style={{paddingLeft:"15px", display: "inline-block", margin:"10px 0 10px 0"}}>
+                                    {this.props.loading ?
+                                        <Fragment>
+                                            <InlineSpinner/><span>Loading {this.props.loadingQueryNames.join(", ")}</span>
+                                        </Fragment>
+                                        : "No Transformers Running" }
+                        </span>
                         {/* Producer Components */}
                         {this.props.producers ?
                             <ProducerControls
@@ -70,9 +82,9 @@ class App extends React.Component {
                                 handleGeneListCreation={this.props.createGeneList}
                                 handleProducerSelect={this.props.selectProducer}/>
                             : <Spinner/>}
-                        <h3>Transformers</h3>
                         {this.props.expanders && this.props.expanders.length > 0 ?
                             <TransformerControls
+                                style={transformerControlsStyle}
                                 expanders={ this.props.expanders }
                                 filters={ this.props.filters }
                                 selectedGeneLists={ this.props.selectedGeneListsByID }
@@ -87,22 +99,14 @@ class App extends React.Component {
                     {/* Gene Lists */}
                     <div className="col-sm-9">
                         <div className={"row"}>
-                            <span style={{paddingLeft:"15px", display: "inline-block"}}>
-                                <h1>Gene Sharpener</h1>{'\u00A0'}
-                                {this.props.loading ?
-                                    <Fragment>
-                                        <InlineSpinner/><span>Loading {this.props.loadingQueryNames.join(", ")}</span>
-                                    </Fragment>
-                                    : "No Transformers Running" }
-                            </span><br/>
                             <TransformerHistory
-                                geneListIDs={ this.props.gene_list_ids }
-                                computeGeneListName={ this.props.computeGeneListName }
-                                clearGeneList={ this.props.clearSingleGeneList }
-                                handleGeneListSelection={ this.props.toggleGeneListSelection }
-                                differenceGenes={ this.props.differentiateGeneLists }
-                                transactionLedger={this.props.transactionLedger}/>
-                        </div><br/>
+                                    geneListIDs={ this.props.gene_list_ids }
+                                    computeGeneListName={ this.props.computeGeneListName }
+                                    clearGeneList={ this.props.clearSingleGeneList }
+                                    handleGeneListSelection={ this.props.toggleGeneListSelection }
+                                    differenceGenes={ this.props.differentiateGeneLists }
+                                    transactionLedger={this.props.transactionLedger}/>
+                            </div><br/>
                         {/* Tables of Genes */}
                         { this.props.selectedGeneListsByID.length > 0 ?
                             <div className={"row"}>

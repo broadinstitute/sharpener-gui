@@ -16,11 +16,11 @@ const Fragment = React.Fragment;
  Miscellaneous
  */
 
-const transformerMenuStyle = {
-    marginTop: "18px",
-    marginBottom: "20px",
+const transformerButtonStyle = {
+    textAlign: "center",
+    margin: "0 auto",
+    display:"block"
 };
-
 
 let indexNameOf = (schemaName) => {
     return schemaName.toLowerCase().replace(/ /g, "-");
@@ -108,10 +108,6 @@ export default class TransformerControls extends React.Component {
         // form has to wrap every transformer even if not all of them are contributing to the extant query
         return (
             <div>
-                <TransformerQuerySender
-                    currentSelections={ { selectedGeneLists: this.props.selectedGeneLists, selectedExpanders: this.props.selectedExpanders } }
-                    onClickCallback={ this.queryTransformers }/>
-
                 <h4>Expanders</h4>
                 <Select id="expander-select"
                         isMulti
@@ -150,7 +146,9 @@ export default class TransformerControls extends React.Component {
                     shownTransformers={ this.state.shownExpanders }
                     handleTransformerSelection={ this.props.handleExpanderSelection }
                     throwbackExpanderIndex={ this.updateTransformerControls }/>
-
+                <TransformerQuerySender
+                    currentSelections={ { selectedGeneLists: this.props.selectedGeneLists, selectedExpanders: this.props.selectedExpanders } }
+                    onClickCallback={ this.queryTransformers }/><br/>
                 <h4>Filters</h4>
                 <TransformerList
                     transformers={ this.props.filters }
@@ -202,7 +200,7 @@ export class CurrentlySelectedGenes extends React.Component {
         render() {
             return (
                 <Fragment>
-                    <label as={"h5"}>Selected Gene Lists</label>
+                    <label as={"h6"}>Selected Gene Lists</label>
                     <ul>
                     {this.props.currentSelections.selectedGeneLists.length > 0 ? this.props.currentSelections.selectedGeneLists.map(selectedGeneList =>
                                 <li>{selectedGeneList}</li>) :
@@ -244,18 +242,18 @@ export class TransformerQuerySender extends React.Component {
     render() {
         return (
             <Fragment>
-                <div style={transformerMenuStyle}>
+                <div style={transformerButtonStyle}>
                     { this.state.canQueryTransformers ?
                         <button
                             type="button"
                             onClick={ this.queryTransformers }
+                            style={{marginLeft:"auto", marginRight:"0"}}
                             className="btn btn-outline-success my-2 my-sm-0">
                             Transform Gene Lists
                         </button> :
                         <button
                             className="btn my-2 my-sm-0"
                             disabled={true}>
-
                             {   !(this.props.currentSelections.selectedGeneLists.length > 0) &&
                                 (this.props.currentSelections.selectedExpanders.length > 0) ?
                                     "Select Gene Lists as input for your Transformers" :
