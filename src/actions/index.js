@@ -94,6 +94,12 @@ export function computeGeneListName(geneListID) {
                 }
              */
 
+            const maybeControl = (controls) => {
+                return controls.length > 0 ?
+                    " with "+controls.map(control => properCase(control.name)+" as "+JSON.stringify(control.value)).join(", and ")
+                    : " "+Date(transaction.timestamp).toLocaleLowerCase("en-US");
+            };
+
             switch(transaction.type) {
                 case CREATE_GENE_LIST:
                     return !short ?
@@ -101,11 +107,11 @@ export function computeGeneListName(geneListID) {
                         : "Gene List " + Date(transaction.timestamp).toLocaleLowerCase("en-US");
                 case PRODUCE_GENES:
                     return !short ?
-                        transaction.query.name+ " with "+transaction.query.controls.map(control => properCase(control.name)+" as "+JSON.stringify(control.value)).join(", and ")
+                        transaction.query.name + maybeControl(transaction.query.controls)
                         : transaction.query.name+" "+Date(transaction.timestamp).toLocaleLowerCase("en-US");
                 case TRANSFORM_GENES:
                     return !short ?
-                        transaction.query.name+ " with "+transaction.query.controls.map(control => properCase(control.name)+" as "+JSON.stringify(control.value)).join(", and ")
+                        transaction.query.name + maybeControl(transaction.query.controls)
                         : transaction.query.name+" "+Date(transaction.timestamp).toLocaleLowerCase("en-US");
                 case AGGREGATE_GENES:
                     return properCase(transaction.query.operation)+" "+Date(transaction.timestamp).toLocaleLowerCase("en-US");

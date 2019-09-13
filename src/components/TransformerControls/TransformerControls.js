@@ -67,13 +67,14 @@ export default class TransformerControls extends React.Component {
         // Test: just take the first list and transformer, see if we can get what we need back
 
         Promise.all(transformerSelectionPairs.map(pair => {
-                let transformerName=pair[0].name,
-                    transformerControls=
-                        Object.values(this.state.transformerControls[indexNameOf(pair[0].name)].controls)
-                            .map(control => {
-                                return { name: control.parameter.name, value: control.value }
-                            }),
-                    geneListID=pair[1];
+                let transformerName=pair[0].name, transformerControls =
+                        Object.values(this.state.transformerControls).length > 0 ?
+                            Object.values((this.state.transformerControls)[indexNameOf(pair[0].name)].controls)
+                                .map(control => {
+                                    return { name: control.parameter.name, value: control.value }
+                                })
+                        : [];
+                let geneListID=pair[1];
 
                 // Concordant with Sharpener Schema version 1.1.0
                 // ie. gene_list_id is optional
@@ -377,11 +378,14 @@ export class TransformerItem extends React.Component {
                            onClick={ this.onClickHandleSelection }>
                             {properCase(this.transformer.name)}
                         </a>
-                        <button className="btn my-2 my-sm-0"
-                                style={{padding:"0%", fontSize: "small", float:"right", marginLeft: "auto", margin: "auto", display:"inline-block"}}
-                                onClick={ this.clearParameters }>
-                            Reset
-                        </button>
+                        {Object.keys(this.state.parameterIndex).length > 0 ?
+                            <button className="btn my-2 my-sm-0"
+                                    style={{padding:"0%", fontSize: "small", float:"right", marginLeft: "auto", margin: "auto", display:"inline-block"}}
+                                    onClick={ this.clearParameters }>
+                                Reset
+                            </button>
+                        : <Fragment/>}
+
                     </Card.Header>
                     <div id={"expander-".concat(indexNameOf(this.transformer.name))}>
                         {Object.keys(this.state.parameterIndex).map(parameterIndexKey => {

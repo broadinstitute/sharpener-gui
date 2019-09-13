@@ -1,7 +1,7 @@
 import React from "react";
 
-export const tap = (data) => {
-    console.log(data);
+export const tap = (data, message="") => {
+    console.log(message, data);
     return data;
 };
 

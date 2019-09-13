@@ -13,7 +13,7 @@ export const TransformerTooltip = (props) => {
     console.log("transformer tooltip data", props);
     return (<div style={{width:"100%", height:"100%" , border:"1px solid #000", background: "snow", padding: "5px"}}>
                 <div className='graph-node-body'>
-                    {props.inputs ?
+                    {props.inputs && props.inputs.length > 0 ?
                         <React.Fragment>
                             <span className='graph-node-title-text'>
                                 Inputs
