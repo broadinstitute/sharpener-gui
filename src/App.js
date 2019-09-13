@@ -130,16 +130,16 @@ class App extends React.Component {
                     <div className="col-sm-9">
                         <div className={"row"}>
 
-                            {/* Transformer Operations for Session (Visualized as a Graph) */}
-                            <TransformerHistory
-                                    geneListIDs={ this.props.gene_list_ids }
-                                    computeGeneListName={ this.props.computeGeneListName }
-                                    clearGeneList={ this.props.clearSingleGeneList }
-                                    handleGeneListSelection={ this.props.toggleGeneListSelection }
-                                    differenceGenes={ this.props.differentiateGeneLists }
-                                    transactionLedger={this.props.transactionLedger}/>
-                            </div>
-
+                        {/* Transformer Operations for Session (Visualized as a Graph) */}
+                        <TransformerHistory
+                                geneListIDs={ this.props.gene_list_ids }
+                                computeGeneListName={ this.props.computeGeneListName }
+                                clearGeneList={ this.props.clearSingleGeneList }
+                                handleGeneListSelection={ this.props.toggleGeneListSelection }
+                                differenceGenes={ this.props.differentiateGeneLists }
+                                transactionLedger={this.props.transactionLedger}/>
+                        </div>
+                        <br/>
                         {/* Gene List Controls */}
                         { this.props.selectedGeneListsByID.length > 0 ?
                             <div className={"row"}>
