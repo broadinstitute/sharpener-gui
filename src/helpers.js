@@ -10,9 +10,9 @@ export const properCase = (string) => {
         "a", "with", "for"
     ];
     string = underscoreToSpaces(string);
-    return string.split(' ').map(function(word){
+    return formatAbbreviations(string.split(' ').map(function(word){
         return !fillwords.includes(word) ? word.charAt(0).toUpperCase() + word.substr(1).toLowerCase() : word;
-    }).join(' ');
+    }).join(' '));
 };
 
 export const pluralize = (length, word) => {

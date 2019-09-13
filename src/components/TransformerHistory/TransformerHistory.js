@@ -7,7 +7,7 @@ import {SizeMe} from "react-sizeme";
 // graph imports
 import Node, {NodeTooltip} from "../../elements/Node/Node"
 import DagreD3 from "../../elements/dagreD3/dagreD3";
-import {AGGREGATE_GENES, CREATE_GENE_LIST, PRODUCE_GENES, TRANSFORM_GENES} from "../../actions";
+import {AGGREGATE_GENES, CREATE_GENE_LIST, FILTER_GENES, PRODUCE_GENES, TRANSFORM_GENES} from "../../actions";
 import {properCase, tap, hashCode} from "../../helpers";
 import {Provider} from "react-redux";
 import {store} from "../../store";
@@ -19,16 +19,20 @@ import AggregatorNode from "../../elements/AggregatorNode/AggregatorNode";
 const transactionClassName = {
     [CREATE_GENE_LIST]: "creator",
     [PRODUCE_GENES]: "producer",
-    [TRANSFORM_GENES]: "expander",  // TODO contractor
-    [AGGREGATE_GENES]: "union"  // TODO intersection
+    [TRANSFORM_GENES]: "expander",
+    [FILTER_GENES]: "filter",
+    [AGGREGATE_GENES]: "union"
 };
 
 const transactionNodeComponent = {
     "creator": ProducerNode,
     "producer": ProducerNode,
     "expander": TransfomerNode,
-    "union": Node,  // TODO
-    "intersection": Node  // TODO
+    "filter": TransfomerNode,
+    "union": AggregatorNode,
+    "difference": AggregatorNode,
+    "symmetric difference": AggregatorNode,
+    "intersection": AggregatorNode
 }
 
 export default class TransformerHistory extends React.Component {
@@ -86,30 +90,32 @@ export default class TransformerHistory extends React.Component {
     };
 
     nodesOnEnter = (id, node, coords, rect) => {
+        console.log(node.elementType, node.data);
         ReactDOM.render(
             transactionNodeComponent[node.elementType].tooltip({...node.data}),
             // node.data.tooltip({...node.data}),
-            document.getElementById("test-class")
+            document.getElementById("history-tooltip")
         );
         // +15px is the radius of the corners of the element, +5px for arrow
-        document.getElementById("test-class").style.left = node.x + (rect.width / 2) + coords.groupX + 20 + "px";
-        document.getElementById("test-class").style.top = node.y + coords.groupY+"px";
-        document.getElementById("test-class").style.zIndex = 1;
-        document.getElementById("test-class").children[0].style.zIndex = 1;
-        document.getElementById("test-class").style.visibility = "visible";
+        document.getElementById("history-tooltip").style.left = node.x + (rect.width / 2) + coords.groupX + 20 + "px";
+        document.getElementById("history-tooltip").style.top = node.y + coords.groupY+"px";
+        document.getElementById("history-tooltip").style.zIndex = 1;
+        document.getElementById("history-tooltip").children[0].style.zIndex = 1;
+        document.getElementById("history-tooltip").style.visibility = "visible";
     };
 
     nodesOnExit = () => {
-        document.getElementById("test-class").style.left = 0+"px";
-        document.getElementById("test-class").style.top = 0+"px";
-        document.getElementById("test-class").style.zIndex = -2;
-        document.getElementById("test-class").children[0].style.zIndex = -2;
-        document.getElementById("test-class").style.visibility = "hidden";
+        document.getElementById("history-tooltip").style.left = 0+"px";
+        document.getElementById("history-tooltip").style.top = 0+"px";
+        document.getElementById("history-tooltip").style.zIndex = -2;
+        document.getElementById("history-tooltip").children[0].style.zIndex = -2;
+        document.getElementById("history-tooltip").style.visibility = "hidden";
     };
 
     render() {
         return (
             <div className={"col-sm-12"}>
+                <div id={"history-tooltip"} style={{position: "absolute", visibility: "hidden", zIndex: 2}}/>
                 {this.props.geneListIDs.length > 0 && FEATURE_FLAG.histories.showHistories ?
                     <React.Fragment>
                     <h4>Gene Lists</h4>

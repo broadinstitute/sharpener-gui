@@ -25,6 +25,18 @@ export const TransformerTooltip = (props) => {
                             )}
                         </React.Fragment>
                     : <React.Fragment/> }
+
+                    { props.count ?
+                        <React.Fragment>
+                            <span className='graph-node-title-text'>
+                                Gene Count
+                            </span><br/>
+                            <Fragment>
+                                <span>{pluralize(props.count,"gene")}</span><br/>
+                            </Fragment>
+                        </React.Fragment>
+                        : <React.Fragment/> }
+
                     { props.difference.difference.difference.length > 0 ?
                         <React.Fragment>
                             <span className='graph-node-title-text'>

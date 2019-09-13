@@ -4,7 +4,6 @@ import BootstrapTable from "react-bootstrap-table-next"
 import ToolkitProvider, { CSVExport } from 'react-bootstrap-table2-toolkit';
 const { ExportCSVButton } = CSVExport;
 import Card from "react-bootstrap/Card"
-import {MyLoader} from "../ListItem";
 import {Collapse} from "react-collapse"
 
 import {FEATURE_FLAG} from "../../parameters/FeatureFlags";
@@ -186,7 +185,7 @@ export class GeneFeed extends React.Component {
                                     handleGeneSelection={ this.props.handleGeneSelection }
                                 /><br/>
                             </Fragment>
-                            ) : <MyLoader active={true}/>
+                            ) : <Spinner/>
                         }
                     </div>
             </Fragment>

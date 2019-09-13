@@ -89,8 +89,6 @@ export class ProducerControls extends React.Component {
     handleKeyPress = event => {
         if (event.key === 'Enter') {
             event.preventDefault(); // this will result in an "event undefined" error, but will prevent page refresh
-
-            // TODO: clear search text?
         }
     };
 
@@ -138,16 +136,14 @@ export class ProducerControls extends React.Component {
                 </Select>
                 <div style={inputStyle}>
                     <div className="form-inline" onKeyPress={this.handleKeyPress}>
-                        {
-                            this.state.selectedProducer.parameters
-                                .map(parameter => {
-                                    return (
-                                        <TransformerParameter key={parameter.name}
-                                                              id={parameter.name}
-                                                              parameter={parameter}
-                                                              action={this.handleProducerParameterChange}/> )
-                                })
-                        }
+                        {this.state.selectedProducer.parameters
+                            .map(parameter => {
+                                return (
+                                    <TransformerParameter key={parameter.name}
+                                                          id={parameter.name}
+                                                          parameter={parameter}
+                                                          action={this.handleProducerParameterChange}/> )
+                            })}
                         <button
                             style={{marginTop: "13px", marginLeft: "auto", marginRight:"0%"}}
                             type="button"

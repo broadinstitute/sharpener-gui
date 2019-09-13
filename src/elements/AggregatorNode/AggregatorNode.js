@@ -18,28 +18,41 @@ export const AggregatorTooltip = (props) => {
                             <span className='graph-node-title-text'>
                                 Inputs
                             </span><br/>
-                            {props.inputs.map((input) =>
-                                <Fragment>
-                                    <span>{properCase(input.name)+": "+properCase(input.value)}</span><br/>
-                                </Fragment>
-                            )}
+                            <Fragment>
+                                <span>{properCase("operation")+": "+properCase(props.inputs["operation"])}</span><br/>
+                            </Fragment>
                         </React.Fragment>
                     : <React.Fragment/> }
-                    { props.difference.difference.difference.length > 0 ?
+
+                    {props.count ?
                         <React.Fragment>
                             <span className='graph-node-title-text'>
-                                {pluralize(props.difference.difference.difference.length, props.difference.difference.addedOrRemoved+" gene")}
+                                Gene Count
                             </span><br/>
-                            {flatten(props.difference.difference.difference.map(
-                                diff => diff.attributes
-                                    .filter(attr => attr.name === "gene_symbol")
-                                    .map(gene_symbol => gene_symbol.value)
-                            )).map(gene_symbol =>
-                                <React.Fragment>
-                                    <span>{gene_symbol}</span><br/>
-                                </React.Fragment>)}
+                            <Fragment>
+                                <span>{pluralize(props.count,"gene")}</span><br/>
+                            </Fragment>
                         </React.Fragment>
-                    :   <React.Fragment/> }
+                        : <React.Fragment/> }
+
+                    {/*<span className='graph-node-title-text'>*/}
+                    {/*            Difference*/}
+                    {/*</span><br/>*/}
+                    {/*{ props.difference.difference.length > 0 ?*/}
+                    {/*    <React.Fragment>*/}
+                    {/*        <span className='graph-node-title-text'>*/}
+                    {/*            {pluralize(props.difference.difference.length, props.difference.difference.addedOrRemoved+" gene")}*/}
+                    {/*        </span><br/>*/}
+                    {/*        {flatten(props.difference.difference.map(*/}
+                    {/*            diff => diff.attributes*/}
+                    {/*                .filter(attr => attr.name === "gene_symbol")*/}
+                    {/*                .map(gene_symbol => gene_symbol.value)*/}
+                    {/*        )).map(gene_symbol =>*/}
+                    {/*            <React.Fragment>*/}
+                    {/*                <span>{gene_symbol}</span><br/>*/}
+                    {/*            </React.Fragment>)}*/}
+                    {/*    </React.Fragment>*/}
+                    {/*:   <div>No difference</div> }*/}
                 </div>
             </div>)
 };

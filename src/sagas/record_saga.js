@@ -1,5 +1,5 @@
 import { race, call, put, takeEvery, takeLatest, take, delay } from 'redux-saga/effects'
-import {differentiateGeneLists, getGeneListByID, getGeneListStatus, receiveGeneList} from "../actions";
+import {differentiateGeneLists, GENES_COMPLETE, getGeneListByID, getGeneListStatus, receiveGeneList} from "../actions";
 import {SERVICE_URL} from "../parameters/EndpointURLs";
 import _ from "lodash";
 
@@ -18,7 +18,9 @@ function* recordSaga(action) {
     let difference = [];
     const gene_list_left = action.payload.query.gene_list_id;
     const gene_list_right = action.payload.results.gene_list_id;
-    if (action.type === TRANSFORM_GENES) {
+
+    if (action.payload.type === TRANSFORM_GENES) {
+
         const requestLeftGenes =
             fetch(SERVICE_URL.concat("/gene_list").concat("/"+gene_list_left),
                 {
