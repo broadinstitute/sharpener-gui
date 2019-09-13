@@ -458,7 +458,16 @@ export function clearExpanderSelections() {
     return {
         type: CLEAR_EXPANDER_SELECTIONS,
         payload: {
-            noExpanders: []
+            expanders: []
+        }
+    }
+}
+
+export function clearFilterSelections() {
+    return {
+        type: CLEAR_FILTER_SELECTIONS,
+        payload: {
+            filters: []
         }
     }
 }
@@ -575,7 +584,3 @@ export function differentiateGeneLists(gene_list_id_left, gene_list_id_right) {
         });
     }
 }
-
-/*
-    Graph Actions
- */

@@ -9,7 +9,7 @@ export default class AggregatorControls extends React.Component {
                         key={operation}
                         selectedGeneLists={this.props.selectedGeneLists}
                         aggregateGenes={this.props.aggregateGenes}
-                        action={operation}/>)}
+                        operation={operation}/>)}
             </React.Fragment> )
     }
 }
@@ -25,7 +25,7 @@ export class AggregationSender extends React.Component {
                         // className="btn btn-outline-success my-2 my-sm-0"
                         style={{marginLeft: "auto", marginRight: "0%"}}>
                         {/* Capitalize the operation label */}
-                        {this.props.action.replace(/^[a-z]/g, function(t) { return t.toUpperCase() })}
+                        {this.props.operation.replace(/^[a-z]/g, function(t) { return t.toUpperCase() })}
                     </button>{'\u00A0'}{'\u00A0'}
                 </div>
             </React.Fragment>

@@ -12,6 +12,8 @@ import {
     TOGGLE_FILTER_SELECTION,
     TOGGLE_EXPANDER_SELECTION,
     TOGGLE_GENE_LIST_SELECTION,
+    CLEAR_FILTER_SELECTIONS,
+    CLEAR_EXPANDER_SELECTIONS,
     GENES_COMPLETE,
     GENES_ERROR,
     CLEAR_ALL_GENE_LISTS,
@@ -143,6 +145,16 @@ export default function(state=defaultState, action) {
                 selectedExpanders: [],
                 selectedFilters: [],
                 selectedGeneListsByID: []
+            };
+        case CLEAR_FILTER_SELECTIONS:
+            return {
+                ...state,
+                selectedFilters: action.payload.filters,
+            };
+        case CLEAR_EXPANDER_SELECTIONS:
+            return {
+                ...state,
+                selectedExpanders: action.payload.expanders,
             };
         case CLEAR_ALL_GENE_LISTS:
             return {

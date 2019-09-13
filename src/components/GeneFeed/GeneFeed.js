@@ -36,6 +36,28 @@ export default class GeneTabs extends React.Component {
         return null;
     }
 
+    handleEdit = ({type, index}) => {
+        console.log(type, index);
+        let { geneListIDs } = this.state;
+        if (type === 'delete') {
+            // if we're here we can assume that the geneListID is, in fact, selected, so toggling it should unselect it
+            // what will this do to active index?
+            this.props.handleGeneListSelection(geneListIDs[index]);
+        }
+        // this.setState((state) => {
+        //     let {geneListIDs, activeIndex} = state;
+        //     if (type === 'delete') {
+        //         geneListIDs = [...geneListIDs.slice(0, index), ...geneListIDs.slice(index + 1)];
+        //     }
+        //     if (index - 1 >= 0) {
+        //         activeIndex = index - 1;
+        //     } else {
+        //         activeIndex = 0;
+        //     }
+        //     return {geneListIDs, activeIndex};
+        // });
+    };
+
     handleTabChange(index) {
         this.setState({activeIndex: index});
     }
@@ -53,16 +75,19 @@ export default class GeneTabs extends React.Component {
     };
 
     render(){
-        const {geneListIDs, activeIndex} = this.state;
+        const { geneListIDs } = this.state;
         const tabsTemplate = [];
         const panelTemplate = [];
         geneListIDs.forEach((geneListID, index) => {
+            const closable = geneListIDs.length > 0;  // we're allowed to have no gene lists, so we can close with at least one gene list
+            // const closable = geneListIDs.length > 1;  // bugs out the modal if we let all tabs to be closable from that component! so we will need to do this for now...
             tabsTemplate.push(
-                <Tab>
+                <Tab key={index} closable={closable}>
                     {this.props.computeGeneListName(geneListID).payload}
                 </Tab>);
             panelTemplate.push(
                     <AsyncPanel
+                        key={index}
                         loadContent={ this.getGenesForGeneListID(geneListID) }
                         render={content =>
                             <Fragment>
@@ -71,8 +96,7 @@ export default class GeneTabs extends React.Component {
                                         key={ content.gene_list_id }
                                         geneListID={ content.gene_list_id }
                                         clearGeneList={ this.props.clearGeneList }
-                                        handleGeneListSelection={ this.props.handleGeneListSelection }
-                                        handleGeneSelection={ this.props.handleGeneSelection }/>
+                                        handleGeneListSelection={ this.props.handleGeneListSelection }/>
                                 : <Spinner/>}
                             </Fragment>
                         }
@@ -82,7 +106,11 @@ export default class GeneTabs extends React.Component {
         });
         return (
             <div className={"col-sm-12"}>
-                <Tabs customStyle={customStyle} showModalButton={3}>
+                <Tabs customStyle={customStyle}
+                      onTabEdit={this.handleEdit}
+                      onTabChange={this.handleTabChange}
+                      // onTabSequenceChange={this.handleTabSequenceChange}
+                      showModalButton={3}>
                     <TabList>
                         {tabsTemplate}
                     </TabList>
