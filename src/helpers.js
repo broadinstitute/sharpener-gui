@@ -5,6 +5,14 @@ export const tap = (data) => {
     return data;
 };
 
+// TODO: i'm using this function in a stupid way
+// export const sigFig = (number, sigfig) => {
+//     function precise(number, sigFig) {
+//         return Number.parseFloat(number).toPrecision(sigFig);
+//     }
+//     return Number(number) == number && Number(number) % 1 !== 0 ? precise(number, sigfig) : number;
+// };
+
 export const properCase = (string) => {
     const fillwords = [
         "a", "with", "for"

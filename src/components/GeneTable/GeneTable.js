@@ -1,7 +1,7 @@
 import React from "react"
 import Card from "react-bootstrap/Card";
 import {Collapse} from "react-collapse";
-import {formatAbbreviations, pluralize, properCase} from "../../helpers";
+import {formatAbbreviations, pluralize, properCase, sigFig} from "../../helpers";
 import BootstrapTable from "react-bootstrap-table-next";
 import _ from "underscore";
 import ToolkitProvider, { CSVExport } from 'react-bootstrap-table2-toolkit';
@@ -179,7 +179,7 @@ export default class GeneTable extends React.Component {
                 const cellList = potentialList;
                 return <div>{_.take(cellList, 4)}...</div>
             } else {
-                return cell;
+                return (cell);
             }
         }
     };
@@ -229,7 +229,7 @@ const GeneTableColumnFilter = ({columns, onColumnToggle, toggles}) => {
     return (
         <React.Fragment>
             <Select
-                placeholder={"Filter Columns..."}
+                placeholder={"Hide Columns..."}
                 defaultValue={[]}
                 isMulti
                 name="columns"
@@ -246,7 +246,6 @@ const GeneTableColumnFilter = ({columns, onColumnToggle, toggles}) => {
                     } else if (action.action === "remove-value" || action.action === "pop-value" ) {
                         onColumnToggle(action.removedValue.value);
                     }
-                    // TODO:
                     else if (action.action === "clear") {
                         Object.keys(toggles).forEach((toggleKey) => {
                             toggles[toggleKey] = true;

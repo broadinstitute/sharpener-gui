@@ -1,17 +1,5 @@
 import React, {Fragment} from 'react';
-import _ from "underscore";
-import BootstrapTable from "react-bootstrap-table-next"
-import ToolkitProvider, { CSVExport } from 'react-bootstrap-table2-toolkit';
-const { ExportCSVButton } = CSVExport;
-import Card from "react-bootstrap/Card"
-import {Collapse} from "react-collapse"
-
-import {FEATURE_FLAG} from "../../parameters/FeatureFlags";
-
-import Select from 'react-select';
-import {pluralize, properCase, formatAbbreviations, underscoreToSpaces, tap} from "../../helpers";
-
-import {Tabs, Tab, TabList, DragTabList, PanelList, Panel, DragTab, AsyncPanel} from "react-tabtab"
+import {Tabs, Tab, TabList, PanelList, AsyncPanel} from "react-tabtab"
 import {arrayMove} from 'react-sortable-hoc';
 import * as customStyle from 'react-tabtab/lib/themes/bootstrap';
 import Spinner from "../../elements/Spinner/Spinner";
