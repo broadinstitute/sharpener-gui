@@ -1,7 +1,7 @@
-import React from "react"
+import React, {Fragment} from "react"
 import Card from "react-bootstrap/Card";
 import {Collapse} from "react-collapse";
-import {formatAbbreviations, pluralize, properCase, sigFig} from "../../helpers";
+import {formatAbbreviations, pluralize, properCase, sigFig, tap} from "../../helpers";
 import BootstrapTable from "react-bootstrap-table-next";
 import _ from "underscore";
 import ToolkitProvider, { CSVExport } from 'react-bootstrap-table2-toolkit';
@@ -11,6 +11,7 @@ const { ExportCSVButton } = CSVExport;
 import {FEATURE_FLAG} from "../../parameters/FeatureFlags";
 
 import "./GeneTable.css"
+import "./Tooltip.css"
 
 const SERVICE_URL =  process.env.REACT_APP_SERVICE_URL;
 
@@ -84,22 +85,22 @@ export default class GeneTable extends React.Component {
 
                             {props =>
                                 <React.Fragment>
-                                    {/*{ !(Object.values(props.columnToggleProps.toggles).every((value => value))) ?*/}
-                                    {/*    <span style={{fontSize:"small", marginLeft:"0.75em"}}>Filtered Columns</span>*/}
-                                    {/*    :   <span style={{fontSize:"small", marginLeft:"0.75em"}}>Select columns below to filter them</span> }*/}
-                                    <GeneTableColumnFilter
-                                        {...props.columnToggleProps}
-                                    />
+
                                     <div>
                                         <span className={"btn"}>{pluralize(this.state.geneTableData.length, "gene")}</span>
                                         {/*TODO: Refactor -> https://stackoverflow.com/a/53558566 */}
                                         <ExportCSVButton style={{border: "none", textDecoration: "underline", float: "right"}} {...props.csvProps}>Export</ExportCSVButton>
                                     </div>
+
                                     <BootstrapTable
                                         wrapperClasses={"table-responsive"}
                                         pagination={ paginationFactory() }
                                         {...props.baseProps} />
 
+                                    {/* TODO: is this placement awkward? is it too large? */}
+                                    <GeneTableColumnFilter
+                                        {...props.columnToggleProps}
+                                    />
 
                                 </React.Fragment>}
                         </ToolkitProvider>
@@ -123,7 +124,7 @@ export default class GeneTable extends React.Component {
         const geneListAttributes =
             _.uniq(this.state.geneList.map((current_gene) => current_gene.attributes, [])
                 .reduce((attributes_list, current_gene_attributes) => attributes_list.concat(current_gene_attributes), [])  // flatten list of depth one
-                .map(attribute => attribute.name));
+                .map(attribute => tap(attribute.name)));
         //.concat(["gene_id"]);  // interpret gene_id as a column  TODO: DEPRECATED -- it needs to be handled specially
 
         let geneTableColumns =
@@ -145,22 +146,7 @@ export default class GeneTable extends React.Component {
     };
 
     getGeneListAndSetupGeneTable = (geneListID) => {
-        console.dir("setting up gene table");
-
-        let aggregationQuery = {
-            gene_list_ids: [geneListID],
-            operation: "intersection"  // self-intersection ~~~ identity
-        };
-
-        // TODO: update with identity transformer
-        fetch(SERVICE_URL.concat('/aggregate'), {
-            method: "POST",
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(aggregationQuery)
-        })
+        fetch(SERVICE_URL.concat('/gene_list/').concat(geneListID))
             .then(response => response.json())
             .then(data => {
                 // guarantee to have the gene list before running
@@ -184,6 +170,18 @@ export default class GeneTable extends React.Component {
         }
     };
 
+    tooltipFormatter = (column, colIndex) => {
+        return (
+            <Fragment>
+                <span className={"has-tooltip"}>
+                    <span className={"tooltiptext"}>{column.dataField}</span>
+                    { formatAbbreviations(properCase(column.text)) }
+                </span>
+            </Fragment>
+        );
+    };
+
+
     makeTableColumns = (attributeList) => {
 
         return (
@@ -191,11 +189,11 @@ export default class GeneTable extends React.Component {
                 .map(gla => {
                     return {
                         dataField: gla,
-                        text: formatAbbreviations(properCase(gla)),
-                        headerStyle: {  textTransform: "capitalize" },
+                        text: properCase(gla),
                         // TODO: for now we're enabling all input to be placed in the search field
                         // THIS IS TO ENABLE INTERACTION WITH PRODUCERS; BUT SHOULD BE FLAGGED FOR CHANGE
                         formatter: this.listAbbrevation,
+                        headerFormatter: this.tooltipFormatter,
                         events: {
                             onClick: (e, column, columnIndex, row, rowIndex) => {
                                 console.log("clicking gene_id ", row[column.dataField]);
@@ -207,8 +205,8 @@ export default class GeneTable extends React.Component {
                 }).concat([
                 {
                     dataField: "gene_id",
-                    text: formatAbbreviations(properCase("gene_id")),
-                    headerStyle: {  textTransform: "capitalize" },
+                    text: properCase("gene_id"),
+                    headerFormatter: this.tooltipFormatter,
                     events: {
                         onClick: (e, column, columnIndex, row, rowIndex) => {
                             console.log("clicking gene_id ", row[column.dataField]);
