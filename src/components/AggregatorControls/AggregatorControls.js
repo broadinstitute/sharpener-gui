@@ -21,7 +21,7 @@ export class AggregationSender extends React.Component {
                 <div>
                     <button
                         type="button"
-                        onClick={ () => this.props.aggregateGenes(this.props.action) }
+                        onClick={ () => this.props.aggregateGenes(this.props.operation) }
                         // className="btn btn-outline-success my-2 my-sm-0"
                         style={{marginLeft: "auto", marginRight: "0%"}}>
                         {/* Capitalize the operation label */}
