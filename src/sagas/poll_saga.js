@@ -1,10 +1,10 @@
-import {call, race, take, delay, put} from "@redux-saga/core/effects";
+import {call, race, take, delay, put, spawn, fork, cancel} from "@redux-saga/core/effects";
 import {GENES_RECEIVED, getGeneListStatus} from "../actions";
 import {SERVICE_URL} from "../parameters/EndpointURLs";
 
 const TRANSFORM_GENES = 'TRANSFORM_GENES';
 const PRODUCE_GENES = 'PRODUCE_GENES';
-const POLL_STOP = 'POLL_STOP';
+const POLL_STOP_ = 'POLL_STOP_';
 const GENES_COMPLETE = 'GENES_COMPLETE';
 const GENES_ERROR = 'GENES_ERROR';
 
@@ -28,7 +28,7 @@ function* pollSaga(action) {
                     }
                 });
                 yield put({
-                    type: POLL_STOP
+                    type: POLL_STOP_+JSON.stringify(action)
                 })
             } else if (geneTransaction.status === "failed") {
                 yield put({
@@ -40,14 +40,14 @@ function* pollSaga(action) {
                     }
                 });
                 yield put({
-                    type: POLL_STOP
+                    type: POLL_STOP_+JSON.stringify(action)
                 });
             }
             yield delay(2*1000);
         } catch (err) {
             // Once the polling has encountered an error, it should be stopped immediately
             yield put({
-                type: POLL_STOP,
+                type: POLL_STOP_+JSON.stringify(action),
                 err
             });
             // // Default error handling action called.
@@ -59,11 +59,15 @@ function* pollSaga(action) {
     }
 }
 
+function* forkedPollSaga (actionSignal) {
+    yield race([call(pollSaga, actionSignal), take(POLL_STOP_+JSON.stringify(actionSignal))])
+}
+
 export default function* pollSagaWatch() {
     while (true) {
         // Taking the POLL_START dispatch action.
-        const action = yield take([TRANSFORM_GENES, PRODUCE_GENES]);
+        const actionSignal = yield take([TRANSFORM_GENES, PRODUCE_GENES]);
         // // Custom payload will be available at action object.
-        yield race([call(pollSaga, action), take(POLL_STOP)]);
+        const actionTask = yield spawn(forkedPollSaga, actionSignal);
     }
 }
