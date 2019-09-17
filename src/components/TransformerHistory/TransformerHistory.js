@@ -49,13 +49,11 @@ export default class TransformerHistory extends React.Component {
 
     componentDidMount() {
         this.setState({ network: {
-                nodes: tap(convertGraphSchema(
+                nodes: (convertGraphSchema(
                     ledgerTo("nodes")(this.props.transactionLedger),
                     ledgerTo("edges")(this.props.transactionLedger)
                 ))
-        }}, () => {
-            console.log(this.state.network);
-        })
+        }});
     }
 
     static getDerivedStateFromProps(nextProps, prevState) {
@@ -64,15 +62,15 @@ export default class TransformerHistory extends React.Component {
             return {
                     transactionLedgerHash: hashCode(JSON.stringify(nextProps.transactionLedger)),
                     network: {
-                        nodes: tap(
+                        nodes:
                             convertGraphSchema(
                                 ledgerTo("nodes")(nextProps.transactionLedger),
                                 ledgerTo("edges")(nextProps.transactionLedger)
                             )
-                        )
                     }
             }
         }
+        return null;
     }
 
     nodesOnClick = (gene_list_id) => {

@@ -23,7 +23,8 @@ let storeWithMiddleware = compose(
     applyMiddleware(sagaMiddleware),
     // logging middleware must be placed after all middleware (including sagas) to get prev and nextState (why?),
     // as well as saga-dispatched actions
-    applyMiddleware(loggingMiddleware));
+    applyMiddleware(loggingMiddleware)
+);
 export const store = storeWithMiddleware(createStore)(reducers);
 
 sagaMiddleware.run(pollSagaWatch);

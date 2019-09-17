@@ -10,7 +10,6 @@ export default class AggregatorNode extends Node {
 }
 
 export const AggregatorTooltip = (props) => {
-    console.log("transformer tooltip data", props);
     return (<div style={{width:"100%", height:"100%" , border:"1px solid #000", background: "snow", padding: "5px"}}>
                 <div className='graph-node-body'>
                     {props.inputs ?

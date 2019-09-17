@@ -124,7 +124,7 @@ export default class GeneTable extends React.Component {
         const geneListAttributes =
             _.uniq(this.state.geneList.map((current_gene) => current_gene.attributes, [])
                 .reduce((attributes_list, current_gene_attributes) => attributes_list.concat(current_gene_attributes), [])  // flatten list of depth one
-                .map(attribute => tap(attribute.name)));
+                .map(attribute => attribute.name));
         //.concat(["gene_id"]);  // interpret gene_id as a column  TODO: DEPRECATED -- it needs to be handled specially
 
         let geneTableColumns =

@@ -81,7 +81,6 @@ class DagreD3React extends Component {
     addNodes() {
         this.props.children.forEach((node) => {
             const {id, ...data} = node.props;
-            console.log("data", data);
             this.graph.setNode(id,
                 { // TODO: why isn't this a spread of properties
                     elementType: data.elementType,
@@ -110,7 +109,7 @@ class DagreD3React extends Component {
     }
 
     addEdgeClickListener() {
-        tap(this.svg.selectAll("g.edgePath")).on('click', (line) => {
+        this.svg.selectAll("g.edgePath").on('click', (line) => {
             console.log("line", line);
         });
     }

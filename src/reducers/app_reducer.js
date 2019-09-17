@@ -60,7 +60,6 @@ const defaultState = {
 };
 
 export default function(state=defaultState, action) {
-    console.log("reducing", action);
     switch(action.type) {
         case GET_TRANSFORMERS:
             return {

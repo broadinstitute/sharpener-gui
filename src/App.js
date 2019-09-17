@@ -57,7 +57,7 @@ const transformerControlsStyle = {
 
 class App extends React.Component {
     componentDidMount() {
-        this.props.getTransformers(tap);
+        this.props.getTransformers();
     }
 
     render() {
