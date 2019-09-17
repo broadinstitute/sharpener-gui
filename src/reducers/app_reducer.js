@@ -55,7 +55,7 @@ const defaultState = {
     // transaction history
     // list of dates -> geneListID -> query
     transactionLedger: [],
-    loadingQueryNames: [],
+    loadingQueries: [],
     loading: false
 };
 
@@ -81,7 +81,7 @@ export default function(state=defaultState, action) {
             return {
                 ...state,
                 // gene_list_ids: state.gene_list_ids.concat([action.payload.results.gene_list_id]),
-                loadingQueryNames: state.loadingQueryNames.concat(action.payload.query.name),
+                loadingQueries: state.loadingQueries.concat(action.payload.query),
                 loading: true
             };
         // TODO: loadingRequest ID and the Query Details
@@ -89,7 +89,7 @@ export default function(state=defaultState, action) {
             return {
                 ...state,
                 // gene_list_ids: state.gene_list_ids.concat([action.payload.results.gene_list_id]),
-                loadingQueryNames: state.loadingQueryNames.concat(action.payload.query.name),
+                loadingQueries: state.loadingQueries.concat(action.payload.query),
                 loading: true
             };
         case FILTER_GENES:
@@ -185,24 +185,19 @@ export default function(state=defaultState, action) {
                 ...state,
                 gene_list_ids: state.gene_list_ids.concat([action.payload.results.gene_list_id]),
                 // loadingRequest: pop out the request id and query title form the loading request index
-                loadingQueryNames: state.loadingQueryNames.filter(names => names !== action.payload.query.name),
-                loading: state.loadingQueryNames.filter(names => names !== action.payload.query.name).length > 0
+                loadingQueries: state.loadingQueries.filter(query => query !== action.payload.query),
+                loading: state.loadingQueries.filter(query => query !== action.payload.query).length > 0
             };
         case GENES_ERROR:
             return {
                 ...state,
                 gene_list_ids: state.gene_list_ids.concat([action.payload.results.gene_list_id]),
                 // loadingRequest: pop out the request id and query title form the loading request index
-                loadingQueryNames: state.loadingQueryNames.filter(names => names !== action.payload.query.name),
-                loading: state.loadingQueryNames.filter(names => names !== action.payload.query.name).length > 0,
-                errorQueryNames: action.payload.query.name,
-                error: true
+                loadingQueries: state.loadingQueries.filter(names => names !== action.payload.query),
+                loading: state.loadingQueries.filter(query => query !== action.payload.query).length > 0,
             };
         case DIFFERENCE_GENE_LISTS:
             // it's a query: do nothing
-            return state;
-        case COMPUTE_GENE_LIST_NAME:
-            // it's a projection: do nothing
             return state;
         default:  // do nothing
             return state;

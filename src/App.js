@@ -72,7 +72,7 @@ class App extends React.Component {
                         <span style={{paddingLeft:"15px", display: "inline-block", margin:"10px 0 10px 0"}}>
                             {this.props.loading ?
                                 <Fragment>
-                                    <InlineSpinner/><span>Loading {this.props.loadingQueryNames.join(", ")}</span>
+                                    <InlineSpinner/><span>Loading {this.props.loadingQueries.map(query => query.name).join(", ")}</span>
                                 </Fragment>
                                 : "No Transformers Running" }
                         </span>
