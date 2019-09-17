@@ -88,7 +88,6 @@ export default class TransformerHistory extends React.Component {
     };
 
     nodesOnEnter = (id, node, coords, rect) => {
-        console.log(node.elementType, node.data);
         ReactDOM.render(
             transactionNodeComponent[node.elementType].tooltip({...node.data}),
             // node.data.tooltip({...node.data}),

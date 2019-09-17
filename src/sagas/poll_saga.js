@@ -19,7 +19,8 @@ function* pollTask(action) {
             console.log(geneTransaction.status);
             if (geneTransaction.status === "success") {
                 yield put({
-                    type: GENES_COMPLETE,
+                    type: GENES_ERROR,
+                    status: geneTransaction.status,
                     payload: {
                         type: action.type,
                         gene_list_id: geneTransaction.gene_list_id,
@@ -30,9 +31,10 @@ function* pollTask(action) {
             } else if (geneTransaction.status === "failed") {
                 yield put({
                     type: GENES_ERROR,
+                    status: geneTransaction.status,
                     payload: {
                         type: action.type,
-                        gene_list_id: geneTransaction.gene_list_id,
+                        request_id: action.payload.request_id,
                         query: action.payload.query
                     }
                 });
@@ -42,7 +44,12 @@ function* pollTask(action) {
         } catch (err) {
             yield put({
                 type: GENES_ERROR,
-                err
+                status: err,
+                payload: {
+                    type: action.type,
+                    request_id: action.payload.request_id,
+                    query: action.payload.query
+                }
             });
             yield cancel()
         } finally {

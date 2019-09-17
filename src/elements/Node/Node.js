@@ -38,9 +38,6 @@ class Node extends React.Component{
                         {properCase(this.props.transformerName)}
                     </span>
                 </div>
-                <div className='graph-node-footer'>
-                    {this.props.footer}
-                </div>
             </div>
         )
     }

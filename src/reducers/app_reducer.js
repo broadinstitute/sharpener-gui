@@ -56,7 +56,8 @@ const defaultState = {
     // list of dates -> geneListID -> query
     transactionLedger: [],
     loadingQueries: [],
-    loading: false
+    loading: false,
+    currentErrors: []
 };
 
 export default function(state=defaultState, action) {
@@ -190,10 +191,11 @@ export default function(state=defaultState, action) {
         case GENES_ERROR:
             return {
                 ...state,
-                gene_list_ids: state.gene_list_ids.concat([action.payload.results.gene_list_id]),
+                // gene_list_ids: state.gene_list_ids.concat([action.payload.results.gene_list_id]),
                 // loadingRequest: pop out the request id and query title form the loading request index
-                loadingQueries: state.loadingQueries.filter(names => names !== action.payload.query),
+                loadingQueries: state.loadingQueries.filter(query => query !== action.payload.query),
                 loading: state.loadingQueries.filter(query => query !== action.payload.query).length > 0,
+                currentErrors: state.currentErrors.concat({query: action.payload.query, status: action.status})
             };
         case DIFFERENCE_GENE_LISTS:
             // it's a query: do nothing

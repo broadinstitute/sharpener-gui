@@ -21,7 +21,9 @@ import {
     differentiateGeneLists,
     computeGeneListName, toggleFilterSelection
 } from "./actions"
-import {tap} from './helpers'
+import {properCase, tap} from './helpers'
+
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
 // local components
 import ProducerControls from './components/ProducerControls/ProducerControls.js'
@@ -75,6 +77,17 @@ class App extends React.Component {
                                     <InlineSpinner/><span>Loading {this.props.loadingQueries.map(query => query.name).join(", ")}</span>
                                 </Fragment>
                                 : "No Transformers Running" }
+                            {this.props.currentErrors ?
+                                <Fragment>
+                                    <span>
+                                        { this.props.currentErrors.map(error =>
+                                            <p>
+                                                {properCase(error.status)}: {error.query.name}
+                                            </p>
+                                        ) }
+                                    </span>
+                                </Fragment>
+                            : <Fragment/> }
                         </span>
 
                         {/* Producers */}

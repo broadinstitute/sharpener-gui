@@ -208,8 +208,6 @@ class DagreD3React extends Component {
         this.svgNode = this.svg.node();
         this.x = (this.svgNode.getBoundingClientRect().width - this.graph.graph().width) / 2;
         this.y = 50;
-        // this.x = 0;
-        // this.y = 0;
         this.k = 1;
         this.svgGroup.attr("transform", "translate(" + this.x + ", " + this.y + ") ");
     }

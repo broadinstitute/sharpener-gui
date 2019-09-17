@@ -4,6 +4,12 @@
     border-radius: 15px;
 }
 
+.graph-node.selected {
+    border: 2px solid gray;
+    border-radius: 15px;
+}
+
+
 .graph-node:hover {
     cursor: pointer;
 }
@@ -23,6 +29,8 @@
     /*background-color: cornflowerblue;*/
     border-top-left-radius: 13px;
     border-top-right-radius: 13px;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
     padding: 5px;
 }
 
