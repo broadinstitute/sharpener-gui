@@ -381,11 +381,11 @@ export class TransformerItem extends React.Component {
                     <Card.Header as={"h6"}>
                         <a style={{display: "inline-block", cursor: "pointer"}}
                            onClick={ this.onClickHandleSelection }>
-                            {properCase(this.transformer.name)}
-                        </a>{'\u00A0'}{'\u00A0'}
-                        <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{this.transformer.description}</Tooltip>}>
-                            <FontAwesomeIcon icon={faInfoCircle} size="xs" style={{opacity: 0.5}}/>
-                        </OverlayTrigger>
+                            {properCase(this.transformer.name)}{'\u00A0'}{'\u00A0'}
+                            <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{this.transformer.description}</Tooltip>}>
+                                <FontAwesomeIcon icon={faInfoCircle} size="xs" style={{opacity: 0.5}}/>
+                            </OverlayTrigger>
+                        </a>
                         {Object.keys(this.state.parameterIndex).length > 0 ?
                             <button className="btn my-2 my-sm-0"
                                     style={{padding:"0%", fontSize: "small", float:"right", marginLeft: "auto", margin: "auto", display:"inline-block"}}

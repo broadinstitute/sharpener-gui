@@ -163,6 +163,9 @@ export default class GeneTable extends React.Component {
                 const cellList = potentialList;
                 return <div>{_.take(cellList, 4)}...</div>
             } else {
+                if (parseFloat(cell)) {
+                    return parseFloat(cell) < 1 ? parseFloat(cell).toFixed(4) : parseFloat("1").toFixed(1);
+                }
                 return (cell);
             }
         }
