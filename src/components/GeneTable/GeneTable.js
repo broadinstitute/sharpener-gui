@@ -196,7 +196,6 @@ export default class GeneTable extends React.Component {
                         headerFormatter: this.tooltipFormatter,
                         events: {
                             onClick: (e, column, columnIndex, row, rowIndex) => {
-                                console.log("clicking gene_id ", row[column.dataField]);
                                 // TODO:
                                 // this.props.handleGeneSelection(row[column.dataField]);
                             }
