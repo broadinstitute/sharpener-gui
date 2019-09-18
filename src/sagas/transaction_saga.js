@@ -15,6 +15,7 @@ function* transactionSaga(action) {
 
     yield put({
         type: GENES_RECEIVED,
+        status: "success",
         payload: {
             ...action.payload,
             results: transformerResults

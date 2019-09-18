@@ -39,10 +39,20 @@ export const CLEAR_SELECTIONS = 'CLEAR_SELECTIONS';
 export const COMPUTE_GENE_LIST_NAME = 'COMPUTE_GENE_LIST_NAME';
 
 export const GENES_ERROR = 'GENES_ERROR';
+export const COMPLETE_ERROR_REPORT = 'COMPLETE_ERROR_REPORT';
 export const GENES_STATUS = 'GENES_STATUS';
 export const GENES_COMPLETE = 'GENES_COMPLETE';
 export const GENES_RECEIVED = 'GENES_RECEIVED';
 export const RECORD_SHARPENER_ACTION = 'RECORD_SHARPENER_ACTION';
+
+export function removeError(error) {
+    return (dispatch) => {
+        return dispatch({
+            type: COMPLETE_ERROR_REPORT,
+            payload: error
+        })
+    }
+}
 
 export function receiveGeneList(geneListID, transformerAction) {
     return (dispatch) => {

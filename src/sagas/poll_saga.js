@@ -1,5 +1,6 @@
 import {call, delay, put, cancel, cancelled, takeEvery} from "@redux-saga/core/effects";
 import {SERVICE_URL} from "../parameters/EndpointURLs";
+import {GENES_RECEIVED} from "../actions";
 
 const TRANSFORM_GENES = 'TRANSFORM_GENES';
 const PRODUCE_GENES = 'PRODUCE_GENES';
@@ -18,8 +19,9 @@ function* pollTask(action) {
             const geneTransaction = yield call(statusRequest, action.payload.request_id);
             console.log(geneTransaction.status);
             if (geneTransaction.status === "success") {
+                console.log(geneTransaction);
                 yield put({
-                    type: GENES_ERROR,
+                    type: GENES_COMPLETE,
                     status: geneTransaction.status,
                     payload: {
                         type: action.type,

@@ -28,6 +28,7 @@
     "react-directed-graph": "^1.0.5",
     "react-dom": "^16.8.6",
     "react-element-to-jsx-string": "^14.0.2",
+    "react-fade-opacity": "^2.0.0",
     "react-loader-spinner": "^2.3.0",
     "react-loading-overlay": "^1.0.1",
     "react-motion": "^0.5.2",

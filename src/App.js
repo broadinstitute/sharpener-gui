@@ -23,7 +23,7 @@ import {
 } from "./actions"
 import {properCase, tap} from './helpers'
 
-import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
+import _ from "lodash"
 
 // local components
 import ProducerControls from './components/ProducerControls/ProducerControls.js'
@@ -33,6 +33,7 @@ import TransformerHistory from "./components/TransformerHistory/TransformerHisto
 import GeneTabs from "./components/GeneFeed/GeneFeed";
 import Spinner from "./elements/Spinner/Spinner";
 import {InlineSpinner} from "./elements/InlineSpinner/InlineSpinner";
+import TransformerStatusReport from "./elements/TransformerStatusReport/TransformerStatusReport";
 
 // app configurations
 import {FEATURE_FLAG} from "./parameters/FeatureFlags";
@@ -76,18 +77,12 @@ class App extends React.Component {
                                 <Fragment>
                                     <InlineSpinner/><span>Loading {this.props.loadingQueries.map(query => query.name).join(", ")}</span>
                                 </Fragment>
-                                : "No Transformers Running" }
-                            {this.props.currentErrors ?
-                                <Fragment>
-                                    <span>
-                                        { this.props.currentErrors.map(error =>
-                                            <p>
-                                                {properCase(error.status)}: {error.query.name}
-                                            </p>
-                                        ) }
-                                    </span>
-                                </Fragment>
-                            : <Fragment/> }
+                            :  "No Transformers Running" }
+
+                            {this.props.currentStatus ?
+                                _.take(this.props.currentStatus, 3).map(error =>
+                                    <TransformerStatusReport style={{position: "absolute"}} error={error}/>)
+                            : <Fragment/>}
                         </span>
 
                         {/* Producers */}

@@ -20,7 +20,7 @@ import {
     CLEAR_SINGLE_GENE_LIST,
     UNDO_LAST_CLEAR,
     RECORD_SHARPENER_ACTION,
-    DIFFERENCE_GENE_LISTS, FILTER_GENES, COMPUTE_GENE_LIST_NAME, GENES_RECEIVED
+    DIFFERENCE_GENE_LISTS, FILTER_GENES, COMPUTE_GENE_LIST_NAME, GENES_RECEIVED, COMPLETE_ERROR_REPORT
 } from "../actions"
 
 const defaultState = {
@@ -57,7 +57,7 @@ const defaultState = {
     transactionLedger: [],
     loadingQueries: [],
     loading: false,
-    currentErrors: []
+    currentStatus: []
 };
 
 export default function(state=defaultState, action) {
@@ -186,7 +186,8 @@ export default function(state=defaultState, action) {
                 gene_list_ids: state.gene_list_ids.concat([action.payload.results.gene_list_id]),
                 // loadingRequest: pop out the request id and query title form the loading request index
                 loadingQueries: state.loadingQueries.filter(query => query !== action.payload.query),
-                loading: state.loadingQueries.filter(query => query !== action.payload.query).length > 0
+                loading: state.loadingQueries.filter(query => query !== action.payload.query).length > 0,
+                currentStatus: state.currentStatus.concat({query: action.payload.query, status: action.status})
             };
         case GENES_ERROR:
             return {
@@ -195,7 +196,12 @@ export default function(state=defaultState, action) {
                 // loadingRequest: pop out the request id and query title form the loading request index
                 loadingQueries: state.loadingQueries.filter(query => query !== action.payload.query),
                 loading: state.loadingQueries.filter(query => query !== action.payload.query).length > 0,
-                currentErrors: state.currentErrors.concat({query: action.payload.query, status: action.status})
+                currentStatus: state.currentStatus.concat({query: action.payload.query, status: action.status})
+            };
+        case COMPLETE_ERROR_REPORT:
+            return {
+                ...state,
+                currentStatus: state.currentStatus.filter(error => error === action.payload.error)
             };
         case DIFFERENCE_GENE_LISTS:
             // it's a query: do nothing
