@@ -53,7 +53,7 @@ export class ProducerControls extends React.Component {
         let parameterValues = parameterIndexControls.map(parameterIndexControl => parameterIndexControl.value );
         if (parameterValues.every((truthyValue) => (truthyValue !== '' || truthyValue !== null))) {  // yeah
             // then produce genes
-            if (this.state.selectedProducer.name !== "Gene Symbols") {
+            if (this.state.selectedProducer.name !== "Custom Gene List") {
                 // we produce genes by calling a producer
                 let producerQuery = {
                     name: this.state.selectedProducer.name,
@@ -68,7 +68,7 @@ export class ProducerControls extends React.Component {
                             console.log("response", data);
                         }
                     });
-            } else if (this.state.selectedProducer.name === "Gene Symbols") {
+            } else if (this.state.selectedProducer.name === "Custom Gene List") {
                 let geneList = ProducerControls.parseGeneSymbolList(parameterIndexControls[0].value);
                 this.handleGeneListCreation(geneList);
             }

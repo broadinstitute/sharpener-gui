@@ -6,6 +6,8 @@ import Spinner from "../../elements/Spinner/Spinner";
 
 import ReactTable from "react-table"
 import GeneTable from "../GeneTable/GeneTable"
+import {geneListTitleOf} from "../../helpers";
+import {computeGeneListName} from "../../actions";
 
 const SERVICE_URL =  process.env.REACT_APP_SERVICE_URL;
 
@@ -44,18 +46,6 @@ export default class GeneTabs extends React.Component {
             // what will this do to active index?
             this.props.handleGeneListSelection(geneListIDs[index]);
         }
-        // this.setState((state) => {
-        //     let {geneListIDs, activeIndex} = state;
-        //     if (type === 'delete') {
-        //         geneListIDs = [...geneListIDs.slice(0, index), ...geneListIDs.slice(index + 1)];
-        //     }
-        //     if (index - 1 >= 0) {
-        //         activeIndex = index - 1;
-        //     } else {
-        //         activeIndex = 0;
-        //     }
-        //     return {geneListIDs, activeIndex};
-        // });
     };
 
     handleTabChange(index) {

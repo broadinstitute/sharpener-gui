@@ -12,8 +12,8 @@ import {clearSingleSelectedGeneList, differentiateGeneLists} from "../../actions
 
 class Node extends React.Component{
     static tooltip = NodeTooltip;
-    constructor(){
-        super();
+    constructor(props){
+        super(props);
     }
 
     render(){
@@ -31,11 +31,11 @@ class Node extends React.Component{
         return(
             <div className='graph-node'>
                 <div className={titleClassNames}>
+                    <span className='graph-node-title-text'>
+                        {this.props.title}
+                    </span>
                     <span className='graph-node-title-icon' >
                         <FontAwesomeIcon icon={myIcon[this.props.transformerType]}/>
-                    </span>
-                    <span className='graph-node-title-text'>
-                        {properCase(this.props.transformerName)}
                     </span>
                 </div>
             </div>
@@ -47,7 +47,7 @@ export const NodeTooltip = (props) => {
     return (
         <div style={{width:"100%", height:"100%" , border:"1px solid #000", background: "snow", padding: "5px"}}>
             <div className='graph-node-body'>
-
+                {this.props.title}
             </div>
         </div>
     )

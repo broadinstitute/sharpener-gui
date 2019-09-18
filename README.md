@@ -48,7 +48,7 @@ and pointing to the gene sharpener at `https://indigo.ncats.io/sharpener/` by de
 
 
 1. Create your starting Gene Lists using the "Producer" selector and search box at the top. 
-For example, enter a Gene Symbol (e.g. NGLY1) when selecting "Gene Symbols" from the drop-down.
+For example, enter a Gene Symbol (e.g. NGLY1) when selecting "Custom Gene List" from the drop-down.
 
 2. You should now see a table of genes. Click on the Gene List ID or the plus sign on the side of the table's header, to add the gene list to the list of current genes. 
 

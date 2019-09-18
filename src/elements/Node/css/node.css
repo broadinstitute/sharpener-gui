@@ -35,11 +35,11 @@
 }
 
 .graph-node .graph-node-title .graph-node-title-icon {
-    padding-left: 5px;
-    padding-right: 10px; }
+    padding-left: 10px;
+    padding-right: 5px; }
 
 .graph-node .graph-node-title .graph-node-title-text {
-    padding-right: 10px; }
+    padding-left: 10px; }
 
 .graph-node-body .graph-node-title-text {
     font-family: 'Lato';

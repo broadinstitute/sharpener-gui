@@ -1,5 +1,4 @@
 import {call, race, take, put} from "@redux-saga/core/effects";
-import {getGeneListStatus} from "../actions";
 import {SERVICE_URL} from "../parameters/EndpointURLs";
 
 const GENES_COMPLETE = 'GENES_COMPLETE';

@@ -7,8 +7,14 @@ import {SizeMe} from "react-sizeme";
 // graph imports
 import Node, {NodeTooltip} from "../../elements/Node/Node"
 import DagreD3 from "../../elements/dagreD3/dagreD3";
-import {AGGREGATE_GENES, CREATE_GENE_LIST, FILTER_GENES, PRODUCE_GENES, TRANSFORM_GENES} from "../../actions";
-import {properCase, tap, hashCode} from "../../helpers";
+import {
+    AGGREGATE_GENES,
+    CREATE_GENE_LIST,
+    FILTER_GENES,
+    PRODUCE_GENES,
+    TRANSFORM_GENES
+} from "../../actions";
+import {properCase, tap, hashCode, geneListTitleOf} from "../../helpers";
 import {Provider} from "react-redux";
 import {store} from "../../store";
 import App from "../../App";
@@ -75,16 +81,6 @@ export default class TransformerHistory extends React.Component {
 
     nodesOnClick = (gene_list_id) => {
         this.props.handleGeneListSelection(gene_list_id);
-        // else if (double === true) {
-        //     console.log(gene_list_ids);
-        //     gene_list_ids.map(gene_list_id => {
-        //         // TODO: behavior:
-        //             // if there is any one successor in the list of genes that has not been selected, select the remainder
-        //             // else if all successors have already been selected, deselect all of them
-        //         // this.props.handleGeneListSelection(gene_list_id);
-        //         console.log("gene_list_id", gene_list_id);
-        //     })
-        // }
     };
 
     nodesOnEnter = (id, node, coords, rect) => {
@@ -176,11 +172,13 @@ const ledgerTo = (type) => {
             return (transactionLedger) => transactionLedger.reduce((node_list, transaction) => {
                 const defaultNode = {
                     id: transaction.gene_list_id,
-                    count: transaction.count,
+                    title: geneListTitleOf(transaction),
+                    size: transaction.size,
                     inputs: transaction.query,
                     difference: transaction.difference,
                     type: transactionClassName[transaction.type]
                 };
+                console.log(defaultNode)
 
                 switch(transaction.type) {
                     case CREATE_GENE_LIST:
@@ -215,7 +213,7 @@ const ledgerTo = (type) => {
                             {
                                 source: transaction.query.gene_list_id,
                                 target: transaction.gene_list_id,
-                                label: properCase(transaction.query.name)
+                                // label: properCase(transaction.query.name)
                             }
                         ]);
                     case AGGREGATE_GENES:
@@ -252,13 +250,13 @@ const convertGraphSchema = (nodes, edges) => {
     return nodes.map(node => {
         return {
             id: node.id,
+            title: node.title,
             elementType: node.type,  // TODO: hardcoded... for now
             transformerType: node.type,
-            transformerName: node.inputs.name ? node.inputs.name : "Gene Symbols",
+            transformerName: node.inputs.name ? node.inputs.name : "Custom Gene List",
             inputs: node.inputs.controls ? node.inputs.controls : node.inputs,
             difference: node.difference,
-            count: node.count,
-            title: node.id,  // TODO: work on something better
+            size: node.size,
             connection: edges.filter(edge => edge.source === node.id).map(edge => (
                 {
                     id: edge.target,

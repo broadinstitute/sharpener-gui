@@ -72,3 +72,7 @@ export const hashCode = (string) => {
     }
     return hash;
 };
+
+export function geneListTitleOf(transaction) {
+    return transaction.frequency.value + " – " + transaction.frequency.name
+}

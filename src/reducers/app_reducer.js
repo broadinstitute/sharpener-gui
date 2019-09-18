@@ -27,7 +27,7 @@ const defaultState = {
     // these should default to a false-y value to allow us to check for their full presence
     producers: [
         {
-            name: "Gene Symbols",
+            name: "Custom Gene List",
             function: "producer",
             parameters: [{name: "gene symbol", type: "list"}]
         }
@@ -38,7 +38,7 @@ const defaultState = {
 
     // gene list creation state
     selectedProducer: {
-        name: "Gene Symbols",
+        name: "Custom Gene List",
         function: "producer",
         parameters: [{name: "gene symbol", type: "list"}]
     },

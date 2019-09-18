@@ -2,7 +2,7 @@ import {SERVICE_URL} from "../parameters/EndpointURLs";
 import {FEATURE_FLAG} from "../parameters/FeatureFlags";
 import {store} from "../store";
 import _ from "lodash";
-import {properCase} from "../helpers";
+import {geneListTitleOf, properCase} from "../helpers";
 
 /*
     Application Actions
@@ -90,45 +90,6 @@ export function computeGeneListName(geneListID) {
     return (dispatch, getState) => {
         const { app: { transactionLedger } } = getState();
         const transaction =  transactionLedger.filter(transaction => transaction.gene_list_id === geneListID)[0];
-        const geneListTitleOf = (transaction, short=false, terminator=".") => {
-            /* Transaction Shape:
-                {
-                    gene_list_id: "",
-                    query: action.payload.query,
-                    difference: {
-                        difference: []
-                    },
-                    count: 0,
-                    type: "",
-                    timestamp: Date.now()
-                }
-             */
-
-            const maybeControl = (controls) => {
-                return controls.length > 0 ?
-                    " with "+controls.map(control => properCase(control.name)+" as "+JSON.stringify(control.value)).join(", and ")
-                    : " "+Date(transaction.timestamp).toLocaleLowerCase("en-US");
-            };
-
-            switch(transaction.type) {
-                case CREATE_GENE_LIST:
-                    return !short ?
-                        "Create Gene List with "+transaction.query.join(", ")
-                        : "Gene List " + Date(transaction.timestamp).toLocaleLowerCase("en-US");
-                case PRODUCE_GENES:
-                    return !short ?
-                        transaction.query.name + maybeControl(transaction.query.controls)
-                        : transaction.query.name+" "+Date(transaction.timestamp).toLocaleLowerCase("en-US");
-                case TRANSFORM_GENES:
-                    return !short ?
-                        transaction.query.name + maybeControl(transaction.query.controls)
-                        : transaction.query.name+" "+Date(transaction.timestamp).toLocaleLowerCase("en-US");
-                case AGGREGATE_GENES:
-                    return properCase(transaction.query.operation)+" "+Date(transaction.timestamp).toLocaleLowerCase("en-US");
-            }
-
-        };
-
         let geneListTitle = geneListTitleOf(transaction);
         return dispatch({
             type: COMPUTE_GENE_LIST_NAME,

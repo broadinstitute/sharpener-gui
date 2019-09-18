@@ -36,7 +36,7 @@ export default class TransformerStatusReport extends React.Component {
         return (
             <Fade in={this.state.open} unmountOnExit={true}>
                 <div id="fade-text">
-                    <span style={{color: this.error.status === "failed" ? "red": "green", fontWeight: "bold"}}> {this.error.status.toUpperCase()}:</span> {this.error.query.name}
+                    <span style={{color: this.error.status === "failed" ? "red": "green", fontWeight: "bold"}}> {this.error.status.toUpperCase()}</span> {this.error.query.name}
                 </div>
             </Fade>
         );
