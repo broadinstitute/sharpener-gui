@@ -8,6 +8,10 @@ import {properCase, formatAbbreviations, pluralize} from "../../helpers";
 import "./TransformerControls.css"
 import Select from "react-select";
 import {toggleExpanderSelection} from "../../actions";
+import {OverlayTrigger, Tooltip} from "react-bootstrap";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import {faQuestion} from "@fortawesome/free-solid-svg-icons";
+import {faInfoCircle} from "@fortawesome/free-solid-svg-icons/faInfoCircle";
 
 const Fragment = React.Fragment;
 
@@ -356,7 +360,8 @@ export class TransformerItem extends React.Component {
         });
     };
 
-    clearParameters = () => {
+    handleSetParameters = (clearOrNot) => {
+        console.log(clearOrNot);
         const parameterIndexNames = Object.keys(this.state.parameterIndex);
         parameterIndexNames.forEach(parameterIndexName => {
             if (this.state.parameterIndex[parameterIndexName].value) {
@@ -377,15 +382,17 @@ export class TransformerItem extends React.Component {
                         <a style={{display: "inline-block", cursor: "pointer"}}
                            onClick={ this.onClickHandleSelection }>
                             {properCase(this.transformer.name)}
-                        </a>
+                        </a>{'\u00A0'}{'\u00A0'}
+                        <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{this.transformer.description}</Tooltip>}>
+                            <FontAwesomeIcon icon={faInfoCircle} size="xs" style={{opacity: 0.5}}/>
+                        </OverlayTrigger>
                         {Object.keys(this.state.parameterIndex).length > 0 ?
                             <button className="btn my-2 my-sm-0"
                                     style={{padding:"0%", fontSize: "small", float:"right", marginLeft: "auto", margin: "auto", display:"inline-block"}}
-                                    onClick={ this.clearParameters }>
+                                    onClick={ this.handleSetParameters }>
                                 Reset
                             </button>
                         : <Fragment/>}
-
                     </Card.Header>
                     <div id={"expander-".concat(indexNameOf(this.transformer.name))}>
                         {Object.keys(this.state.parameterIndex).map(parameterIndexKey => {
@@ -447,8 +454,7 @@ export class TransformerParameter extends React.Component {
                         id={ this.id }
                         className={"transformer-parameter"}
                         as={"select"}
-                        onChange={ this.handleParameterValueChange }
-                        defaultValue={this.state.value}>
+                        onChange={ this.handleParameterValueChange }>
                     <option key={"blank"} value={this.state.value}>{this.state.value}</option>
                     {this.parameter.allowed_values.map(allowed_value => (
                         <option key={allowed_value} value={allowed_value}>
@@ -456,20 +462,6 @@ export class TransformerParameter extends React.Component {
                         </option>
                     ))}
                   </FormControl>}
-                {/*<Select*/}
-                {/*    id={"allowed-parameter-"+this.parameter.name}*/}
-                {/*    className="form-control"*/}
-                {/*    style={{display:"block", margin: 0}}*/}
-                {/*    isSearchable*/}
-                {/*    options={this.parameter.allowed_values.map(allowed_value=>({label: properCase(allowed_value), value: allowed_value}))}*/}
-                {/*    defaultValue={this.parameter.allowed_values.map(allowed_value=>({label: properCase(allowed_value), value: allowed_value}))[0]}*/}
-                {/*    onChange={ () => {} }>*/}
-                {/*    {this.parameter.allowed_values.map(allowed_value => (*/}
-                {/*        <option key={allowed_value} value={allowed_value}>*/}
-                {/*            {properCase(allowed_value)}*/}
-                {/*        </option>*/}
-                {/*    ))}*/}
-                {/*</Select>*/}
             </InputGroup>
         )
     }

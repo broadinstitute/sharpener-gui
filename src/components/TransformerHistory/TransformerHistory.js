@@ -46,7 +46,8 @@ export default class TransformerHistory extends React.Component {
         super(props);
         this.state = {
             transactionLedgerHash: hashCode(JSON.stringify(props.transactionLedger)),
-            network: { nodes: [] },
+            recently_cleared_gene_lists: props.recently_cleared_gene_lists,
+            network: { nodes: [] }
         };
 
         convertGraphSchema.bind(this)
@@ -64,7 +65,10 @@ export default class TransformerHistory extends React.Component {
 
     static getDerivedStateFromProps(nextProps, prevState) {
         // detect need for network recalculation
+        // when things are added
         if ( hashCode(JSON.stringify(nextProps.transactionLedger)) !== prevState.transactionLedgerHash ) {
+            console.log("change in transactionLedger?", hashCode(JSON.stringify(nextProps.transactionLedger)) !== prevState.transactionLedgerHash);
+            console.log("change in recently_cleared_gene_lists?", nextProps.recently_cleared_gene_lists !== prevState.recently_cleared_gene_lists);
             return {
                     transactionLedgerHash: hashCode(JSON.stringify(nextProps.transactionLedger)),
                     network: {
@@ -76,12 +80,28 @@ export default class TransformerHistory extends React.Component {
                     }
             }
         }
+
+        if ( nextProps.recently_cleared_gene_lists !== prevState.recently_cleared_gene_lists ) {
+            console.log("change in transactionLedger?", nextProps.transactionLedger, hashCode(JSON.stringify(nextProps.transactionLedger)) !== prevState.transactionLedgerHash);
+            console.log("change in recently_cleared_gene_lists?", nextProps.recently_cleared_gene_lists, prevState.recently_cleared_gene_lists, nextProps.recently_cleared_gene_lists !== prevState.recently_cleared_gene_lists);
+
+            return {
+                recently_cleared_gene_lists: nextProps.recently_cleared_gene_lists,
+            }
+        }
+
         return null;
     }
 
     nodesOnClick = (gene_list_id) => {
         this.props.handleGeneListSelection(gene_list_id);
     };
+
+    nodesOnContextClick = (gene_list_id) => {
+        console.log('context click');
+        this.setState({recently_cleared_gene_lists: this.state.recently_cleared_gene_lists.concat(gene_list_id)})
+    };
+
 
     nodesOnEnter = (id, node, coords, rect) => {
         ReactDOM.render(
@@ -124,6 +144,7 @@ export default class TransformerHistory extends React.Component {
                                     svgStyle={{width: size.width, height:size.height}}
                                     ref={this.graph}
                                     nodesOnClick={this.nodesOnClick}
+                                    nodesOnContextClick={this.nodesOnContextClick}
                                     nodesOnEnter={this.nodesOnEnter}
                                     nodesOnExit={this.nodesOnExit}>
 
@@ -131,7 +152,7 @@ export default class TransformerHistory extends React.Component {
                                     their own presentational events and actions (to allow for distinctions between nodes
                                     that aren't how they are handled by the application)*/}
 
-                                    {this.state.network.nodes.map((el) => {
+                                    { this.state.network.nodes.map((el) => {
                                         // render node type properly
                                         switch(el.elementType) {
                                             case("creator"):
@@ -150,10 +171,8 @@ export default class TransformerHistory extends React.Component {
                                                 return (<Node {...el}/>);
                                         }
                                     })}
-
                                 </DagreD3>
-                            )
-                            }
+                            )}
                         </SizeMe>
                     </Card>
                     </React.Fragment>
@@ -164,66 +183,67 @@ export default class TransformerHistory extends React.Component {
 
 }
 
-// TODO: this should be an idempotent transformer whenever the data is the same?
 const ledgerTo = (type) => {
-
     switch(type) {
         case "nodes":
-            return (transactionLedger) => transactionLedger.reduce((node_list, transaction) => {
-                const defaultNode = {
-                    id: transaction.gene_list_id,
-                    title: geneListTitleOf(transaction),
-                    size: transaction.size,
-                    inputs: transaction.query,
-                    difference: transaction.difference,
-                    type: transactionClassName[transaction.type]
-                };
-                console.log(defaultNode)
+            return (transactionLedger) =>
+                transactionLedger
+                    .reduce((node_list, transaction) => {
+                        const defaultNode = {
+                            id: transaction.gene_list_id,
+                            title: geneListTitleOf(transaction),
+                            size: transaction.size,
+                            inputs: transaction.query,
+                            difference: transaction.difference,
+                            type: transactionClassName[transaction.type]
+                        };
 
-                switch(transaction.type) {
-                    case CREATE_GENE_LIST:
-                        return node_list.concat([
-                            Object.assign({}, defaultNode)
-                        ]);
-                    case PRODUCE_GENES:
-                        return node_list.concat([
-                            Object.assign({}, defaultNode)
-                        ]);
-                    case TRANSFORM_GENES:
-                        return node_list.concat([
-                            Object.assign({}, defaultNode)
-                        ]);
-                    case AGGREGATE_GENES:
-                        return node_list.concat([
-                            Object.assign({}, defaultNode)
-                            // ...transaction.query.gene_list_ids.map(
-                            //     input_gene_list_id => ( { id: input_gene_list_id } )
-                            // )
-                        ]);
-                }
-            }, []);
+                        switch(transaction.type) {
+                            case CREATE_GENE_LIST:
+                                return node_list.concat([
+                                    Object.assign({}, defaultNode)
+                                ]);
+                            case PRODUCE_GENES:
+                                return node_list.concat([
+                                    Object.assign({}, defaultNode)
+                                ]);
+                            case TRANSFORM_GENES:
+                                return node_list.concat([
+                                    Object.assign({}, defaultNode)
+                                ]);
+                            case AGGREGATE_GENES:
+                                return node_list.concat([
+                                    Object.assign({}, defaultNode)
+                                    // ...transaction.query.gene_list_ids.map(
+                                    //     input_gene_list_id => ( { id: input_gene_list_id } )
+                                    // )
+                                ]);
+                        }
+                }, []);
         case "edges":
-            return (transactionLedger) => transactionLedger.reduce((edge_list, transaction) => {
-                switch(transaction.type) {
-                    case CREATE_GENE_LIST:
-                    case PRODUCE_GENES:
-                        return edge_list;
-                    case TRANSFORM_GENES:
-                        return edge_list.concat([
-                            {
-                                source: transaction.query.gene_list_id,
-                                target: transaction.gene_list_id,
-                                // label: properCase(transaction.query.name)
-                            }
-                        ]);
-                    case AGGREGATE_GENES:
-                        return edge_list.concat([
-                            ...transaction.query.gene_list_ids.map(
-                                input_gene_list_id => ({ source: input_gene_list_id, target: transaction.gene_list_id, label: properCase(transaction.query.operation) })
-                            )
-                        ]);
-                }
-            }, []);
+            return (transactionLedger) =>
+                transactionLedger
+                    .reduce((edge_list, transaction) => {
+                        switch(transaction.type) {
+                            case CREATE_GENE_LIST:
+                            case PRODUCE_GENES:
+                                return edge_list;
+                            case TRANSFORM_GENES:
+                                return edge_list.concat([
+                                    {
+                                        source: transaction.query.gene_list_id,
+                                        target: transaction.gene_list_id,
+                                        // label: properCase(transaction.query.name)
+                                    }
+                                ]);
+                            case AGGREGATE_GENES:
+                                return edge_list.concat([
+                                    ...transaction.query.gene_list_ids.map(
+                                        input_gene_list_id => ({ source: input_gene_list_id, target: transaction.gene_list_id, label: properCase(transaction.query.operation) })
+                                    )
+                                ]);
+                        }
+                    }, []);
         default:
             return [];
 

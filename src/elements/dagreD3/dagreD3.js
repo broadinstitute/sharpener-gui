@@ -93,6 +93,21 @@ class DagreD3React extends Component {
         });
     }
 
+    removeNodes() {
+        this.props.children.forEach((node) => {
+            const {id, ...data} = node.props;
+            this.graph.setNode(id,
+                { // TODO: why isn't this a spread of properties
+                    elementType: data.elementType,
+                    data: data,
+                    label: ReactDOMServer.renderToStaticMarkup(node),
+                    labelType: "html",
+                    style: reactToCSS(data.style),
+                    padding: 0
+                })
+        });
+    }
+
     addLines() {
         this.props.children.forEach((node) => {
             node.props.connection.forEach((line) => {
@@ -124,16 +139,16 @@ class DagreD3React extends Component {
                 };
                 this.props.nodesOnClick(id, el, coords);
             });
+        }
+        if (this.props.nodesOnContextClick) {
             this.svg.selectAll(".node").on('contextmenu', (id) => {
                 d3.event.preventDefault();
                 const el = this.graph.node(id);
-                const coords = {
-                    groupX: this.x,
-                    groupY: this.y,
-                };
-                this.props.nodesOnClick(id, el, coords);
+                // this will have to handle remove ids from the state
+                this.props.nodesOnContextClick(id);
             });
         }
+
     }
 
     addNodeHoverListener() {

@@ -8,7 +8,7 @@ import "./css/tooltip.css"
 
 import {flatten, pluralize, properCase, tap} from "../../helpers";
 
-import {clearSingleSelectedGeneList, differentiateGeneLists} from "../../actions";
+import {clearSingleGeneList, differentiateGeneLists} from "../../actions";
 
 class Node extends React.Component{
     static tooltip = NodeTooltip;
@@ -23,8 +23,8 @@ class Node extends React.Component{
         const myIcon = {
             "producer": faDatabase,
             "creator": faDatabase,
-            "expander": faLongArrowAltRight,
-            "contractor": faLongArrowAltRight,
+            "expander": faPlus,
+            "contractor": faMinus,
             "intersection": faMinus,
             "union": faPlus
         };
