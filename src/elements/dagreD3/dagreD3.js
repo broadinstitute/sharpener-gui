@@ -124,6 +124,15 @@ class DagreD3React extends Component {
                 };
                 this.props.nodesOnClick(id, el, coords);
             });
+            this.svg.selectAll(".node").on('contextmenu', (id) => {
+                d3.event.preventDefault();
+                const el = this.graph.node(id);
+                const coords = {
+                    groupX: this.x,
+                    groupY: this.y,
+                };
+                this.props.nodesOnClick(id, el, coords);
+            });
         }
     }
 
@@ -171,7 +180,6 @@ class DagreD3React extends Component {
         this.addTooltips();
 
         if (this.props.centerGraph) {
-
             this.centerGraph()
         }
         this.setSvgHeight();

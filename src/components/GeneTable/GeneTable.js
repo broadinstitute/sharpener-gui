@@ -92,16 +92,14 @@ export default class GeneTable extends React.Component {
                                         <ExportCSVButton style={{border: "none", textDecoration: "underline", float: "right"}} {...props.csvProps}>Export</ExportCSVButton>
                                     </div>
 
-                                    <BootstrapTable
-                                        wrapperClasses={"table-responsive"}
-                                        pagination={ paginationFactory() }
-                                        {...props.baseProps} />
-
                                     {/* TODO: is this placement awkward? is it too large? */}
                                     <GeneTableColumnFilter
                                         {...props.columnToggleProps}
                                     />
-
+                                    <BootstrapTable
+                                        wrapperClasses={"table-responsive"}
+                                        pagination={ paginationFactory() }
+                                        {...props.baseProps} />
                                 </React.Fragment>}
                         </ToolkitProvider>
                     </Collapse> : <React.Fragment/>}

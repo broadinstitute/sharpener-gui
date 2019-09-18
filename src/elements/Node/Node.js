@@ -19,6 +19,7 @@ class Node extends React.Component{
     render(){
         let titleClassNames = 'graph-node-title';
         titleClassNames += ' ' + this.props.transformerType;
+        // TODO: putting this here is a bad idea, let each node supply its icon
         const myIcon = {
             "producer": faDatabase,
             "creator": faDatabase,
