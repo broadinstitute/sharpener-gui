@@ -441,12 +441,12 @@ export class TransformerParameter extends React.Component {
         return (
             <InputGroup>
                 <InputGroup.Prepend>
-                    <InputGroup.Text>{ formatAbbreviations(properCase(this.parameter.name)) }</InputGroup.Text>
+                    <InputGroup.Text>{ ((this.parameter.name)) }</InputGroup.Text>
                 </InputGroup.Prepend>
                 {!this.parameter.allowed_values ?
                 <FormControl id={ this.id }
                              className={"transformer-parameter"}
-                             placeholder={ this.parameter.default ? this.parameter.default : this.parameter.type === "list" ? properCase(this.parameter.type)+" of "+this.parameter.name+"s" : properCase(this.parameter.type) }
+                             placeholder={ this.parameter.default ? this.parameter.default : this.parameter.type === "list" ? (this.parameter.type)+" of "+this.parameter.name+"s" : (this.parameter.type) }
                              value={ this.state.value }
                              onChange={ this.handleParameterValueChange }/>
                 : <FormControl
@@ -457,7 +457,7 @@ export class TransformerParameter extends React.Component {
                     <option key={"blank"} value={this.state.value}>{this.state.value}</option>
                     {this.parameter.allowed_values.map(allowed_value => (
                         <option key={allowed_value} value={allowed_value}>
-                            {properCase(allowed_value)}
+                            {(allowed_value)}
                         </option>
                     ))}
                   </FormControl>}

@@ -13,15 +13,6 @@ export const tap = (data, message="") => {
 //     return Number(number) == number && Number(number) % 1 !== 0 ? precise(number, sigfig) : number;
 // };
 
-export const properCase = (string) => {
-    const fillwords = [
-        "a", "with", "for"
-    ];
-    string = underscoreToSpaces(string);
-    return formatAbbreviations(string.split(' ').map(function(word){
-        return !fillwords.includes(word) ? word.charAt(0).toUpperCase() + word.substr(1).toLowerCase() : word;
-    }).join(' '));
-};
 
 export const pluralize = (length, word) => {
     return length + ' ' + word + (length > 1 ? "s" : length <= 0 ? "s" : '')

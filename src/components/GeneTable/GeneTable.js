@@ -164,7 +164,7 @@ export default class GeneTable extends React.Component {
             <Fragment>
                 <span className={"has-tooltip"}>
                     <span className={"tooltiptext"}>{column.dataField}</span>
-                    { formatAbbreviations((column.text)) }
+                    { ((column.text)) }
                 </span>
             </Fragment>
         );
@@ -213,7 +213,7 @@ export default class GeneTable extends React.Component {
 const GeneTableColumnFilter = ({columns, onColumnToggle, toggles}) => {
     // https://react-bootstrap-table.github.io/react-bootstrap-table2/docs/basic-column-toggle.html
     // https://react-select.com/home
-    const geneTableColumnOptions = columns.map(gtc => {return {value: gtc.dataField, label: formatAbbreviations(properCase(gtc.text))}});
+    const geneTableColumnOptions = columns.map(gtc => {return {value: gtc.dataField, label: ((gtc.text))}});
     return (
         <React.Fragment>
             <Select
