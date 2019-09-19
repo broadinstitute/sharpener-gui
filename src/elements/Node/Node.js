@@ -10,28 +10,32 @@ import {flatten, pluralize, properCase, tap} from "../../helpers";
 
 import {clearSingleGeneList, differentiateGeneLists} from "../../actions";
 
+const myIcon = {
+    "producer": faDatabase,
+    "creator": faDatabase,
+    "expander": faPlus,
+    "contractor": faMinus,
+    "intersection": faMinus,
+    "union": faPlus
+};
+
 class Node extends React.Component{
     static tooltip = NodeTooltip;
     constructor(props){
         super(props);
+        this.state = {
+            titleClassNames: ['graph-node-title', props.transformerType]
+        }
     }
 
-    render(){
-        let titleClassNames = 'graph-node-title';
-        titleClassNames += ' ' + this.props.transformerType;
-        // TODO: putting this here is a bad idea, let each node supply its icon
-        const myIcon = {
-            "producer": faDatabase,
-            "creator": faDatabase,
-            "expander": faPlus,
-            "contractor": faMinus,
-            "intersection": faMinus,
-            "union": faPlus
-        };
+    toggleSelection = () => {
+        this.setState()
+    };
 
+    render(){
         return(
             <div className='graph-node'>
-                <div className={titleClassNames}>
+                <div className={this.state.titleClassNames.join(" ")}>
                     <span className='graph-node-title-text'>
                         {this.props.title}
                     </span>

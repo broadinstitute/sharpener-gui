@@ -70,6 +70,7 @@ export class ProducerControls extends React.Component {
                         }
                     });
             } else if (this.state.selectedProducer.name === "Custom Gene List") {
+                // TODO: handle error cases
                 let geneList = ProducerControls.parseGeneSymbolList(parameterIndexControls[0].value);
                 this.handleGeneListCreation(geneList);
             }

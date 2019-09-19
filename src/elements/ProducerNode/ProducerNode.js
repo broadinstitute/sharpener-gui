@@ -14,43 +14,37 @@ export const ProducerTooltip = (props) => {
                 <div className='graph-node-body'>
 
                     {props.transformerType==="producer" && props.inputs ?
-                        <React.Fragment>
+                        <Fragment>
                             <span className='graph-node-title-text'>
                                 Inputs
                             </span><br/>
+
                             {props.inputs.map(
-                                input =>
-                                    <Fragment>
-                                        <span>{properCase(input.name)+": "+input.value}</span><br/>
-                                    </Fragment>
+                                input => <div>{properCase(input.name)+": "+input.value}</div>
                             )}
-                        </React.Fragment>
-                    : <React.Fragment/> }
+
+                        </Fragment>
+                    : <Fragment/> }
 
                     {props.transformerType==="creator" && props.inputs ?
-                        <React.Fragment>
+                        <Fragment>
                             <span className='graph-node-title-text'>
                                 Inputs
                             </span><br/>
-                            {props.inputs.map(
-                                gene_symbol =>
-                                    <Fragment>
-                                        <span>{gene_symbol}</span><br/>
-                                    </Fragment>
-                            )}
-                        </React.Fragment>
-                        : <React.Fragment/> }
+                             {props.inputs.map(gene_symbol => <div>{gene_symbol}</div>)}
+                        </Fragment>
+                        : <Fragment/> }
 
                     { props.size ?
-                        <React.Fragment>
+                        <Fragment>
                             <span className='graph-node-title-text'>
                                 Gene Count
                             </span><br/>
                             <Fragment>
                                 <span>{pluralize(props.size,"gene")}</span><br/>
                             </Fragment>
-                        </React.Fragment>
-                        : <React.Fragment/> }
+                        </Fragment>
+                        : <Fragment/> }
                 </div>
             </div>)
 };

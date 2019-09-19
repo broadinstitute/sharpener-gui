@@ -15,30 +15,6 @@ import "./Tooltip.css"
 
 const SERVICE_URL =  process.env.REACT_APP_SERVICE_URL;
 
-export class GeneReactTable extends React.Component {
-    constructor(props) {
-        super(props);
-    }
-
-    componentDidMount() {}
-
-    static getDerivedStateFromProps(props, state) {
-        if (props.geneListIDs !== state.geneListIDs) {
-            return { geneListIDs: props.geneListIDs };
-        }
-        return null;
-    }
-
-    render() {
-        return (
-            <table>
-                <thead></thead>
-                <tbody></tbody>
-            </table>
-        );
-    }
-}
-
 export default class GeneTable extends React.Component {
     constructor(props) {
         super(props);
@@ -119,28 +95,24 @@ export default class GeneTable extends React.Component {
     /* UTILITY METHODS */
     populateGeneTable = () => {
         // convert all gene attributes into columns. geneset could be heterogeneous so we need to check all of them
-        const geneListAttributes =
+        let geneListAttributes =
             _.uniq(this.state.geneList.map((current_gene) => current_gene.attributes, [])
                 .reduce((attributes_list, current_gene_attributes) => attributes_list.concat(current_gene_attributes), [])  // flatten list of depth one
                 .map(attribute => attribute.name)).filter(name => name !== "myGene.info id");
-        const geneListIdentifiers =
-            this.state.geneList.map((current_gene) => current_gene.identifiers);
-        console.log(geneListIdentifiers);
-        //.concat(["gene_id"]);  // interpret gene_id as a column  TODO: DEPRECATED -- it needs to be handled specially
 
-        let geneTableColumns =
-            this.makeTableColumns(geneListAttributes);
-
-        let geneTableData =
+        let geneListIdentifiersMap =
             this.state.geneList
-                .map(gene => gene.attributes.concat([{name: "gene_id", value: gene["gene_id"]}]))
-                .map((geneAttributesList) => {
-                    let geneAttributesObject = {};
-                    for (let i = 0; i < geneAttributesList.length; i++) {
-                        geneAttributesObject[geneAttributesList[i].name] = geneAttributesList[i].value
-                    }
-                    return geneAttributesObject;
-                });
+                .map((current_gene) => current_gene.identifiers)
+                .reduce((attributes_list, current_gene_attributes) => attributes_list.concat(current_gene_attributes), [])[0]
+        let geneListIdentifiers = [];
+        for (let identity in geneListIdentifiersMap) {
+            if (geneListIdentifiersMap.hasOwnProperty(identity)) {
+                geneListIdentifiers.push( { name: identity, value: geneListIdentifiersMap[identity] } );
+            }
+        }
+
+        let geneTableColumns = this.makeTableColumns(geneListAttributes, geneListIdentifiers);
+        let geneTableData = this.makeTableData(geneListAttributes, geneListIdentifiers);
 
         // set all the state at once to guarantee synchrony
         this.setState({geneTableColumns: geneTableColumns, geneTableData: geneTableData});
@@ -185,9 +157,21 @@ export default class GeneTable extends React.Component {
         );
     };
 
+    makeTableData = (geneListAttributes, geneListIdentifiers) => {
+        return this.state.geneList
+                // TODO: functional programming in javascript -> better way to compose lists etc
+                .map(gene => gene.attributes.concat([{name: "gene_id", value: gene["gene_id"]}, ...geneListIdentifiers]))
+                .map(combinedList => (combinedList))
+                .map((geneAttributesList) => {
+                    let geneAttributesObject = {};
+                    for (let i = 0; i < geneAttributesList.length; i++) {
+                        geneAttributesObject[geneAttributesList[i].name] = geneAttributesList[i].value
+                    }
+                    return geneAttributesObject;
+                });
+    }
 
-    makeTableColumns = (attributeList) => {
-
+    makeTableColumns = (attributeList, identifierList) => {
         return (
             attributeList
                 .map(gla => {

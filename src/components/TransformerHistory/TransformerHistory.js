@@ -112,8 +112,8 @@ export default class TransformerHistory extends React.Component {
         // +15px is the radius of the corners of the element, +5px for arrow
         document.getElementById("history-tooltip").style.left = node.x + (rect.width / 2) + coords.groupX + 20 + "px";
         document.getElementById("history-tooltip").style.top = node.y + coords.groupY+"px";
-        document.getElementById("history-tooltip").style.zIndex = 1;
-        document.getElementById("history-tooltip").children[0].style.zIndex = 1;
+        document.getElementById("history-tooltip").style.zIndex = 2;
+        document.getElementById("history-tooltip").children[0].style.zIndex = 2;
         document.getElementById("history-tooltip").style.visibility = "visible";
     };
 

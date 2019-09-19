@@ -143,6 +143,7 @@ class App extends React.Component {
                         <TransformerHistory
                                 geneListIDs={ this.props.gene_list_ids }
                                 recently_cleared_gene_lists={ this.props.recently_cleared_gene_lists }
+                                selectedGeneListsByID={ this.props.selectedGeneListsByID }
                                 computeGeneListName={ this.props.computeGeneListName }
                                 clearGeneList={ this.props.clearSingleGeneList }
                                 handleGeneListSelection={ this.props.toggleGeneListSelection }
