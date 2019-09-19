@@ -162,10 +162,7 @@ export default class GeneTable extends React.Component {
     tooltipFormatter = (column, colIndex) => {
         return (
             <Fragment>
-                <span className={"has-tooltip"}>
-                    <span className={"tooltiptext"}>{column.dataField}</span>
                     { ((column.text)) }
-                </span>
             </Fragment>
         );
     };
