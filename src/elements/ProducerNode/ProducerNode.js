@@ -20,7 +20,7 @@ export const ProducerTooltip = (props) => {
                             </span><br/>
 
                             {props.inputs.map(
-                                input => <div>{properCase(input.name)+": "+input.value}</div>
+                                input => <div>{(input.name)+": "+input.value}</div>
                             )}
 
                         </Fragment>

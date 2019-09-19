@@ -84,7 +84,7 @@ function* recordSaga(action) {
     } else if (action.payload.type === PRODUCE_GENES) {
         freqIndex = action.payload.query.name;
     } else if (action.type === AGGREGATE_GENES) {
-        freqIndex = properCase(action.payload.query.operation);
+        freqIndex = (action.payload.query.operation);
     }
     transactionFrequencies[freqIndex] = freqIndex in transactionFrequencies ? transactionFrequencies[freqIndex] += 1 : 1;
 

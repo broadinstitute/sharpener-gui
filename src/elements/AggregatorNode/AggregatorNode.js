@@ -18,7 +18,7 @@ export const AggregatorTooltip = (props) => {
                                 Inputs
                             </span><br/>
                             <Fragment>
-                                <span>{properCase("operation")+": "+properCase(props.inputs["operation"])}</span><br/>
+                                <span>{("operation")+": "+(props.inputs["operation"])}</span><br/>
                             </Fragment>
                         </React.Fragment>
                     : <React.Fragment/> }

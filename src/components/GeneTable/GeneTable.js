@@ -190,7 +190,7 @@ export default class GeneTable extends React.Component {
                 .map(gla => {
                     return {
                         dataField: gla,
-                        text: properCase(tap(gla, "gla")),
+                        text: (tap(gla, "gla")),
                         csvText: gla,
                         // TODO: for now we're enabling all input to be placed in the search field
                         // THIS IS TO ENABLE INTERACTION WITH PRODUCERS; BUT SHOULD BE FLAGGED FOR CHANGE
@@ -219,7 +219,7 @@ const GeneTableColumnFilter = ({columns, onColumnToggle, toggles}) => {
             <Select
                 components={{ MultiValueRemove }}
                 placeholder={ "Hide Columns..." }
-                defaultValue={ DefaultHiddenColumns.map(column => ({value: column, label: properCase(column)})) }
+                defaultValue={ DefaultHiddenColumns.map(column => ({value: column, label: (column)})) }
                 isMulti
                 name="columns"
                 options={ tap(geneTableColumnOptions, "geneTableColumnOptions") }

@@ -106,7 +106,7 @@ export default class TransformerControls extends React.Component {
 
     render() {
         let options = this.props.expanders.map(expander =>
-            Object.assign({}, {label: properCase(expander.name), value: expander})
+            Object.assign({}, {label: (expander.name), value: expander})
         );
 
         // form has to wrap every transformer even if not all of them are contributing to the extant query
@@ -380,7 +380,7 @@ export class TransformerItem extends React.Component {
                     <Card.Header as={"h6"}>
                         <span style={{display: "inline-block", cursor: "pointer"}}
                            onClick={ this.onClickHandleSelection }>
-                            {properCase(this.transformer.name)}{'\u00A0'}{'\u00A0'}
+                            {(this.transformer.name)}{'\u00A0'}{'\u00A0'}
                             <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{this.transformer.description}</Tooltip>}>
                                 <FontAwesomeIcon icon={faInfoCircle} size="xs" style={{opacity: 0.5}}/>
                             </OverlayTrigger>

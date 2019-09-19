@@ -239,7 +239,7 @@ const ledgerTo = (type) => {
                             case AGGREGATE_GENES:
                                 return edge_list.concat([
                                     ...transaction.query.gene_list_ids.map(
-                                        input_gene_list_id => ({ source: input_gene_list_id, target: transaction.gene_list_id, label: properCase(transaction.query.operation) })
+                                        input_gene_list_id => ({ source: input_gene_list_id, target: transaction.gene_list_id, label: (transaction.query.operation) })
                                     )
                                 ]);
                         }
