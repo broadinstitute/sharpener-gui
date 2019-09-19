@@ -6,16 +6,22 @@ import BootstrapTable from "react-bootstrap-table-next";
 import _ from "underscore";
 import ToolkitProvider, {CSVExport} from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator';
-import Select from "react-select";
-
+import Select, {components} from "react-select";
 import is from "is_js"
+
+import EmojiIcon from '@atlaskit/icon/glyph/emoji';
+import Tooltip from '@atlaskit/tooltip';
 
 import "./GeneTable.css"
 import "./Tooltip.css"
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faPlus} from "@fortawesome/free-solid-svg-icons";
 
 const { ExportCSVButton } = CSVExport;
 
 const SERVICE_URL =  process.env.REACT_APP_SERVICE_URL;
+
+const DefaultHiddenColumns = ["synonyms","entrez","hgnc","mim","ensembl","mygene_info"];
 
 export default class GeneTable extends React.Component {
     constructor(props) {
@@ -62,7 +68,11 @@ export default class GeneTable extends React.Component {
                             into the child components to be used for expected behavior*/}
 
                             {props =>
-                                <React.Fragment>
+                                <Fragment>
+
+                                    <GeneTableColumnFilter
+                                        {...props.columnToggleProps}
+                                    />
 
                                     <div>
                                         <span className={"btn"}>{pluralize(this.state.geneTableData.length, "gene")}</span>
@@ -70,15 +80,12 @@ export default class GeneTable extends React.Component {
                                         <ExportCSVButton style={{border: "none", textDecoration: "underline", float: "right"}} {...props.csvProps}>Export</ExportCSVButton>
                                     </div>
 
-                                    {/* TODO: is this placement awkward? is it too large? */}
-                                    <GeneTableColumnFilter
-                                        {...props.columnToggleProps}
-                                    />
                                     <BootstrapTable
                                         wrapperClasses={"table-responsive"}
                                         pagination={ paginationFactory() }
                                         {...props.baseProps} />
-                                </React.Fragment>}
+
+                                </Fragment>}
                         </ToolkitProvider>
                     </Collapse> : <React.Fragment/>}
             </Card>
@@ -195,21 +202,9 @@ export default class GeneTable extends React.Component {
                                 // this.props.handleGeneSelection(row[column.dataField]);
                             }
                         },
+                        hidden: DefaultHiddenColumns.includes(gla)
                     }
-                }).concat([
-                {
-                    dataField: "gene_id",
-                    text: properCase("gene_id"),
-                    headerFormatter: this.tooltipFormatter,
-                    events: {
-                        onClick: (e, column, columnIndex, row, rowIndex) => {
-                            console.log("clicking gene_id ", row[column.dataField]);
-                            // TODO
-                            // this.props.handleGeneSelection(row[column.dataField]);
-                        }
-                    },
-                }
-            ])
+                })
         )
     };
 
@@ -219,15 +214,15 @@ const GeneTableColumnFilter = ({columns, onColumnToggle, toggles}) => {
     // https://react-bootstrap-table.github.io/react-bootstrap-table2/docs/basic-column-toggle.html
     // https://react-select.com/home
     const geneTableColumnOptions = columns.map(gtc => {return {value: gtc.dataField, label: formatAbbreviations(properCase(gtc.text))}});
-    const defaultColumnsSelected = [];
     return (
         <React.Fragment>
             <Select
-                placeholder={"Hide Columns..."}
-                defaultValue={ defaultColumnsSelected }
+                components={{ MultiValueRemove }}
+                placeholder={ "Hide Columns..." }
+                defaultValue={ DefaultHiddenColumns.map(column => ({value: column, label: properCase(column)})) }
                 isMulti
                 name="columns"
-                options={ geneTableColumnOptions }
+                options={ tap(geneTableColumnOptions, "geneTableColumnOptions") }
                 className="basic-multi-select"
                 classNamePrefix="select"
                 isClearable={false}
@@ -251,4 +246,26 @@ const GeneTableColumnFilter = ({columns, onColumnToggle, toggles}) => {
             />
         </React.Fragment>
     )
+};
+
+export const colourOptions = [
+    { value: 'ocean', label: 'Ocean', color: '#00B8D9', isFixed: true },
+    { value: 'blue', label: 'Blue', color: '#0052CC', isDisabled: true },
+    { value: 'purple', label: 'Purple', color: '#5243AA' },
+    { value: 'red', label: 'Red', color: '#FF5630', isFixed: true },
+    { value: 'orange', label: 'Orange', color: '#FF8B00' },
+    { value: 'yellow', label: 'Yellow', color: '#FFC400' },
+    { value: 'green', label: 'Green', color: '#36B37E' },
+    { value: 'forest', label: 'Forest', color: '#00875A' },
+    { value: 'slate', label: 'Slate', color: '#253858' },
+    { value: 'silver', label: 'Silver', color: '#666666' },
+];
+
+
+const MultiValueRemove = props => {
+    return (
+        <components.MultiValueRemove {...props}>
+            +
+        </components.MultiValueRemove>
+    );
 };
