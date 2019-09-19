@@ -152,27 +152,26 @@ class App extends React.Component {
                         </div>
                         <br/>
                         {/* Gene List Controls */}
-                        {/*{ this.props.selectedGeneListsByID.length > 0 ?*/}
-                        {/*    <div className={"row"}>*/}
-                        {/*        <h4 style={{paddingLeft: "15px"}}>Selected Gene Lists</h4>*/}
-                        {/*        <div style={{marginLeft: "auto", marginRight: "15px"}}>*/}
-                        {/*            /!* DEPRECATED: Clear Gene Tables *!/*/}
-                        {/*            /!*{ this.props.selectedGeneListsByID.length > 0 ?*!/*/}
-                        {/*            /!*    <button onClick={ this.props.clearAllGeneLists }>Clear Gene Lists</button>*!/*/}
-                        {/*            /!*    : <button disabled>Clear All Selections</button>}*!/*/}
-                        {/*            /!*{ this.props.recently_cleared_gene_lists.length > 0 ?*!/*/}
-                        {/*            /!*    <React.Fragment>*!/*/}
-                        {/*            /!*        {'\u00A0'}{'\u00A0'}*!/*/}
-                        {/*            /!*        <button onClick={ this.props.undoLastClear }>Undo Last Clear</button>*!/*/}
-                        {/*            /!*    </React.Fragment> :*!/*/}
-                        {/*            /!*    <React.Fragment>*!/*/}
-                        {/*            /!*        {'\u00A0'}{'\u00A0'}*!/*/}
-                        {/*            /!*        <button disabled>Undo</button>*!/*/}
-                        {/*            /!*    </React.Fragment>*!/*/}
-                        {/*            /!*}*!/*/}
-                        {/*        </div>*/}
-                        {/*    </div>*/}
-                        {/*: <Fragment/> }*/}
+                        { this.props.selectedGeneListsByID.length > 0 ?
+                            <div className={"row"}>
+                                <h4 style={{paddingLeft: "15px"}}>Selected Gene Lists</h4>
+                                <div style={{marginLeft: "auto", marginRight: "15px"}}>
+                                    { this.props.selectedGeneListsByID.length > 0 ?
+                                        <button onClick={ this.props.clearAllGeneLists }>Clear Gene Lists</button>
+                                        : <button disabled>Clear All Selections</button>}
+                                    {/* DEPRECATED: Undo Clear Gene Tables */}
+                                    {/*{ this.props.recently_cleared_gene_lists.length > 0 ?*/}
+                                    {/*    <React.Fragment>*/}
+                                    {/*        {'\u00A0'}{'\u00A0'}*/}
+                                    {/*        <button onClick={ this.props.undoLastClear }>Undo Last Clear</button>*/}
+                                    {/*    </React.Fragment> :*/}
+                                    {/*    <React.Fragment>*/}
+                                    {/*        {'\u00A0'}{'\u00A0'}*/}
+                                    {/*        <button disabled>Undo</button>*/}
+                                    {/*    </React.Fragment>}*/}
+                                </div>
+                            </div>
+                        : <Fragment/> }
 
                         {/* Tabbed Navigation */}
                         {this.props.gene_list_ids ?

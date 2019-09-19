@@ -1,17 +1,19 @@
 import React, {Fragment} from "react"
 import Card from "react-bootstrap/Card";
 import {Collapse} from "react-collapse";
-import {formatAbbreviations, pluralize, properCase, sigFig, tap} from "../../helpers";
+import {formatAbbreviations, pluralize, properCase, tap} from "../../helpers";
 import BootstrapTable from "react-bootstrap-table-next";
 import _ from "underscore";
-import ToolkitProvider, { CSVExport } from 'react-bootstrap-table2-toolkit';
+import ToolkitProvider, {CSVExport} from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import Select from "react-select";
-const { ExportCSVButton } = CSVExport;
-import {FEATURE_FLAG} from "../../parameters/FeatureFlags";
+
+import is from "is_js"
 
 import "./GeneTable.css"
 import "./Tooltip.css"
+
+const { ExportCSVButton } = CSVExport;
 
 const SERVICE_URL =  process.env.REACT_APP_SERVICE_URL;
 
@@ -103,19 +105,20 @@ export default class GeneTable extends React.Component {
         let geneListIdentifiersMap =
             this.state.geneList
                 .map((current_gene) => current_gene.identifiers)
-                .reduce((attributes_list, current_gene_attributes) => attributes_list.concat(current_gene_attributes), [])[0]
-        let geneListIdentifiers = [];
+                .reduce((attributes_list, current_gene_attributes) => attributes_list.concat(current_gene_attributes), [])[0];
+        let geneListIdentifiersRecord = [];
         for (let identity in geneListIdentifiersMap) {
             if (geneListIdentifiersMap.hasOwnProperty(identity)) {
-                geneListIdentifiers.push( { name: identity, value: geneListIdentifiersMap[identity] } );
+                geneListIdentifiersRecord.push( { name: identity, value: geneListIdentifiersMap[identity] } );
             }
         }
+        let geneListIdentifiers = geneListIdentifiersRecord.map(identifier => identifier.name);
 
         let geneTableColumns = this.makeTableColumns(geneListAttributes, geneListIdentifiers);
-        let geneTableData = this.makeTableData(geneListAttributes, geneListIdentifiers);
+        let geneTableData = this.makeTableData(geneListAttributes, geneListIdentifiersRecord);
 
         // set all the state at once to guarantee synchrony
-        this.setState({geneTableColumns: geneTableColumns, geneTableData: geneTableData});
+        this.setState({ geneTableColumns: geneTableColumns, geneTableData: geneTableData });
     };
 
     getGeneListAndSetupGeneTable = (geneListID) => {
@@ -131,17 +134,20 @@ export default class GeneTable extends React.Component {
     };
 
     listAbbrevation = (cell) => {
-        // TODO: make this test more robust
-        if (cell) {
-            let potentialList = cell.split(', ');
-            if (potentialList.length > 1) {
-                const cellList = potentialList;
+        if (is.string(cell)) {
+            return cell;
+        } else if (is.integer(cell)) {
+            return cell;
+        } else if (is.decimal(cell)) {
+            return parseFloat(cell) < 1 ? parseFloat(cell).toFixed(4) : parseFloat("1").toFixed(1);
+        } else if (is.array(cell)) {
+            if (cell.length > 1) {
+                const cellList = cell.split(', ');
                 return <div>{_.take(cellList, 4)}...</div>
+            } else if (cell.length > 0) {
+                return cell[0];
             } else {
-                if (parseFloat(cell)) {
-                    return parseFloat(cell) < 1 ? parseFloat(cell).toFixed(4) : parseFloat("1").toFixed(1);
-                }
-                return (cell);
+                return cell;
             }
         }
     };
@@ -151,7 +157,7 @@ export default class GeneTable extends React.Component {
             <Fragment>
                 <span className={"has-tooltip"}>
                     <span className={"tooltiptext"}>{column.dataField}</span>
-                    { formatAbbreviations(properCase(column.text)) }
+                    { formatAbbreviations((column.text)) }
                 </span>
             </Fragment>
         );
@@ -161,7 +167,7 @@ export default class GeneTable extends React.Component {
         return this.state.geneList
                 // TODO: functional programming in javascript -> better way to compose lists etc
                 .map(gene => gene.attributes.concat([{name: "gene_id", value: gene["gene_id"]}, ...geneListIdentifiers]))
-                .map(combinedList => (combinedList))
+                .map(combinedList => tap(combinedList))
                 .map((geneAttributesList) => {
                     let geneAttributesObject = {};
                     for (let i = 0; i < geneAttributesList.length; i++) {
@@ -173,11 +179,11 @@ export default class GeneTable extends React.Component {
 
     makeTableColumns = (attributeList, identifierList) => {
         return (
-            attributeList
+            attributeList.concat(identifierList)
                 .map(gla => {
                     return {
                         dataField: gla,
-                        text: properCase(gla),
+                        text: properCase(tap(gla, "gla")),
                         csvText: gla,
                         // TODO: for now we're enabling all input to be placed in the search field
                         // THIS IS TO ENABLE INTERACTION WITH PRODUCERS; BUT SHOULD BE FLAGGED FOR CHANGE
@@ -212,14 +218,16 @@ export default class GeneTable extends React.Component {
 const GeneTableColumnFilter = ({columns, onColumnToggle, toggles}) => {
     // https://react-bootstrap-table.github.io/react-bootstrap-table2/docs/basic-column-toggle.html
     // https://react-select.com/home
+    const geneTableColumnOptions = columns.map(gtc => {return {value: gtc.dataField, label: formatAbbreviations(properCase(gtc.text))}});
+    const defaultColumnsSelected = [];
     return (
         <React.Fragment>
             <Select
                 placeholder={"Hide Columns..."}
-                defaultValue={[]}
+                defaultValue={ defaultColumnsSelected }
                 isMulti
                 name="columns"
-                options={ columns.map(gtc => {return {value: gtc.dataField, label: formatAbbreviations(properCase(gtc.text))}}) }  // done
+                options={ geneTableColumnOptions }
                 className="basic-multi-select"
                 classNamePrefix="select"
                 isClearable={false}
@@ -229,6 +237,7 @@ const GeneTableColumnFilter = ({columns, onColumnToggle, toggles}) => {
                     }
                     if (action.action === "select-option") {
                         onColumnToggle(action.option.value);
+
                     } else if (action.action === "remove-value" || action.action === "pop-value" ) {
                         onColumnToggle(action.removedValue.value);
                     }
