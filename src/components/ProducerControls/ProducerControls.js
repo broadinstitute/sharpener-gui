@@ -51,7 +51,8 @@ export class ProducerControls extends React.Component {
 
         // if all parameters from parameter index have non-blank values or other truthy values
         let parameterValues = parameterIndexControls.map(parameterIndexControl => parameterIndexControl.value );
-        if (parameterValues.every((truthyValue) => (truthyValue !== '' || truthyValue !== null))) {  // yeah
+        const valuesFilled = parameterValues.every((truthyValue) => !(truthyValue == false));
+        if (valuesFilled) {
             // then produce genes
             if (this.state.selectedProducer.name !== "Custom Gene List") {
                 // we produce genes by calling a producer
@@ -76,7 +77,7 @@ export class ProducerControls extends React.Component {
     };
 
     static parseGeneSymbolList(geneSymbolListString) {
-        return _.uniq(geneSymbolListString.split(/[\r\n, ]+/).filter(el => el !== '' && el !== ' '));
+        return _.uniq(geneSymbolListString.split(/[\r\n;, ]+/).filter(el => el !== '' && el !== ' '));
     }
 
     handleProducerParameterChange = (e) => {

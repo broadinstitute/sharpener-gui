@@ -122,7 +122,10 @@ export default class GeneTable extends React.Component {
         const geneListAttributes =
             _.uniq(this.state.geneList.map((current_gene) => current_gene.attributes, [])
                 .reduce((attributes_list, current_gene_attributes) => attributes_list.concat(current_gene_attributes), [])  // flatten list of depth one
-                .map(attribute => attribute.name));
+                .map(attribute => attribute.name)).filter(name => name !== "myGene.info id");
+        const geneListIdentifiers =
+            this.state.geneList.map((current_gene) => current_gene.identifiers);
+        console.log(geneListIdentifiers);
         //.concat(["gene_id"]);  // interpret gene_id as a column  TODO: DEPRECATED -- it needs to be handled specially
 
         let geneTableColumns =
@@ -191,6 +194,7 @@ export default class GeneTable extends React.Component {
                     return {
                         dataField: gla,
                         text: properCase(gla),
+                        csvText: gla,
                         // TODO: for now we're enabling all input to be placed in the search field
                         // THIS IS TO ENABLE INTERACTION WITH PRODUCERS; BUT SHOULD BE FLAGGED FOR CHANGE
                         formatter: this.listAbbrevation,
