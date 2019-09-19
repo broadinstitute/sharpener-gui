@@ -14,6 +14,7 @@ const GENES_RECEIVED = 'GENES_RECEIVED';
 
 // keep count of what transactions
 let transactionFrequencies = {};
+let Frequency = 1;
 
 /* Transaction Records */
 function* recordSaga(action) {
@@ -93,7 +94,7 @@ function* recordSaga(action) {
         payload: {
             gene_list_id: action.payload.results.gene_list_id,
             query: action.payload.query,
-            frequency: { name: freqIndex, value: transactionFrequencies[freqIndex]},
+            frequency: { name: freqIndex, value: Frequency++},
             difference: { difference: difference ? difference : [] },
             size: action.payload.results.genes.length,
             type: action.payload.type ? action.payload.type : action.type,
