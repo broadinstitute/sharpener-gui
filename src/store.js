@@ -12,12 +12,18 @@ import recordSagaWatch from "./sagas/record_saga";
 import pollSagaWatch from "./sagas/poll_saga";
 import transactionSagaWatch from "./sagas/transaction_saga";
 
-const sagaMiddleware = createSagaMiddleware();
+// https://github.com/zalmoxisus/redux-devtools-extension#installation
+const composeEnhancers =
+    typeof window === 'object' && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ ?
+        window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({
+            // Specify extension’s options like name, actionsBlacklist, actionsCreators, serialize...
+        }) : compose;
 
+const sagaMiddleware = createSagaMiddleware();
 const async_middleware = [
     promiseMiddleware, thunkMiddleware
 ];
-let storeWithMiddleware = compose(
+let storeWithMiddleware = composeEnhancers(
     applyMiddleware(...async_middleware),
     // saga middleware must be placed after thunk middleware to capture its dispatches
     applyMiddleware(sagaMiddleware),
