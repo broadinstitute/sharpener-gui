@@ -1,0 +1,234 @@
+import React, {Fragment, useCallback, useEffect, useReducer, useRef, useState} from 'react';
+import createEngine, {DagreEngine, DefaultLinkModel, DiagramModel} from '@projectstorm/react-diagrams'
+
+
+import {InputType} from "@projectstorm/react-canvas-core"
+
+import {JSCustomNodeFactory} from './Node/JSCustomNodeWidget/JSCustomNodeFactory';
+import {JSCustomNodeModel} from './Node/JSCustomNodeWidget/JSCustomNodeModel';
+import {BodyWidget} from './GraphWidget';
+
+import './TransformerGraph.css'
+
+import _ from "lodash";
+import SharpenerInfo from "../SharpenerInfo/SharpenerInfo";
+
+export class GraphLayout extends React.Component {
+    constructor(props) {
+        super(props);
+
+        // create an instance of the engine
+        this.engine = createEngine();
+        const deleteAction = this.engine.getActionEventBus().getActionsForType(InputType.KEY_DOWN)[0];
+        this.engine.getActionEventBus().deregisterAction(deleteAction);
+
+        // register the factory
+        this.engine.getNodeFactories().registerFactory(new JSCustomNodeFactory());
+        // create a diagram model
+        let model = new DiagramModel();
+
+        // install the model into the engine
+        this.engine.setModel(model);
+
+        model.getNodes().forEach(node => {
+            node.registerListener({
+                // TODO: tweak, maybe create a cache which can track previous results, if identical, stop propagation?
+                eventDidFire: _.debounce((event) => this.handleNodeEvent(event), 80, { leading: true }),
+            })
+        });
+
+        model.registerListener({
+            linksUpdated: event => {
+                console.log("linksUpdated", event);
+                if (!event.isCreated) {
+                    event.stopPropagation()
+                }
+            }
+        });
+
+        this.layoutEngine = new DagreEngine({
+            graph: {
+                rankdir: 'LR',
+                ranker: 'longest-path',
+                marginx: 100,
+                marginy: 100
+            },
+            includeLinks: true
+        });
+    }
+
+    componentWillReceiveProps(nextProps, _) {
+        console.log("graph updating")
+        let selectedGeneListsById = this.props.getSelectedGeneListIds().payload.selections;
+
+        // The roster is used to prevent the redundant creation of nodes as we traverse through the
+        // transactions (which double count the query id when a gene list serves as both an output and an input.
+        // We check against the roster whether a node has already been created, then get it; else we skip trying to get a node
+        // and create it if the gene_list_id is not null.
+        let roster = {};
+        if (nextProps.transactions) {
+            console.log("transactions");
+
+            let newModel = new DiagramModel();
+            nextProps.transactions.forEach(transaction => {
+
+                const { gene_list_id, query, size } = transaction;
+                if (!nextProps.deletedGeneLists.includes(gene_list_id)) {
+                    console.log("not deleted")
+
+                    const outputNode = new JSCustomNodeModel({
+                        name: gene_list_id,
+                        title: nextProps.transformerName[gene_list_id],
+                        controls: query.controls,
+                        size: size,
+                        isSelected: selectedGeneListsById.includes(gene_list_id),
+                        function: nextProps.transformersNormalized.byName[query.name].function
+                    });
+                    roster[gene_list_id] = outputNode.options.id;
+
+                    // TODO: refactor and simplify
+                    if (typeof query.gene_list_id !== "undefined") {
+                        console.log("query gene list id not undefined")
+
+                        // if the query's gene_list_id is not null, then that means it is related to another gene_list_id from the session
+                        // so our updated graph must include a link between the two, else we just add the node to the graph without a link
+                        if (query.gene_list_id !== null && !nextProps.deletedGeneLists.includes(query.gene_list_id)) {
+                            console.log("query gene list id not null and not deleted")
+
+                            let inputNode = null;
+                            // if the gene list id is already in the roster, then we can just get the node as it already exists
+                            // in the graph and use its model in the graph-model updating (including adding a linkage)
+                            if (typeof roster[query.gene_list_id] != "undefined") {
+                                inputNode = newModel.getNode(roster[query.gene_list_id])
+                            } else {
+                                console.log("input node not in roster");
+                                if (typeof query.gene_list_id !== "undefined") {
+
+                                    inputNode = new JSCustomNodeModel({
+                                        name: query.gene_list_id,
+                                        title: nextProps.transformerName[query.gene_list_id],
+                                        controls: query.controls,
+                                        size: size,
+                                        isSelected: selectedGeneListsById.includes(query.gene_list_id),
+                                        function: nextProps.transformersNormalized.byName[query.name].function
+                                    });
+                                    roster[query.gene_list_id] = inputNode.options.id;
+
+                                }
+
+                            }
+
+                            const newLink = new DefaultLinkModel();
+                            // TODO: Link deltas: size, diff elements
+                            newLink.setSourcePort(inputNode.getPort("out"));
+                            newLink.setTargetPort(outputNode.getPort("in"));
+                            newModel.addAll(inputNode, outputNode, newLink);
+
+                        }
+                        console.log("query gene list id is null")
+                        newModel.addNode(outputNode);
+
+                    } else if (typeof query.gene_list_ids !== "undefined") {
+                        console.log("query gene list id undefined")
+                        console.log("query gene list ids not undefined")
+
+                        if (query.gene_list_ids !== null && query.gene_list_ids.length > 0) {
+                            console.log("query gene list ids not null and not empty")
+
+                            query.gene_list_ids.filter(gene_list_id => !nextProps.deletedGeneLists.includes(gene_list_id)).forEach(gene_list_id => {
+                                console.log(gene_list_id);
+                                let inputNode = null;
+                                if (typeof roster[gene_list_id] != "undefined") {
+                                    console.log("node is already in roster")
+                                    inputNode = newModel.getNode(roster[gene_list_id])
+                                } else {
+                                    inputNode = new JSCustomNodeModel({
+                                        name: gene_list_id,
+                                        title: nextProps.transformerName[gene_list_id],
+                                        controls: query.controls,
+                                        size: size,
+                                        isSelected: selectedGeneListsById.includes(gene_list_id),
+                                        function: nextProps.transformersNormalized.byName[query.name].function
+                                    });
+                                    roster[gene_list_id] = inputNode.options.id;
+                                }
+                                const newLink = new DefaultLinkModel();
+                                // TODO: Link deltas: size, diff elements
+                                newLink.setSourcePort(inputNode.getPort("out"));
+                                newLink.setTargetPort(outputNode.getPort("in"));
+                                newModel.addAll(inputNode, outputNode, newLink);
+                            })
+                        }
+
+                    } else {
+                        console.log("query gene list id undefined")
+                        console.log("query gene list ids undefined")
+                        newModel.addNode(outputNode);
+                    }
+
+                }
+            });
+
+            newModel.getNodes().forEach(node => {
+                node.registerListener({
+                    eventDidFire: (event) => this.handleNodeEvent(event)
+                })
+            });
+
+            this.layoutEngine.redistribute(newModel);
+            this.engine.setModel(newModel);
+        }
+    }
+
+    // ---------------- //
+    // HELPER FUNCTIONS //
+    // ---------------- //
+
+    // callback for handling the events thrown by nodes (mainly selection and deletion)
+    handleNodeEvent (event) {
+        if (event.function === 'selectionChanged') {
+            if (event.isSelected) {
+                this.props.selectGeneList(event.entity.name);
+             } else if (!event.isSelected) {
+                this.props.unselectGeneList(event.entity.name);
+            }
+        }
+        // we know it's a node
+        if (event.function === "entityRemoved") {
+            this.props.unselectGeneList(event.entity.name);
+            this.props.removeGeneList(event.entity.name);
+        }
+    }
+
+    autoDistributeNodes (engine) {
+        // copy
+        let model = engine.getModel();
+
+        // operation: layout the nodes
+        this.layoutEngine.redistribute(model);
+
+        // deserialize
+        engine.setModel(model);
+    }
+
+    render() {
+        return (
+            <Fragment>
+                <div style={{
+                    display: "flex",
+                    flexShrink: "0",
+                    justifyContent: "space-between"
+                }}>
+                    <span>
+                        <h4 className={"info-header"}>Graph View</h4>
+                        <SharpenerInfo description={'Displays the relationships between successfully executed transformations. Provides information about the resulting Gene Lists, including inputs, list size, and a preview of newly added genes.'}/>
+                    </span>
+                    <button className={"graph-control"} onClick={ () => this.autoDistributeNodes(this.engine) }>Layout</button>
+                </div>
+                <BodyWidget engine={this.engine} style={{"margin-top": "9px"}}/>
+            </Fragment>
+        )
+    }
+};
+
+

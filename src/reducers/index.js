@@ -1,12 +1,14 @@
-import {combineReducers} from "redux";
-import app from "./app_reducer"
-import networks from "./network_reducer"
+import { combineReducers } from 'redux'
+import history from "./graph_reducer"
+import geneLists from "./genelist_reducer";
+import transformers from './transformers_reducer'
+import app from './transaction_reducer'
+import prime from "./prime_reducer";
 
-const rootReducer = combineReducers(
-    {
-        app,
-        networks
-    }
-);
-
-export default rootReducer;
+export default combineReducers({
+    app,
+    geneLists,
+    transformers,
+    history,
+    // prime
+})

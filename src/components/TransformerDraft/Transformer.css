@@ -1,0 +1,49 @@
+.align-right {
+    padding: 0%;
+    float:right;
+    margin: auto;
+    display:inline-block;
+}
+
+.inset {
+    font-size: small;
+}
+
+.hidden {
+    display: none;
+}
+
+.card-header {
+    padding: 12px !important;
+    border: 0px !important;
+}
+.transformer-header {
+    display: flex;
+    justify-content: space-between;
+}
+
+.btn {
+    color: #999999 !important;
+    font-size: small;
+    font-weight: lighter;
+}
+
+.btn:hover {
+    color: #333333 !important;
+    font-weight: normal;
+}
+input {
+    color: #222222 !important;
+    font-weight: bold;
+}
+
+button {
+    padding-left: 0.65em;
+    padding-right: 0.65em;
+}
+
+.transformerProperties {
+    padding: 0 .75em 0 .75em;
+    background: lightgrey;
+    color: #555555;
+}

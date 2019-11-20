@@ -1,0 +1,48 @@
+.title {
+    background: rgba(0, 0, 0, 0.3);
+    display: flex;
+    white-space: nowrap;
+    justify-items: center;
+    padding: 6px 6px 6px 6px;
+}
+
+
+.title-name {
+    text-align: center;
+    flex-grow: 1;
+}
+
+.body {
+    text-align: center;
+    font-size: 18px;
+}
+
+.ports {
+    display: flex;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.2));
+}
+
+.ports-container {
+    position: relative;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.ports-container:first-of-type {
+    margin-right: 10px;
+}
+.ports-container:only-child {
+    margin-right: 0px;
+}
+
+.remove-button {
+    background: none;
+    border: none;
+    color: #ffffff;
+    padding: 0 0 0 1em;
+}
+
+ul {
+    list-style-type: none;
+}
