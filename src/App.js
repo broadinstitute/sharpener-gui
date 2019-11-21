@@ -16,43 +16,67 @@ function App() {
     return (
         <div>
             <Space.ViewPort>
-                <Space.Fill scrollable={true} trackSize>
+                <Space.Fill scrollable>
                     <Space.Fixed height={window.innerHeight}>
-                        <Space.Top size={"100%"}>
                             <Space.LeftResizable size={"393px"} minimumSize={393} scrollable={true} className={"padded panel left"}>
+
                                 <span>
                                     <h4 className={"info-header"}>Create Gene List</h4>
                                     <SharpenerInfo description={"Create a Gene List by submitting gene symbols through the input box, or by uploading a table in CSV format."}/>
                                 </span>
                                 <CreateGeneListContainer />
+
                                 <br/>
+
                                 <div style={{
                                     display: "flex",
                                     justifyContent: "space-between",
                                     alignItems: "center"
                                 }}>
-                                <span>
-                                    <h4 className={"info-header"}>Transformer Draft</h4>
-                                    <SharpenerInfo description={"Query the Sharpener by staging Transformers before submitting them. You can modify the value of parameters, or use their defaults."}/>
-                                </span>
-                                <AsyncListenerContainer />
+                                    <span>
+                                        <h4 className={"info-header"}>Transformer Draft</h4>
+                                        <SharpenerInfo description={"Query the Sharpener by staging Transformers before submitting them. You can modify the value of parameters, or use their defaults."}/>
+                                    </span>
+                                    <AsyncListenerContainer />
                                 </div>
+
                                 <TransformerDraftContainer />
                             </Space.LeftResizable>
 
                             <Space.Fill className={"padded panel right back "}>
 
-                                    <Space.TopResizable size={"45%"} className={"padded panel "}>
+                                    <Space.Fixed height={"45%"} className={"padded panel "}>
                                         <TransformerGraphContainer />
-                                    </Space.TopResizable>
+                                    </Space.Fixed>
 
-                                    <Space.Fill className={"panel bottom"} scrollable={true}>
-                                            <GeneTableContainer className={"padded panel"} />
-
-                                    </Space.Fill>
+                                    <Space.Fixed height={"55%"} className={"panel bottom"} scrollable={true}>
+                                        <GeneTableContainer className={"padded panel"} />
+                                    </Space.Fixed>
+                                    <Space.Fixed height={"5%"}>
+                                        <div style={{
+                                            display: "flex",
+                                            justifyContent: "space-between",
+                                            alignItems: "center"
+                                        }}>
+                                                    <span>
+                                                        <h4 className={"info-header"}>Gene Pivot</h4>
+                                                        <SharpenerInfo description={"A matrix showing the membership of genes across their gene lists."}/>
+                                                    </span>
+                                        </div>
+                                    </Space.Fixed>
+                                    <Space.Fixed height={"100%"} trackSize={true}>
+                                        <Space.Info>
+                                            {info =>
+                                                <>
+                                                    {info.height > 0 ?
+                                                        <ClusterGramContainer size={info}/>
+                                                        : <span>{JSON.stringify(info)}</span>}
+                                                </>
+                                            }
+                                        </Space.Info>
+                                    </Space.Fixed>
 
                             </Space.Fill>
-                        </Space.Top>
                     </Space.Fixed>
                 </Space.Fill>
             </Space.ViewPort>

@@ -4,10 +4,6 @@ import ReactTooltip from 'react-tooltip'
 import styled from '@emotion/styled';
 
 import "./JSCustomNodeWidget.css"
-import {REMOVE_TRANSFORMER} from "../../../../actions";
-import {Card} from "react-bootstrap";
-import {Action, ActionEventBus, InputType} from "@projectstorm/react-canvas-core";
-import _ from 'lodash'
 
 const FunctionToColorMapping = {
     "producer": "#ca4f00",

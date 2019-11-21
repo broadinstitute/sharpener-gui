@@ -4,7 +4,7 @@ import ClusterGram from "../components/GeneListPivot/ClusterGram";
 import {createSelector} from "reselect"
 import _ from "lodash"
 
-const rowsSelector = createSelector(
+const colsSelector = createSelector(
     state => state.geneLists.byId,
     state => state.geneLists.Ids,
     (geneListsById, geneListIds) => {
@@ -12,7 +12,7 @@ const rowsSelector = createSelector(
     }
 );
 
-const colsSelector = createSelector(
+const rowsSelector = createSelector(
     state => state.geneLists.byId,
     state => state.geneLists.Ids,
     (geneListsById, geneListIds) => {
@@ -26,23 +26,25 @@ const linksSelector = createSelector(
     state => state.geneLists.byId,
     rowsSelector,
     colsSelector,
-    (geneListsById, allGeneListRows, allGeneCols) => {
+    (geneListsById, allGeneRows, allGeneListCols) => {
         // // TODO get rambda working
         // const rowIndexOfValue = R.invertObj(allGeneListRows.map(row => row.name));
         // const colIndexOfValue = R.invertObj(allGeneCols.map(col => col.name));
         // console.log(rowIndexOfValue, colIndexOfValue);
 
-        return _.flatten(allGeneListRows.map(row => row.name).map(geneListId => geneListsById[geneListId].genes.map(gene => {
-            return ({source: allGeneListRows.map(row=>row.name).indexOf(geneListId), target: allGeneCols.map(col=>col.name).indexOf(gene.gene_id), value: 1})
+        return _.flatten(allGeneListCols.map(row => row.name).map(geneListId => geneListsById[geneListId].genes.map(gene => {
+
+            return ({target: allGeneListCols.map(row=>row.name).indexOf(geneListId), source: allGeneRows.map(col=>col.name).indexOf(gene.gene_id), value: 1})
+
         })));
     }
 );
 
 const mapStateToProps = (state, ownProps) => ({
-    geneListIds: state => state.geneLists.Ids, // listed here to cause updating
+    geneListIds: state.geneLists.Ids, // listed here to cause updating
     links: linksSelector(state),
-    rows: rowsSelector(state),
-    cols: colsSelector(state)
+    row_nodes: rowsSelector(state),
+    col_nodes: colsSelector(state)
 });
 
 const mapDispatchToProps = dispatch => ({

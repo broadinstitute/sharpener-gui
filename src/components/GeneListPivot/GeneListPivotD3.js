@@ -39,7 +39,7 @@ function applyTransition() {
         .each(slide);
 
     function slide() {
-        const circle = d3.select(this);
+        let circle = d3.select(this);
         (function repeat() {
             circle = circle.transition()
                 .attr("cx", width)

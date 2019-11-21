@@ -1,9 +1,6 @@
 import React, {Fragment, useCallback, useEffect, useReducer, useRef, useState} from 'react';
-import createEngine, {DagreEngine, DefaultLinkModel, DiagramModel} from '@projectstorm/react-diagrams'
-
-
-import {InputType} from "@projectstorm/react-canvas-core"
-
+import createEngine, {DiagramModel, DagreEngine} from '@projectstorm/react-diagrams'
+import {DefaultLinkModel} from "@projectstorm/react-diagrams";
 import {JSCustomNodeFactory} from './Node/JSCustomNodeWidget/JSCustomNodeFactory';
 import {JSCustomNodeModel} from './Node/JSCustomNodeWidget/JSCustomNodeModel';
 import {BodyWidget} from './GraphWidget';
@@ -19,8 +16,6 @@ export class GraphLayout extends React.Component {
 
         // create an instance of the engine
         this.engine = createEngine();
-        const deleteAction = this.engine.getActionEventBus().getActionsForType(InputType.KEY_DOWN)[0];
-        this.engine.getActionEventBus().deregisterAction(deleteAction);
 
         // register the factory
         this.engine.getNodeFactories().registerFactory(new JSCustomNodeFactory());
@@ -209,6 +204,7 @@ export class GraphLayout extends React.Component {
 
         // deserialize
         engine.setModel(model);
+        this.forceUpdate();
     }
 
     render() {
@@ -225,7 +221,7 @@ export class GraphLayout extends React.Component {
                     </span>
                     <button className={"graph-control"} onClick={ () => this.autoDistributeNodes(this.engine) }>Layout</button>
                 </div>
-                <BodyWidget engine={this.engine} style={{"margin-top": "9px"}}/>
+                <BodyWidget engine={this.engine}/>
             </Fragment>
         )
     }

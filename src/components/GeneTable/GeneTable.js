@@ -61,10 +61,6 @@ const GeneTable = ({ geneListId }) => {
         setColumns(columns);
     };
 
-    useEffect(() => {
-        console.log(myColumns.map(column => ({label: column.Header, value: column.Header})))
-    }, [myColumns]);
-
     // TODO: Do text overflow instead of text wrap for selected columns
     // https://stackoverflow.com/a/54011607/1991892
     const customStyles = {

@@ -43,7 +43,7 @@ button {
 }
 
 .transformerProperties {
-    padding: 0 .75em 0 .75em;
+    padding: 0.25em .75em 0.25em .75em;
     background: lightgrey;
     color: #555555;
 }

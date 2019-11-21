@@ -21,7 +21,7 @@ export const GenePivotLite = ({geneListIds}) => {
         {"gene_list_id":"vSkUb1YKwJ","source":"user input","attributes":[],"genes":[{"gene_id":"HGNC:17646","identifiers":{"entrez":"NCBIGene:55768","hgnc":"HGNC:17646","mim":"MIM:610661","ensembl":["ENSEMBL:ENSG00000151092"],"mygene_info":"55768"},"attributes":[{"name":"myGene.info id","value":"55768","source":"myGene.info"},{"name":"gene_symbol","value":"NGLY1","source":"myGene.info"},{"name":"synonyms","value":"CDDG;CDG1V;PNG1;PNGase","source":"myGene.info"},{"name":"gene_name","value":"N-glycanase 1","source":"myGene.info"},{"name":"source","value":"user input","source":"user input"}]}]}
         */
         async function fetchGeneLists() {
-            const geneLists = await Promise.all(gene_list_ids.map(gene_list_id => fetch("https://sharpener.ncats.io/api/gene_list/" + gene_list_id, {
+            const geneLists = await Promise.all(gene_list_ids.map(gene_list_id => fetch("https://indigo.ncats.io/sharpener/gene_list/" + gene_list_id, {
                     method: "GET",
                     headers: {
                         'Accept': 'application/json',
@@ -117,7 +117,7 @@ export const GenePivotFull = ({geneListIds}) => {
         {"gene_list_id":"vSkUb1YKwJ","source":"user input","attributes":[],"genes":[{"gene_id":"HGNC:17646","identifiers":{"entrez":"NCBIGene:55768","hgnc":"HGNC:17646","mim":"MIM:610661","ensembl":["ENSEMBL:ENSG00000151092"],"mygene_info":"55768"},"attributes":[{"name":"myGene.info id","value":"55768","source":"myGene.info"},{"name":"gene_symbol","value":"NGLY1","source":"myGene.info"},{"name":"synonyms","value":"CDDG;CDG1V;PNG1;PNGase","source":"myGene.info"},{"name":"gene_name","value":"N-glycanase 1","source":"myGene.info"},{"name":"source","value":"user input","source":"user input"}]}]}
         */
         async function fetchGeneLists() {
-            const geneLists = await Promise.all(gene_list_ids.map(gene_list_id => fetch("https://sharpener.ncats.io/api/gene_list/" + gene_list_id, {
+            const geneLists = await Promise.all(gene_list_ids.map(gene_list_id => fetch("https://indigo.ncats.io/sharpener/gene_list/" + gene_list_id, {
                     method: "GET",
                     headers: {
                         'Accept': 'application/json',
