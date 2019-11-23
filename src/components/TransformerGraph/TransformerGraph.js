@@ -1,6 +1,6 @@
 import React, {Fragment, useCallback, useEffect, useReducer, useRef, useState} from 'react';
-import createEngine, {DiagramModel, DagreEngine} from '@projectstorm/react-diagrams'
-import {DefaultLinkModel} from "@projectstorm/react-diagrams";
+import createEngine, {DiagramModel, DagreEngine} from '@kbruskiewicz/react-diagrams'
+import {DefaultLinkModel} from "@kbruskiewicz/react-diagrams";
 import {JSCustomNodeFactory} from './Node/JSCustomNodeWidget/JSCustomNodeFactory';
 import {JSCustomNodeModel} from './Node/JSCustomNodeWidget/JSCustomNodeModel';
 import {BodyWidget} from './GraphWidget';
@@ -9,6 +9,7 @@ import './TransformerGraph.css'
 
 import _ from "lodash";
 import SharpenerInfo from "../SharpenerInfo/SharpenerInfo";
+import {InputType, DeleteItemsAction, ZoomCanvasAction} from "@kbruskiewicz/react-canvas-core";
 
 export class GraphLayout extends React.Component {
     constructor(props) {
@@ -16,6 +17,15 @@ export class GraphLayout extends React.Component {
 
         // create an instance of the engine
         this.engine = createEngine();
+
+        // override default delete action
+        const deleteAction = this.engine.getActionEventBus().getActionsForType(InputType.KEY_DOWN)[0];
+        this.engine.getActionEventBus().deregisterAction(deleteAction);
+        this.engine.getActionEventBus().registerAction(new DeleteItemsAction({keyCodes:[46]}));
+
+        const scrollAction = this.engine.getActionEventBus().getActionsForType(InputType.MOUSE_WHEEL)[0];
+        this.engine.getActionEventBus().deregisterAction(scrollAction);
+        this.engine.getActionEventBus().registerAction(new ZoomCanvasAction()); // TODO: extend with mouse speed?
 
         // register the factory
         this.engine.getNodeFactories().registerFactory(new JSCustomNodeFactory());
@@ -53,7 +63,7 @@ export class GraphLayout extends React.Component {
     }
 
     componentWillReceiveProps(nextProps, _) {
-        console.log("graph updating")
+        console.log("graph updating");
         let selectedGeneListsById = this.props.getSelectedGeneListIds().payload.selections;
 
         // The roster is used to prevent the redundant creation of nodes as we traverse through the

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Fragment} from 'react';
 import * as Space from "react-spaces";
 import SharpenerInfo from "./components/SharpenerInfo/SharpenerInfo";
 import CreateGeneListContainer from "./containers/CreateGeneListContainer";
@@ -11,6 +11,9 @@ import ClusterGram from "./components/GeneListPivot/ClusterGram";
 import ClusterGramContainer from "./containers/ClusterGramContainer";
 import {GenePivotNivo} from "./components/GeneListPivot/GenePivotNivo";
 import GenePivotNivoContainer from "./containers/GenePivotNivoContainer";
+import {SizeMe} from "react-sizeme";
+import GeneListViews from "./components/Navigation/GeneListViews";
+import GeneListViewsContainer from "./containers/GeneListViewsContainer";
 
 function App() {
     return (
@@ -43,38 +46,15 @@ function App() {
                                 <TransformerDraftContainer />
                             </Space.LeftResizable>
 
-                            <Space.Fill className={"padded panel right back "}>
+                            <Space.Fill className={"padded panel right back "} scrollable>
 
-                                    <Space.Fixed height={"45%"} className={"padded panel "}>
+                                    <Space.TopResizable size={"40%"} className={"padded panel "}>
                                         <TransformerGraphContainer />
-                                    </Space.Fixed>
+                                    </Space.TopResizable>
 
-                                    <Space.Fixed height={"55%"} className={"panel bottom"} scrollable={true}>
-                                        <GeneTableContainer className={"padded panel"} />
-                                    </Space.Fixed>
-                                    <Space.Fixed height={"5%"}>
-                                        <div style={{
-                                            display: "flex",
-                                            justifyContent: "space-between",
-                                            alignItems: "center"
-                                        }}>
-                                                    <span>
-                                                        <h4 className={"info-header"}>Gene Pivot</h4>
-                                                        <SharpenerInfo description={"A matrix showing the membership of genes across their gene lists."}/>
-                                                    </span>
-                                        </div>
-                                    </Space.Fixed>
-                                    <Space.Fixed height={"100%"} trackSize={true}>
-                                        <Space.Info>
-                                            {info =>
-                                                <>
-                                                    {info.height > 0 ?
-                                                        <ClusterGramContainer size={info}/>
-                                                        : <span>{JSON.stringify(info)}</span>}
-                                                </>
-                                            }
-                                        </Space.Info>
-                                    </Space.Fixed>
+                                    <Space.Fill size={"60%"}>
+                                        <GeneListViewsContainer />
+                                    </Space.Fill>
 
                             </Space.Fill>
                     </Space.Fixed>

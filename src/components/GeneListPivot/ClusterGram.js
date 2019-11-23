@@ -1,6 +1,7 @@
 import React, {Component, useEffect, useState} from 'react';
 import Clustergrammer from 'react-clustergrammer';
 import hash from "js-hash-code";
+import "./ClusterGram.css"
 
 export default class ClusterGram extends Component {
         constructor(props) {
@@ -74,6 +75,7 @@ export default class ClusterGram extends Component {
                         <Clustergrammer
                             key={hash(this.props.geneListIds)}
                             network_data={this.state}
+                            about={""}
                             width={this.props.size.width}
                             height={this.props.size.height}
                         />

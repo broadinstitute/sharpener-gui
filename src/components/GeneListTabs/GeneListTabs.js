@@ -106,11 +106,7 @@ const GeneListTabsFunction = ({selectedGeneListIds, transformerName, normalizedG
                     ))}
                 </Tabs>
 
-            :   <div className={"no-selection-placeholder"}>
-                    Select a Transformer in the Graph View to display a gene list's contents.
-                </div>
-
-            }
+            : <></> }
         </Fragment>
 )
 };

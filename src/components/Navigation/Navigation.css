@@ -1,0 +1,18 @@
+.note-icon-bar-v {
+    box-sizing:border-box;
+    height: 20px;
+    width: 7px;
+    margin: 1px auto;
+    border-right: 1px solid #a9a9a9;
+    border-left: 1px solid #a9a9a9;
+    background: linear-gradient(#a9a9a9, #a9a9a9) 2px 0/1px 100% no-repeat;
+}
+.note-icon-bar-h {
+    box-sizing:border-box;
+    width: 20px;
+    height: 7px;
+    margin: 10px auto;
+    border-top: 1px solid #a9a9a9;
+    border-bottom: 1px solid #a9a9a9;
+    background: linear-gradient(#a9a9a9, #a9a9a9) 0 2px/100% 1px  no-repeat;
+}

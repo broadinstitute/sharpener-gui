@@ -6,6 +6,7 @@ import { selectGeneList, unselectGeneList } from "../actions";
 import GeneListTabsFunction from "../components/GeneListTabs/GeneListTabs";
 
 const selectedGeneListIdMultipleSelector = state => state.geneLists.selectedMultipleGeneListsById;
+
 const transactionSelector = state => state.app.transactionLedger;
 const transformerSelector = state => state.transformers.transformersNormalized.byName
 const nameMap = (transactionLedger, transformersByName) => transactionLedger.reduce((geneListIdsToName, transaction, index) => {

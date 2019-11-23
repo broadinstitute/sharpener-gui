@@ -1,5 +1,5 @@
 import React, {Fragment} from 'react';
-import { PortWidget, DefaultNodeWidget } from '@projectstorm/react-diagrams';
+import { PortWidget, DefaultNodeWidget } from '@kbruskiewicz/react-diagrams';
 import ReactTooltip from 'react-tooltip'
 import styled from '@emotion/styled';
 
@@ -53,18 +53,21 @@ export class JSCustomNodeWidget extends DefaultNodeWidget {
                         <div className={"title-name"}
                              style={{
                                  display: "flex",
-                                 justifyContent: "space-evenly"
+                                 justifyContent: "space-evenly",
+                                 paddingLeft: "0.25em",
+                                 paddingRight: "0.25em"
                              }}>
                             {this.props.node.getOptions().title}
-                            <button
-                                className={"remove-button"}
-                                disabled={false} // TODO
-                                onClick={(e) => {
 
-                                }}
-                            >
-                                &#10799;
-                            </button>
+                            {/*<button*/}
+                            {/*    className={"remove-button"}*/}
+                            {/*    disabled={false} // TODO*/}
+                            {/*    onClick={(e) => {*/}
+                            {/*    }}*/}
+                            {/*>*/}
+                            {/*    &#10799;*/}
+                            {/*</button>*/}
+
                         </div>
                     </div>
                     <div className={"ports-container"}>
