@@ -231,7 +231,11 @@ export class GraphLayout extends React.Component {
                     </span>
                     <button className={"graph-control"} onClick={ () => this.autoDistributeNodes(this.engine) }>Layout</button>
                 </div>
+
+
                 <BodyWidget engine={this.engine}/>
+
+
             </Fragment>
         )
     }

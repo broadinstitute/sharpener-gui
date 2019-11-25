@@ -21,14 +21,18 @@ function App() {
         <div>
             <Space.ViewPort>
                 <Space.LeftResizable size={"60%"} scrollable>
+
                     <Space.TopResizable size={"100%"}>
+
                         <Space.LeftResizable size={"370px"} scrollable>
                             <span>
                                 <h5 className={"info-header"}>Create Gene List</h5>
                                 <SharpenerInfo description={"Create a Gene List by submitting gene symbols through the input box, or by uploading a table in CSV format."}/>
                             </span>
                             <CreateGeneListContainer />
+
                             <br/>
+
                             <div style={{
                                 display: "flex",
                                 justifyContent: "space-between",
@@ -42,7 +46,8 @@ function App() {
                             </div>
                             <TransformerDraftContainer />
                         </Space.LeftResizable>
-                        <Space.Fill trackSize scrollable>
+
+                        <Space.Fill className={"padded"}trackSize scrollable>
                             <TransformerGraphContainer />
                             <h5 className={"info-header"}>Gene List Pivot</h5>
                             <SharpenerInfo description={'Compare the contents of several selected gene lists through a membership matrix.'}/>
@@ -51,15 +56,8 @@ function App() {
                                     <ClusterGramContainer size={info}/>}
                             </Space.Info>
                         </Space.Fill>
+
                     </Space.TopResizable>
-                {/*<Space.Fill trackSize>*/}
-                {/*    <h5 className={"info-header"}>Gene List Pivot</h5>*/}
-                {/*    <SharpenerInfo description={'Compare the contents of several selected gene lists through a membership matrix.'}/>*/}
-                {/*    <Space.Info>*/}
-                {/*        {info =>*/}
-                {/*            <ClusterGramContainer size={info}/>}*/}
-                {/*    </Space.Info>*/}
-                {/*</Space.Fill>*/}
 
                 </Space.LeftResizable>
                 <Space.Fill>
