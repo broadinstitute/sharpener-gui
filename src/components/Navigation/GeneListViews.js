@@ -17,18 +17,6 @@ const GeneListViews = ({geneListIds, selectedGeneListIds}) => {
             <Space.RightResizable key={"view-table-nopivot"} size={"40%"} >
                 <GeneTableContainer />
             </Space.RightResizable>
-            <Space.Fill>
-                <Space.Top size={"8%"}>
-                    <h4 className={"info-header"}>Gene List Pivot</h4>
-                    <SharpenerInfo description={'Compare the contents of several selected gene lists through a membership matrix.'}/>
-                </Space.Top>
-                <Space.Fill trackSize>
-                    <Space.Info>
-                        {info =>
-                            <ClusterGramContainer size={info}/>}
-                    </Space.Info>
-                </Space.Fill>
-            </Space.Fill>
         </Fragment>
     )
 }

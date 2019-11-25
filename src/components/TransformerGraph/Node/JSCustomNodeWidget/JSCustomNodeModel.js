@@ -1,4 +1,4 @@
-import { NodeModel, DefaultPortModel } from '@kbruskiewicz/react-diagrams';
+import { NodeModel, DefaultPortModel } from '@projectstorm/react-diagrams';
 
 /**
  * Example of a custom model using pure javascript

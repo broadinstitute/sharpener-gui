@@ -1,5 +1,5 @@
 import React, {Fragment} from 'react';
-import { PortWidget, DefaultNodeWidget } from '@kbruskiewicz/react-diagrams';
+import { PortWidget, DefaultNodeWidget } from '@projectstorm/react-diagrams';
 import ReactTooltip from 'react-tooltip'
 import styled from '@emotion/styled';
 

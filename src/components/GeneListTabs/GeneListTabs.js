@@ -21,7 +21,7 @@ const GeneListTabsFunction = ({selectedGeneListIds, transformerName, normalizedG
                 justifyContent: "space-between"
             }}>
                 <span>
-                    <h4 className={"info-header"}>Gene List Details</h4>
+                    <h5 className={"info-header"}>Gene List Details</h5>
                     <SharpenerInfo description={'Show the contents of a gene list from a transformer selected in Transformer Graph'}/>
                 </span>
                 <span>

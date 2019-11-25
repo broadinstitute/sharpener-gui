@@ -1,4 +1,4 @@
-import React, {Fragment} from 'react';
+import React, {Fragment, useState} from 'react';
 import * as Space from "react-spaces";
 import SharpenerInfo from "./components/SharpenerInfo/SharpenerInfo";
 import CreateGeneListContainer from "./containers/CreateGeneListContainer";
@@ -16,48 +16,54 @@ import GeneListViews from "./components/Navigation/GeneListViews";
 import GeneListViewsContainer from "./containers/GeneListViewsContainer";
 
 function App() {
+    const [pivot, setPivot] = useState(false);
     return (
         <div>
             <Space.ViewPort>
-                <Space.Fill scrollable>
-                    <Space.Fixed height={window.innerHeight}>
-                            <Space.LeftResizable size={"393px"} minimumSize={393} scrollable={true} className={"padded panel left"}>
-
+                <Space.LeftResizable size={"60%"} scrollable>
+                    <Space.TopResizable size={"100%"}>
+                        <Space.LeftResizable size={"370px"} scrollable>
+                            <span>
+                                <h5 className={"info-header"}>Create Gene List</h5>
+                                <SharpenerInfo description={"Create a Gene List by submitting gene symbols through the input box, or by uploading a table in CSV format."}/>
+                            </span>
+                            <CreateGeneListContainer />
+                            <br/>
+                            <div style={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                                alignItems: "center"
+                            }}>
                                 <span>
-                                    <h4 className={"info-header"}>Create Gene List</h4>
-                                    <SharpenerInfo description={"Create a Gene List by submitting gene symbols through the input box, or by uploading a table in CSV format."}/>
+                                    <h5 className={"info-header"}>Transformer Draft</h5>
+                                    <SharpenerInfo description={"Query the Sharpener by staging Transformers before submitting them. You can modify the value of parameters, or use their defaults."}/>
                                 </span>
-                                <CreateGeneListContainer />
+                                <AsyncListenerContainer />
+                            </div>
+                            <TransformerDraftContainer />
+                        </Space.LeftResizable>
+                        <Space.Fill trackSize scrollable>
+                            <TransformerGraphContainer />
+                            <h5 className={"info-header"}>Gene List Pivot</h5>
+                            <SharpenerInfo description={'Compare the contents of several selected gene lists through a membership matrix.'}/>
+                            <Space.Info>
+                                {info =>
+                                    <ClusterGramContainer size={info}/>}
+                            </Space.Info>
+                        </Space.Fill>
+                    </Space.TopResizable>
+                {/*<Space.Fill trackSize>*/}
+                {/*    <h5 className={"info-header"}>Gene List Pivot</h5>*/}
+                {/*    <SharpenerInfo description={'Compare the contents of several selected gene lists through a membership matrix.'}/>*/}
+                {/*    <Space.Info>*/}
+                {/*        {info =>*/}
+                {/*            <ClusterGramContainer size={info}/>}*/}
+                {/*    </Space.Info>*/}
+                {/*</Space.Fill>*/}
 
-                                <br/>
-
-                                <div style={{
-                                    display: "flex",
-                                    justifyContent: "space-between",
-                                    alignItems: "center"
-                                }}>
-                                    <span>
-                                        <h4 className={"info-header"}>Transformer Draft</h4>
-                                        <SharpenerInfo description={"Query the Sharpener by staging Transformers before submitting them. You can modify the value of parameters, or use their defaults."}/>
-                                    </span>
-                                    <AsyncListenerContainer />
-                                </div>
-
-                                <TransformerDraftContainer />
-                            </Space.LeftResizable>
-
-                            <Space.Fill className={"padded panel right back "} scrollable>
-
-                                    <Space.TopResizable size={"40%"} className={"padded panel "}>
-                                        <TransformerGraphContainer />
-                                    </Space.TopResizable>
-
-                                    <Space.Fill size={"60%"}>
-                                        <GeneListViewsContainer />
-                                    </Space.Fill>
-
-                            </Space.Fill>
-                    </Space.Fixed>
+                </Space.LeftResizable>
+                <Space.Fill>
+                    <GeneTableContainer/>
                 </Space.Fill>
             </Space.ViewPort>
         </div>

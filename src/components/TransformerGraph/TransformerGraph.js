@@ -1,6 +1,6 @@
 import React, {Fragment, useCallback, useEffect, useReducer, useRef, useState} from 'react';
-import createEngine, {DiagramModel, DagreEngine} from '@kbruskiewicz/react-diagrams'
-import {DefaultLinkModel} from "@kbruskiewicz/react-diagrams";
+import createEngine, {DiagramModel, DagreEngine} from '@projectstorm/react-diagrams'
+import {DefaultLinkModel} from "@projectstorm/react-diagrams";
 import {JSCustomNodeFactory} from './Node/JSCustomNodeWidget/JSCustomNodeFactory';
 import {JSCustomNodeModel} from './Node/JSCustomNodeWidget/JSCustomNodeModel';
 import {BodyWidget} from './GraphWidget';
@@ -9,7 +9,7 @@ import './TransformerGraph.css'
 
 import _ from "lodash";
 import SharpenerInfo from "../SharpenerInfo/SharpenerInfo";
-import {InputType, DeleteItemsAction, ZoomCanvasAction} from "@kbruskiewicz/react-canvas-core";
+import {InputType, DeleteItemsAction, ZoomCanvasAction} from "@projectstorm/react-canvas-core";
 
 export class GraphLayout extends React.Component {
     constructor(props) {
@@ -226,7 +226,7 @@ export class GraphLayout extends React.Component {
                     justifyContent: "space-between"
                 }}>
                     <span>
-                        <h4 className={"info-header"}>Graph View</h4>
+                        <h5 className={"info-header"}>Graph View</h5>
                         <SharpenerInfo description={'Displays the relationships between successfully executed transformations. Provides information about the resulting Gene Lists, including inputs, list size, and a preview of newly added genes.'}/>
                     </span>
                     <button className={"graph-control"} onClick={ () => this.autoDistributeNodes(this.engine) }>Layout</button>

@@ -5,7 +5,7 @@ const RadioTablePivot = (props) => {
     const [rSelected, setRSelected] = useState(null);
     return (
         <>
-            <h4>Radio Buttons</h4>
+            <h5>Radio Buttons</h5>
             <ButtonGroup>
                 <Button color="primary" onClick={() => setRSelected(1)} active={rSelected === 1}>One</Button>
                 <Button color="primary" onClick={() => setRSelected(2)} active={rSelected === 2}>Two</Button>
