@@ -38,8 +38,7 @@ const colsSelector = createSelector(
     (state, geneListsById, geneListIds) => {
         return geneListIds.map((geneListId, index) => ({
             name: geneListNameSelector(state)[geneListId],
-            geneListId: geneListId,
-            clust: index }))  // TODO: what counts as clusts and groups?
+            geneListId: geneListId }))  // TODO: what counts as clusts and groups?
     }
 );
 
@@ -52,8 +51,7 @@ const rowsSelector = createSelector(
                     .map(gene => gene.gene_id)
                     .map(geneId => ({
                         name: geneSymbolNameSelector(state)[geneId],
-                        geneId: geneId,
-                        clust: 0
+                        geneId: geneId
                     }))
     }
 );

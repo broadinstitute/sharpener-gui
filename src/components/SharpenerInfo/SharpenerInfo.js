@@ -9,7 +9,7 @@ import "./SharpenerInfo.css"
 // TODO: size
 const InfoSymbol = styled.div`
     display: inline-block;
-    font-size: 1em;
+    font-size: 0.725em;
     font-weight: bold;
     vertical-align: top;
     line-height: 1.6em;

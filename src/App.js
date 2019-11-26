@@ -12,8 +12,9 @@ import ClusterGramContainer from "./containers/ClusterGramContainer";
 import {GenePivotNivo} from "./components/GeneListPivot/GenePivotNivo";
 import GenePivotNivoContainer from "./containers/GenePivotNivoContainer";
 import {SizeMe} from "react-sizeme";
-import GeneListViews from "./components/Navigation/GeneListViews";
+import GeneListViewsLayout from "./components/Navigation/GeneListViewsLayout";
 import GeneListViewsContainer from "./containers/GeneListViewsContainer";
+import TransformerViewsLayout from "./components/Navigation/TransformerViewsLayout";
 
 function App() {
     const [pivot, setPivot] = useState(false);
@@ -21,45 +22,9 @@ function App() {
         <div>
             <Space.ViewPort>
                 <Space.LeftResizable size={"60%"} scrollable>
-
-                    <Space.TopResizable size={"100%"}>
-
-                        <Space.LeftResizable size={"370px"} scrollable>
-                            <span>
-                                <h5 className={"info-header"}>Create Gene List</h5>
-                                <SharpenerInfo description={"Create a Gene List by submitting gene symbols through the input box, or by uploading a table in CSV format."}/>
-                            </span>
-                            <CreateGeneListContainer />
-
-                            <br/>
-
-                            <div style={{
-                                display: "flex",
-                                justifyContent: "space-between",
-                                alignItems: "center"
-                            }}>
-                                <span>
-                                    <h5 className={"info-header"}>Transformer Draft</h5>
-                                    <SharpenerInfo description={"Query the Sharpener by staging Transformers before submitting them. You can modify the value of parameters, or use their defaults."}/>
-                                </span>
-                                <AsyncListenerContainer />
-                            </div>
-                            <TransformerDraftContainer />
-                        </Space.LeftResizable>
-
-                        <Space.Fill className={"padded"}trackSize scrollable>
-                            <TransformerGraphContainer />
-                            <h5 className={"info-header"}>Gene List Pivot</h5>
-                            <SharpenerInfo description={'Compare the contents of several selected gene lists through a membership matrix.'}/>
-                            <Space.Info>
-                                {info =>
-                                    <ClusterGramContainer size={info}/>}
-                            </Space.Info>
-                        </Space.Fill>
-
-                    </Space.TopResizable>
-
+                    <TransformerViewsLayout />
                 </Space.LeftResizable>
+
                 <Space.Fill>
                     <GeneTableContainer/>
                 </Space.Fill>

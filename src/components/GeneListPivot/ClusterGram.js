@@ -14,14 +14,10 @@ export default class ClusterGram extends Component {
 
             const row_nodes = Array(nRow).fill(0).map((_, i) => ({
                 name: `ROW-${i}`,
-                clust: i,
-                group: Array(nGroupDepth).fill(0).map((_, d) => parseInt(i / 2 ** d)),
             }))
 
             const col_nodes = Array(nCol).fill(0).map((_, i) => ({
                 name: `COL-${i}`,
-                clust: i,
-                group: Array(nGroupDepth).fill(0).map((_, d) => parseInt(i / 2 ** d)),
             }))
 
             const links = Array(nLink).fill(0).map(_ => ({
@@ -75,7 +71,12 @@ export default class ClusterGram extends Component {
                         <Clustergrammer
                             key={hash(this.props.geneListIds)}
                             network_data={this.state}
-                            about={""}
+                            title={"Gene List Pivot"}
+                            sidebar_icons={false}
+                            row_tip_callback={() => console.log("row")}
+                            col_tip_callback={() => console.log("col")}
+                            show_dendrogram={false}
+                            is_cropping={true}
                             width={this.props.size.width}
                             height={this.props.size.height}
                         />

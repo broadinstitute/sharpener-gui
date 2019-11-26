@@ -192,12 +192,13 @@
     display: inline-block;
 }
 
+
 .sidebar_tooltip .sidebar_tooltip_text {
-    visibility: hidden;
+    visibility: visible;
     width: 120px;
     background: rgba(0, 0, 0, 1);
     /*opacity: 0.95;*/
-    color: #fff;
+    color: #fff !important;
     text-align: center;
     border-radius: 6px;
     padding: 5px 0;

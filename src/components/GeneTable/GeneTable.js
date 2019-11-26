@@ -28,7 +28,6 @@ const computeColumns = geneList => (geneList ? [
         ..._.uniq(geneList.genes.reduce((acc, gene) => acc.concat(...gene.attributes), [])
                 .map(attribute => attribute.name)).filter(attributeName => !(attributeName === "myGene.info id")).sort(ordering)
                 .map(attributeName => ({ Header: attributeName, accessor: attributeName, show: !(attributeName === "myGene.info id")  }))
-
     ]
     : null);
 
@@ -83,6 +82,18 @@ const GeneTable = ({ geneListId }) => {
                 name={"columns"}
                 className="basic-multi-select"
                 classNamePrefix="select"
+
+                styles={{
+                    placeholder: base => ({
+                        ...base,
+                        fontSize: 14
+                    }),
+                    option: base => ({
+                        ...base,
+                        height: '100%',
+                        fontSize: 16
+                    }),
+                }}
 
                 // custom components
                 styles={customStyles}

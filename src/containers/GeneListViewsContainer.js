@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {connect} from "react-redux";
-import GeneListViews from "../components/Navigation/GeneListViews";
+import GeneListViewsLayout from "../components/Navigation/GeneListViewsLayout";
 
 const mapStateToProps = state => ({
     geneListIds: state => state.geneLists.Ids,
@@ -10,4 +10,4 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(GeneListViews)
+export default connect(mapStateToProps, mapDispatchToProps)(GeneListViewsLayout)

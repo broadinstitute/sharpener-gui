@@ -16,3 +16,20 @@
     border-bottom: 1px solid #a9a9a9;
     background: linear-gradient(#a9a9a9, #a9a9a9) 0 2px/100% 1px  no-repeat;
 }
+
+.container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.floatLeft
+{
+    /*flex-grow: 1;*/
+    width: "390px"
+}
+
+.floatRight
+{
+    flex-grow: 3;
+    height: 1080px;
+}

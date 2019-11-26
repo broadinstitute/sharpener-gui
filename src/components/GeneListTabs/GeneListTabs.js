@@ -10,6 +10,7 @@ import Papa from "papaparse"
 import fileDownload from "js-file-download";
 import JSZip from 'jszip'
 import PivotNav from "../Navigation/PivotNav";
+import GeneTableMUI from "../GeneTable/MaterialGeneTable";
 
 const GeneListTabsFunction = ({selectedGeneListIds, transformerName, normalizedGeneLists}) => {
     const [ tabIndex, setTabIndex ] = useState(0);
@@ -27,34 +28,34 @@ const GeneListTabsFunction = ({selectedGeneListIds, transformerName, normalizedG
                 <span>
                 {selectedGeneListIds.length > 0 ?
                     <>
-                        <button onClick={(e) => {
-                            console.group("export current table functionality");
+                        {/*<button onClick={(e) => {*/}
+                        {/*    console.group("export current table functionality");*/}
 
-                            console.log("normalized gene lists", normalizedGeneLists);
-                            console.log("selected gene list with active tab", selectedGeneListIds[tabIndex]);
-                            const exportedGeneList = normalizedGeneLists[selectedGeneListIds[tabIndex]].genes
-                                    .map(gene_info => {
-                                        return gene_info.attributes.map(attribute => ({
-                                            [attribute.name]: attribute.value,
-                                        })).reduce((acc, item) => Object.assign(acc, item), gene_info.identifiers)
-                                    });
+                        {/*    console.log("normalized gene lists", normalizedGeneLists);*/}
+                        {/*    console.log("selected gene list with active tab", selectedGeneListIds[tabIndex]);*/}
+                        {/*    const exportedGeneList = normalizedGeneLists[selectedGeneListIds[tabIndex]].genes*/}
+                        {/*            .map(gene_info => {*/}
+                        {/*                return gene_info.attributes.map(attribute => ({*/}
+                        {/*                    [attribute.name]: attribute.value,*/}
+                        {/*                })).reduce((acc, item) => Object.assign(acc, item), gene_info.identifiers)*/}
+                        {/*            });*/}
 
-                            console.log("exported gene list", exportedGeneList);
-                            const csvExportedGeneList = new Blob(
-                                [Papa.unparse(exportedGeneList)],
-                                {
-                                    type: 'text/csv'
-                                });
+                        {/*    console.log("exported gene list", exportedGeneList);*/}
+                        {/*    const csvExportedGeneList = new Blob(*/}
+                        {/*        [Papa.unparse(exportedGeneList)],*/}
+                        {/*        {*/}
+                        {/*            type: 'text/csv'*/}
+                        {/*        });*/}
 
-                            console.log("exported file result", csvExportedGeneList);
-                            console.log("filename will be", transformerName[selectedGeneListIds[tabIndex]].replace(' ', '_')+'.csv');
-                            fileDownload(csvExportedGeneList, transformerName[selectedGeneListIds[tabIndex]].replace(/ /g, '_')+'.csv');
+                        {/*    console.log("exported file result", csvExportedGeneList);*/}
+                        {/*    console.log("filename will be", transformerName[selectedGeneListIds[tabIndex]].replace(' ', '_')+'.csv');*/}
+                        {/*    fileDownload(csvExportedGeneList, transformerName[selectedGeneListIds[tabIndex]].replace(/ /g, '_')+'.csv');*/}
 
-                            console.groupEnd();
+                        {/*    console.groupEnd();*/}
 
-                        }}>
-                            Export Current Table
-                        </button>
+                        {/*}}>*/}
+                        {/*    Export Current Table*/}
+                        {/*</button>*/}
                         <button onClick={(e) => {
                             const zip = new JSZip();
                             selectedGeneListIds.map(selected_gene_list_id => {
@@ -79,7 +80,7 @@ const GeneListTabsFunction = ({selectedGeneListIds, transformerName, normalizedG
                                     fileDownload(blob, 'gene_lists.zip')
                                 })
                         }}>
-                            Export All
+                            Export All Tables
                         </button>
                     </>
                     : null }
@@ -99,9 +100,11 @@ const GeneListTabsFunction = ({selectedGeneListIds, transformerName, normalizedG
                     </TabList>
                     {selectedGeneListIds.map(geneListId => (
                         <TabPanel>
-                            <GeneTable
+                            <GeneTableMUI
                                 key={geneListId}
-                                geneListId={geneListId}/>
+                                geneListId={geneListId}
+                                nameMap={transformerName}
+                            />
                         </TabPanel>
                     ))}
                 </Tabs>

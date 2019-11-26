@@ -19,9 +19,14 @@ const TransformerSelect = ({transformers}) => {
                     value={ selectedOptions }
                     components={{Option}}
                     styles={{
+                        placeholder: base => ({
+                            ...base,
+                            fontSize: 14
+                        }),
                         option: base => ({
                             ...base,
                             height: '100%',
+                            fontSize: 16
                         }),
                     }}
                     onChange={ (_, changeEvent) => {

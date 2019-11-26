@@ -91,6 +91,18 @@ export default class CreateGeneList extends React.Component {
                     onFocus={() => console.log("focus")}
                     onBlur={() => console.log("blur")}
 
+                    styles={{
+                        placeholder: base => ({
+                            ...base,
+                            fontSize: 14
+                        }),
+                        option: base => ({
+                            ...base,
+                            height: '100%',
+                            fontSize: 14
+                        }),
+                    }}
+
                 />
 
                 <div style={{

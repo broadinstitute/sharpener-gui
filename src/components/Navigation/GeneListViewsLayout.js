@@ -6,7 +6,7 @@ import ClusterGramContainer from "../../containers/ClusterGramContainer";
 import "./Navigation.css"
 import SharpenerInfo from "../SharpenerInfo/SharpenerInfo";
 
-const GeneListViews = ({geneListIds, selectedGeneListIds}) => {
+const GeneListViewsLayout = ({geneListIds, selectedGeneListIds}) => {
     const [selectedGeneListIdsLength, setSelectedGeneListIdsLength] = useState(selectedGeneListIds.length);
     useEffect(() => {
         setSelectedGeneListIdsLength(selectedGeneListIds.length)
@@ -21,4 +21,4 @@ const GeneListViews = ({geneListIds, selectedGeneListIds}) => {
     )
 }
 
-export default GeneListViews;
+export default GeneListViewsLayout;
