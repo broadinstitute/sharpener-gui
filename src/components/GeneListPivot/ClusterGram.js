@@ -76,7 +76,6 @@ export default class ClusterGram extends Component {
                             row_tip_callback={() => console.log("row")}
                             col_tip_callback={() => console.log("col")}
                             show_dendrogram={false}
-                            is_cropping={true}
                             width={this.props.size.width}
                             height={this.props.size.height}
                         />
