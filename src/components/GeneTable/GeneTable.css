@@ -1,3 +1,7 @@
 .rt-td {
     padding: 0 5px 0 5px !important;
 }
+
+[class *= MUIDataTable-responsiveScrollMaxHeight] {
+    max-height: 460px !important;
+}

@@ -82,3 +82,7 @@ h4 {
   flex-grow: 1;
   height: 80px;
 }
+
+.container {
+  padding-right: 7px;
+}

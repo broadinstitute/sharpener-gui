@@ -15,17 +15,20 @@ import {SizeMe} from "react-sizeme";
 import GeneListViewsLayout from "./components/Navigation/GeneListViewsLayout";
 import GeneListViewsContainer from "./containers/GeneListViewsContainer";
 import TransformerViewsLayout from "./components/Navigation/TransformerViewsLayout";
+import ReactCollapsibleHeatMap from "./components/CollapsibleHeatMap/ReactCollapsibleHeatMap";
 
 function App() {
     const [pivot, setPivot] = useState(false);
     return (
         <div>
             <Space.ViewPort>
-                <Space.LeftResizable size={"60%"} scrollable>
+                <Space.LeftResizable size={"60%"} scrollable trackSize>
                     <TransformerViewsLayout />
                 </Space.LeftResizable>
-
-                <Space.Fill>
+                <Space.Fill style={{
+                    paddingLeft: "15px",
+                    paddingRight: "7px"
+                }}>
                     <GeneTableContainer/>
                 </Space.Fill>
             </Space.ViewPort>

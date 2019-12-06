@@ -1,0 +1,32 @@
+.domain {
+    vector-effect: non-scaling-stroke;
+    stroke-width: 1px;
+}
+
+.active {
+    font-weight: bold;
+}
+
+.highlight-bar {
+    fill: #00000033;
+}
+
+.title {
+    font-family: sans-serif;
+    font-size: 16px;
+    font-weigth: bold;
+}
+
+.clickable-text {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.icon {
+    font-family: 'Font Awesome\ 5 Free';
+}
+
+#controls {
+    display: flex;
+    justify-content: space-evenly;
+}

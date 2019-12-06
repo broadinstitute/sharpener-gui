@@ -8,6 +8,8 @@ import AsyncListenerContainer from "../../containers/AsyncListenerContainer";
 import TransformerDraftContainer from "../../containers/TransformerDraftContainer";
 import TransformerGraphContainer from "../../containers/TransformerGraphContainer";
 import ClusterGramContainer from "../../containers/ClusterGramContainer";
+import ReactCollapsibleHeatMap from "../CollapsibleHeatMap/ReactCollapsibleHeatMap";
+import CollapsibleHeatMapContainer from "../../containers/CollapsibleHeatMapContainer";
 
 const TransformerViewsLayout = () => {
     return (
@@ -15,7 +17,7 @@ const TransformerViewsLayout = () => {
 
                 <div className={"container"}>
 
-                    <div className={"floatLeft"} style={{height: window.innerHeight, paddingRight: "7px", overflow: "scroll"}}>
+                    <div className={"floatLeft"} style={{height: window.innerHeight, overflow: "scroll"}}>
                         <span>
                             <h5 className={"info-header"}>Create Gene List</h5>
                             <SharpenerInfo description={"Create a Gene List by submitting gene symbols through the input box, or by uploading a table in CSV format."}/>
@@ -44,18 +46,15 @@ const TransformerViewsLayout = () => {
                 </div>
 
             <div style={{
-                paddingRight: "15px",
-                paddingLeft: "15px",
                 marginRight: "auto",
                 marginLeft: "auto",
                 border: "1 grey"
             }}>
                 {/*<h5 className={"info-header"}>Gene List Pivot</h5>*/}
                 {/*<SharpenerInfo description={'Compare the contents of several selected gene lists through a membership matrix.'}/>*/}
-                <Space.Fixed height={window.innerHeight} trackSize>
+                <Space.Fixed height={ window.innerHeight } trackSize>
                     <Space.Info>
-                        {info =>
-                            <ClusterGramContainer size={info}/>}
+                        {info => <CollapsibleHeatMapContainer size={info} /> }
                     </Space.Info>
                 </Space.Fixed>
             </div>
