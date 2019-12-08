@@ -120,7 +120,7 @@ const CollapsibleHeatMapLayout = ({nodes, links}) => {
 
                 <div style={{
                     display: "flex",
-                    justifyContent: "space-between",
+                    justifyContent: "flex-left",
                     alignItems: "center"
                 }}>
                     <h5>Gene Pivot Table</h5>

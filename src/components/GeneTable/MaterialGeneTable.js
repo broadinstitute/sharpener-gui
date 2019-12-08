@@ -78,8 +78,7 @@ const ordering = (a, b) => {
 };
 
 const computeColumns = geneList => (geneList ? [
-        // TODO: assumes all genes are valid! (Gene List Creator can introduce invalid or incomplete genes!)
-        ..._.uniq(geneList.genes.reduce((acc, gene) => acc.concat(...Object.keys(gene.identifiers)), []))
+        ..._.uniq(geneList.genes.reduce((acc, gene) => acc.concat(...Object.keys(gene.identifiers ? gene.identifiers : [])), []))
             .map(identifierType => ({ name: identifierType, label: identifierType}))
             .map(attribute => Object.assign(attribute, {
                 options: {
@@ -106,7 +105,7 @@ const computeData = geneList => (geneList ? geneList.genes.reduce( (data, gene) 
     // merge gene list attributes with gene list identifiers
     return data.concat({
         ...gene.attributes.reduce((geneProps, attribute) => Object.assign(geneProps, {[attribute.name]: attribute.value}), {}),
-        ...gene.identifiers
+        ...(gene.identifiers ? gene.identifiers : [])
     })
 }, []) : null);
 

@@ -23,7 +23,8 @@ const ordering = (a, b) => {
 };
 const computeColumns = geneList => (geneList ? [
         // TODO: assumes all genes are valid! (Gene List Creator can introduce invalid or incomplete genes!)
-        ..._.uniq(geneList.genes.reduce((acc, gene) => acc.concat(...Object.keys(gene.identifiers)), []))
+                                                                                // this check is here because custom gene lists may not always have genes the sharpener will identify (which results in `null`)
+        ..._.uniq(geneList.genes.reduce((acc, gene) => acc.concat(...Object.keys(gene.identifiers ? gene.identifiers : [])), []))
                 .map(identifierType => ({ Header: identifierType, accessor: identifierType, show: false })),
         ..._.uniq(geneList.genes.reduce((acc, gene) => acc.concat(...gene.attributes), [])
                 .map(attribute => attribute.name)).filter(attributeName => !(attributeName === "myGene.info id")).sort(ordering)
@@ -35,7 +36,8 @@ const computeData = geneList => (geneList ? geneList.genes.reduce( (data, gene) 
     // merge gene list attributes with gene list identifiers
     return data.concat({
         ...gene.attributes.reduce((geneProps, attribute) => Object.assign(geneProps, {[attribute.name]: attribute.value}), {}),
-        ...gene.identifiers
+        ...(gene.identifiers ? gene.identifiers : []) // this check is here because custom gene lists may not always have genes the sharpener will identify (which results in `null`)
+
     })
 }, []) : null);
 
