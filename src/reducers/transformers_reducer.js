@@ -36,7 +36,7 @@ const transformers = (state=initialTransformersState, action) => {
         case 'ADD_TRANSFORMER':
             return {
                 ...state,
-                selectedTransformersByName: state.selectedTransformersByName.concat([action.payload.name])
+                selectedTransformersByName: [action.payload.name]
             };
         case 'REMOVE_TRANSFORMER':
             const index = action.payload.index;

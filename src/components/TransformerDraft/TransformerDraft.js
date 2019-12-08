@@ -14,16 +14,13 @@ const TransformerDraft = ({transformers, selectedTransformers, fetchTransformers
             <div>
                 <TransformerSelect
                     key={"transformer-select"}
-                    transformers={transformers}/><br/>
-
+                    transformers={transformers}/>
                 {selectedTransformers ? selectedTransformers.map((selectedTransformer, index) =>
-                    <Fragment>
                         <TransformerContainer key={selectedTransformer}
                                               index={index}
-                                              transformerName={selectedTransformer}/><br/>
-                    </Fragment>
+                                              transformerName={selectedTransformer}/>
                 )
-                : <Fragment/>}
+                : <></>}
             </div>
         : <Fragment/>
     )

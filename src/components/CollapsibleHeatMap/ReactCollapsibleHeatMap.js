@@ -32,7 +32,6 @@ function ReactCollapsibleHeatMapFunction ({nodes, links, size}) {
 
             const heatmapControl = document.getElementById("controls")
             const sortByGene = document.getElementById("sortGene");
-            sortByGene.textContent = "Sort rows";
             sortByGene.onclick = () => {
                 heatmap.sortRows();
             };
@@ -40,7 +39,6 @@ function ReactCollapsibleHeatMapFunction ({nodes, links, size}) {
             // heatmapControl.appendChild(sortByGene);
 
             const sortByProcedure = document.getElementById("sortProcedure");
-            sortByProcedure.textContent = "Sort columns";
             sortByProcedure.onclick = () => {
                 heatmap.sortColumns();
             };

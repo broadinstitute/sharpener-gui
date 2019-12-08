@@ -200,6 +200,7 @@ export const fetchGeneListTransformation = (name, values) => dispatch => {
 };
 
 export const receiveGeneList = (geneListInfo, query=null) => {
+    console.log("gene list info")
     return {
         type: FETCH_TRANSFORMATION_SUCCESS,
         payload: {

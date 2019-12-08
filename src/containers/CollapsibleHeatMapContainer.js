@@ -4,6 +4,7 @@ import ReactCollapsibleHeatMap from "../components/CollapsibleHeatMap/ReactColla
 import {createSelector} from "reselect";
 import _ from "lodash";
 import * as Space from "react-spaces";
+import SharpenerInfo from "../components/SharpenerInfo/SharpenerInfo";
 
 /*
 * Target Shape of Data
@@ -34,25 +35,29 @@ const nameSelector = createSelector(
 const nodesSelector = createSelector(
     state => state.geneLists.Ids,
     state => state.geneLists.byId,
+    state => state.geneLists.deletedGeneLists,
     nameSelector,
-    (geneListIds, geneListsById, geneListNames) =>
-        _.flatten(geneListIds.map(geneListId => geneListsById[geneListId])
+    (geneListIds, geneListsById, deletedGeneLists, geneListNames) =>
+        _.flatten(geneListIds.filter(geneListId => !deletedGeneLists.includes(geneListId)).map(geneListId => geneListsById[geneListId])
             .map(geneList =>
-                [
-                    ...geneList.genes.map(gene => ({
-                        id: gene.gene_id,
-                        name: gene.attributes.filter(attribute => attribute.name === "gene_symbol")[0].value, // TODO: should make a map at some point at reducer level to make lookups not take so long
-                        type: "gene"
-                    })),
-                    ({
-                        id: geneList.source + "|" + geneList.gene_list_id,
-                        name: geneListNames[geneList.gene_list_id],
-                        type: "parameter"  // TODO: or procedure?
-                    })
-                ]
+                {
+                    console.log(geneListIds, geneListsById, geneList)
+                    return [
+                        ...geneList.genes.map(gene => ({
+                            id: gene.gene_id,
+                            name: gene.attributes.filter(attribute => attribute.name === "gene_symbol")[0].value, // TODO: should make a map at some point at reducer level to make lookups not take so long
+                            type: "gene"
+                        })),
+                        ({
+                            id: geneList.source + "|" + geneList.gene_list_id,
+                            name: geneListNames[geneList.gene_list_id],
+                            type: "parameter"  // TODO: or procedure?
+                        })
+                    ]
+                }
             ))
             .concat(
-                _.uniq(geneListIds.map(geneListId => geneListsById[geneListId]).map(geneList => geneList.source))
+                _.uniq(geneListIds.filter(geneListId => !deletedGeneLists.includes(geneListId)).map(geneListId => geneListsById[geneListId]).map(geneList => geneList.source))
                     .map(uniqueGeneListSourceName => ({
                         id: uniqueGeneListSourceName,
                         name: uniqueGeneListSourceName.split(" ")[0],
@@ -64,9 +69,10 @@ const nodesSelector = createSelector(
 const linksSelector = createSelector(
     state => state.geneLists.Ids,
     state => state.geneLists.byId,
-    (geneListIds, geneListsById) =>
+    state => state.geneLists.deletedGeneLists,
+    (geneListIds, geneListsById, deletedGeneLists) =>
         [].concat(
-            _.flatten(geneListIds.map(geneListId => geneListsById[geneListId])
+            _.flatten(geneListIds.filter(geneListId => !deletedGeneLists.includes(geneListId)).map(geneListId => geneListsById[geneListId])
                 .map(geneList => [
                     ...geneList.genes.map(
                         gene => ({
@@ -78,7 +84,7 @@ const linksSelector = createSelector(
                 ]))
             )
             .concat(
-                _.flatten(geneListIds.map(geneListId => geneListsById[geneListId])
+                _.flatten(geneListIds.filter(geneListId => !deletedGeneLists.includes(geneListId)).map(geneListId => geneListsById[geneListId])
                     .map(geneList => [
                         ...geneList.genes.map(
                             gene => ({
@@ -104,24 +110,39 @@ const mapDispatchToProps = dispatch => ({
 
 const CollapsibleHeatMapLayout = ({nodes, links}) => {
     return (
-        <div className={"container"}>
-            <Space.Fill
+        <div>
+
+            <Space.LeftResizable
+                size={"33%"}
+                maxWidth={"33%"}
+                className={"gutter"}
                 id="controls">
-                <h5>Gene Pivot Table</h5>
+
+                <div style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center"
+                }}>
+                    <h5>Gene Pivot Table</h5>
+                    <SharpenerInfo description={"Shows which gene lists different genes are part of (including single genes in multiple gene sets."}/>
+                </div>
+
                 <div>
-                    <button id={"sortGene"}></button>
-                    <button id={"sortProcedure"}></button>
+                    <button id={"sortGene"}>Sort Genes</button>
+                    <button id={"sortProcedure"}>Sort Gene Lists</button>
                     <input name={"rowFilter"} style={{ width: "100%" }}></input>
                 </div>
-            </Space.Fill>
-            <Space.RightResizable
-                size={ "75%" }
-                maxWidth={ "75%" }
+
+            </Space.LeftResizable>
+
+            <Space.Fill
+                className={"gutter"}
                 trackSize>
                 <Space.Info>
                     {info => <ReactCollapsibleHeatMap size={info} nodes={nodes} links={links}/>}
                 </Space.Info>
-            </Space.RightResizable>
+            </Space.Fill>
+
         </div>
     )
 }

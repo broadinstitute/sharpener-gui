@@ -14,7 +14,7 @@ const GeneListViewsLayout = ({geneListIds, selectedGeneListIds}) => {
 
     return (
         <Fragment key={"view-"+selectedGeneListIdsLength}>
-            <Space.RightResizable key={"view-table-nopivot"} size={"40%"} >
+            <Space.RightResizable key={"view-table-nopivot"} size={"40%"} className={"gutter"}>
                 <GeneTableContainer />
             </Space.RightResizable>
         </Fragment>

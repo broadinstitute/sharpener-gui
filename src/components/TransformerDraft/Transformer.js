@@ -5,7 +5,7 @@ import {
 import {useDispatch, useSelector} from "react-redux";
 import {Form, Field} from 'react-final-form'
 import {Card} from "react-bootstrap";
-import {Input, InputGroup, InputGroupAddon, Tooltip} from "reactstrap";
+import {Input, InputGroup, InputGroupAddon, Label, Tooltip} from "reactstrap";
 
 import ReactTooltip from "react-tooltip";
 import hash from "js-hash-code";
@@ -14,6 +14,8 @@ import "./Transformer.css";
 
 import Select from "react-select";
 import SharpenerInfo from "../SharpenerInfo/SharpenerInfo";
+
+import { TextField } from '@material-ui/core';
 
 const SubmitMapping = {
     "producer": "Produce",
@@ -44,45 +46,47 @@ const Transformer = ({index, transformerName, fetchGeneListTransformation, fetch
     const deletedGeneListIds = useSelector(state => state.geneLists.deletedGeneLists);
 
     return (
-        <Card key={index}>
-            <Card.Header className={"transformer-header"}>
-                <span id="transformer-title" className={"transformer-title"}>
-                    <div style={{
-                        display:"flex",
-                        justifyContent: "flex-start",
-                        alignItems: "center",
-                    }}>
-                    {transformerInfo.name}&nbsp;&nbsp;
-                    <SharpenerInfo
+        <Fragment key={index}>
 
-                        description={transformerInfo.description}/>
-                    </div>
-                </span>
-                <button
-                    className="inset btn btn-group-s"
-                    style={{
-                        padding: 0
-                    }}
-                    onClick={
-                        () => dispatch({
-                            type: REMOVE_TRANSFORMER,
-                            payload: {
-                                name: transformerName,
-                                index: index
-                            }
-                        })
-                    }>
-                    &#10799;
-                </button>
-            </Card.Header>
+            {/*<Card.Header className={"transformer-header"}>*/}
+            {/*    <span id="transformer-title" className={"transformer-title"}>*/}
+            {/*        <div style={{*/}
+            {/*            display:"flex",*/}
+            {/*            justifyContent: "flex-start",*/}
+            {/*            alignItems: "center",*/}
+            {/*        }}>*/}
+            {/*        {transformerInfo.name}&nbsp;&nbsp;*/}
+            {/*        <SharpenerInfo*/}
 
-            <Tooltip placement={"bottom"} target={"transformer-title"} className={"transformer-info"}>
-                    {transformerInfo.description}
-            </Tooltip>
+            {/*            description={transformerInfo.description}/>*/}
+            {/*        </div>*/}
+            {/*    </span>*/}
+            {/*    <button*/}
+            {/*        className="inset btn btn-group-s"*/}
+            {/*        style={{*/}
+            {/*            padding: 0*/}
+            {/*        }}*/}
+            {/*        onClick={*/}
+            {/*            () => dispatch({*/}
+            {/*                type: REMOVE_TRANSFORMER,*/}
+            {/*                payload: {*/}
+            {/*                    name: transformerName,*/}
+            {/*                    index: index*/}
+            {/*                }*/}
+            {/*            })*/}
+            {/*        }>*/}
+            {/*        &#10799;*/}
+            {/*    </button>*/}
+            {/*</Card.Header>*/}
+
+            {/*<Tooltip placement={"bottom"} target={"transformer-title"} className={"transformer-info"}>*/}
+            {/*        {transformerInfo.description}*/}
+            {/*</Tooltip>*/}
 
             <span className={"transformer-status"}>
                     {/*{isFetching}*/}
-                </span>
+            </span>
+
             <div className={"transformer-body"}>
 
                 <Form key={index}
@@ -94,27 +98,33 @@ const Transformer = ({index, transformerName, fetchGeneListTransformation, fetch
                       validate={ onValidate }
                       render={({ handleSubmit, form, values }) => {
                           return (
-                            <form name={transformerName}
+                            <form className={"transformerForm"}
+                                  name={transformerName}
                                   onSubmit={handleSubmit}>
 
                                 { ["expander", "filter"].includes(transformerInfo.function) ?
-                                    <Field name={ "gene_list_id" }
+                                    <>
+                                        <Label className={"parameterLabel"} for={ "single-gene-list-input"+"-field" }>{ "Input Gene List" }</Label>
+                                        <Field name={ "gene_list_id" }
                                        component={"select"}
                                        type={"text"}
                                        className={ !["expander", "filter"].includes(transformerInfo.function) ? 'hidden' : '' + ' custom-select'}>
-                                        <option value="" disabled selected hidden>
-                                            { currentGeneListIds.filter(geneListItem => !deletedGeneListIds.includes(geneListItem.value)).length > 0 ?
-                                                "Choose gene list to transform"
-                                            :   "No previous gene lists"}
-                                        </option>
-                                        {currentGeneListIds.filter(geneListItem => !deletedGeneListIds.includes(geneListItem.value))
-                                            .map(geneListIdOption =>
-                                                <option value={geneListIdOption.value}>
-                                                    {geneListIdOption.label}
-                                                </option>)}
-                                    </Field>
+                                            <option value="" disabled selected hidden>
+                                                { currentGeneListIds.filter(geneListItem => !deletedGeneListIds.includes(geneListItem.value)).length > 0 ?
+                                                    "Choose gene list to transform"
+                                                :   "No previous gene lists"}
+                                            </option>
+                                            {currentGeneListIds.filter(geneListItem => !deletedGeneListIds.includes(geneListItem.value))
+                                                .map(geneListIdOption =>
+                                                    <option value={geneListIdOption.value}>
+                                                        {geneListIdOption.label}
+                                                    </option>)}
+                                        </Field>
+                                    </>
                                 : ["aggregator"].includes(transformerInfo.function) ?
-                                        <Field name={ "gene_list_ids" }
+                                        <>
+                                            <Label className={"parameterLabel"} for={ "multiple-gene-list-input"+"-field" }>{ "Input Gene Lists" }</Label>
+                                            <Field name={ "gene_list_ids" }
                                                parse={ selectedOptions => {
                                                    if (!selectedOptions) return selectedOptions;
                                                    // selectedOptions are the current values of the input
@@ -125,16 +135,17 @@ const Transformer = ({index, transformerName, fetchGeneListTransformation, fetch
                                                    return currentGeneListIds.filter(geneListItem => !deletedGeneListIds.includes(geneListItem.value))
                                                        .filter(geneListItem => value.includes(geneListItem.value));
                                                }}
-                                        >
-                                            {props => (
-                                                <Select
-                                                    isMulti
-                                                    {...props.input}
-                                                    placeholder={currentGeneListIds.filter(geneListItem => !deletedGeneListIds.includes(geneListItem.value)).length > 0 ? "Choose gene list to transform" : "No previous gene lists" }
-                                                    options={currentGeneListIds.filter(geneListItem => !deletedGeneListIds.includes(geneListItem.value))}
-                                                />
-                                            )}
-                                        </Field>
+                                            >
+                                                {props => (
+                                                    <Select
+                                                        isMulti
+                                                        {...props.input}
+                                                        placeholder={currentGeneListIds.filter(geneListItem => !deletedGeneListIds.includes(geneListItem.value)).length > 0 ? "Choose gene list to transform" : "No previous gene lists" }
+                                                        options={currentGeneListIds.filter(geneListItem => !deletedGeneListIds.includes(geneListItem.value))}
+                                                    />
+                                                )}
+                                            </Field>
+                                        </>
                                 : null }
 
                                 {/* Transformer Parameters */}
@@ -142,9 +153,10 @@ const Transformer = ({index, transformerName, fetchGeneListTransformation, fetch
                                     parameter =>
                                         // choose the kind of component based on available data
                                         parameter.allowed_values ?
-                                            <InputGroup>
-                                                <InputGroupAddon addonType={"prepend"}>{ parameter.name }</InputGroupAddon>
+                                            <>
+                                                <Label className={"parameterLabel"} for={ parameter.name+"-field" }>{ parameter.name }</Label>
                                                 <Field name={ parameter.name }
+                                                       id={ parameter.name+"-field" }
                                                        component={"select"}
                                                        className={"custom-select"}
                                                        {...inputProps(parameter)} >
@@ -153,20 +165,22 @@ const Transformer = ({index, transformerName, fetchGeneListTransformation, fetch
                                                             {allowed_value}
                                                         </option>) }
                                                 </Field>
-                                            </InputGroup>
-                                        :   <InputGroup>
-                                                <InputGroupAddon addonType={"prepend"}>{ parameter.name }</InputGroupAddon>
+                                            </>
+                                        :   <>
+                                                <Label className={"parameterLabel"} for={ parameter.name+"-field" }>{ parameter.name }</Label>
                                                 <Field name={ parameter.name }
+                                                       id={ parameter.name+"-field" }
                                                        component={"input"}
                                                        className={"form-control"}
                                                        {...inputProps(parameter)} />
-                                            </InputGroup>
+                                            </>
                                 ) }
 
                                 {/* Local Transformer Submission */}
                                 <div style={{
                                     display: "flex",
                                     justifyContent: "space-between",
+                                    paddingTop: "7px"
                                 }}>
 
                                     <span>
@@ -204,7 +218,7 @@ const Transformer = ({index, transformerName, fetchGeneListTransformation, fetch
                 />
 
             </div>
-        </Card>
+        </Fragment>
     )
 
 };
@@ -230,8 +244,12 @@ const inputProps = parameter => {
         },
     };
 
-    // TODO: check for defaults? or is null enough?
     return {
+        // styling
+        label: parameter.name,
+        variant: "outlined",
+        size: "sm",
+        // content
         initialValue: parameter.default ? parameter.default : null,
         ...typeDependentProps[parameter.type]
     }

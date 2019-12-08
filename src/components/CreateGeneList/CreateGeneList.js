@@ -82,7 +82,7 @@ export default class CreateGeneList extends React.Component {
                 {/*TODO: overflow https://codesandbox.io/s/v638kx67w7*/}
                 <CreatableSelect
                     isMulti
-                    placeholder={"Add genes (e.g. NGLY1, FOXP2...)"}
+                    placeholder={"Add genes"}
                     onChange={this.handleChange}
                     onCreateOption={this.handleCreate}
                     options={options}
@@ -107,7 +107,7 @@ export default class CreateGeneList extends React.Component {
 
                 <div style={{
                     display: "flex",
-                    justifyContent: "flex-end",
+                    justifyContent: "space-around",
                     marginTop: "0.25em"
                 }}>
                     <ReactFileReader handleFiles={ this.handleFiles } fileTypes={['.csv', '.tsv']}>
@@ -115,7 +115,8 @@ export default class CreateGeneList extends React.Component {
                             Upload Gene List
                         </button>
                     </ReactFileReader>
-                    <button style={{marginLeft: "0.2em"}}
+                    <button
+                        // style={{marginLeft: "0.2em"}}
                         onClick={ this.handleSubmit }>
                         Submit Genes
                     </button>
