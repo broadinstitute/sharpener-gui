@@ -35,7 +35,7 @@
     font-weight: normal;
 }
 input {
-    color: #222222 !important;
+    color: #333333 !important;
     font-weight: bold;
 }
 
@@ -47,7 +47,8 @@ button {
 .transformerProperties {
     padding: 0.25em .75em 0.25em .75em;
     background: lightgrey;
-    color: #555555;
+    color: #333333;
+    font-size: 12px;
 }
 
 .parameterLabel {

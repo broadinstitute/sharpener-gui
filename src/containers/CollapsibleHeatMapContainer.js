@@ -149,7 +149,6 @@ const CollapsibleHeatMapLayout = ({nodes, links}) => {
             </Space.LeftResizable>
 
             <Space.Fill
-                className={"gutter"}
                 trackSize>
                 <Space.Info>
                     {info => <ReactCollapsibleHeatMap size={info} nodes={nodes} links={links}/>}
