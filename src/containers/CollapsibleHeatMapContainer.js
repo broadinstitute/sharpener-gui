@@ -113,24 +113,37 @@ const CollapsibleHeatMapLayout = ({nodes, links}) => {
         <div>
 
             <Space.LeftResizable
-                size={"33%"}
-                maxWidth={"33%"}
-                className={"gutter"}
-                id="controls">
+                size={"35%"}
+                maxWidth={"35%"}
+                className={"gutter"}>
 
                 <div style={{
                     display: "flex",
                     justifyContent: "flex-left",
                     alignItems: "center"
                 }}>
-                    <h5>Gene Pivot Table</h5>
+                    <h5 className={"info-header"}>Gene Pivot Table</h5>
                     <SharpenerInfo description={"Shows which gene lists different genes are part of (including single genes in multiple gene sets."}/>
                 </div>
 
-                <div>
-                    <button id={"sortGene"}>Sort Genes</button>
-                    <button id={"sortProcedure"}>Sort Gene Lists</button>
-                    <input name={"rowFilter"} style={{ width: "100%" }}></input>
+
+                <div id="heatmap-controls">
+
+                    <div className={"heatmap-control"}>
+                        <h6>Sort Genes</h6>
+                        <button id={"sortGene"}>Alphabetically</button><br/>
+                    </div>
+
+                    <div className={"heatmap-control"}>
+                        <h6>Sort Gene Lists</h6>
+                        <button id={"sortProcedure"}>Alphabetically</button><br/>
+                    </div>
+
+                    <div className={"heatmap-control"}>
+                        <h6>Filter for Genes</h6>
+                        <input name={"rowFilter"} style={{ width: "100%" }}></input>
+                    </div>
+
                 </div>
 
             </Space.LeftResizable>

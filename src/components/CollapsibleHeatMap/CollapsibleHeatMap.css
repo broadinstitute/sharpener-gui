@@ -26,7 +26,27 @@
     font-family: 'Font Awesome\ 5 Free';
 }
 
-#controls {
+#heatmap-controls {
     display: flex;
     justify-content: space-evenly;
+    flex-direction: column;
+    border: 1px solid #aaa;
+    padding-left: 7px;
+    padding-right: 7px;
+    padding-bottom: 7px;
+    margin-top: 7px;
+}
+
+.heatmap-control {
+    padding-top: 7px;
+    padding-bottom: 4px;
+}
+
+.heatmap-control > h6 {
+    padding-bottom: 2px;
+    margin-bottom: 2px;
+}
+
+.heatmap-control > button {
+    width: 100%
 }
