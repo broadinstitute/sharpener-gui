@@ -28,7 +28,7 @@ function App() {
                     <TransformerViewsLayout />
                 </Space.LeftResizable>
                 <Space.Fill className={"gutter"}>
-                    <Space.Top size={"100%"} className={"gutter"}>
+                    <Space.Top size={"100%"} className={"gutter"} scrollable>
                         <GeneTableContainer/>
                     </Space.Top>
                 </Space.Fill>

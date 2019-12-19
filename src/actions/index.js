@@ -22,7 +22,7 @@ export const initializeTransformers = () => dispatch => {
 
 export const fetchTransformers = () => dispatch => {
     dispatch(requestTransformers());
-    return fetch('https://sharpener.ncats.io/api/transformers')
+    return fetch(process.env.REACT_APP_BACKEND_URL+'transformers')
         .then(response => response.json())
         .then(json => dispatch(receiveTransformers(json)))
         .catch(error => dispatch(failToReceiveTransformers(error)))
@@ -67,7 +67,7 @@ export const FETCH_TRANSFORMER_INFO_ERROR = 'FETCH_TRANSFORMER_INFO_ERROR'
 
 export const fetchTransformerInfo = () => dispatch => {
     dispatch(requestTransformers());
-    return fetch('https://sharpener.ncats.io/api/transformers')
+    return fetch(process.env.REACT_APP_BACKEND_URL+'transformers')
         .then(response => response.json())
         .then(json => dispatch(receiveTransformerInfo(json)))
         .catch(error => dispatch(failToReceiveTransformerInfo(error)))
@@ -123,7 +123,7 @@ export const createGeneList = geneSymbols => dispatch => {
         ]
     };
     dispatch( { type: REQUEST_GENE_LIST_CREATION, payload: { isFetching: true, query: geneSymbolsQuery } });
-    return fetch('https://sharpener.ncats.io/api/create_gene_list', {
+    return fetch(process.env.REACT_APP_BACKEND_URL+'create_gene_list', {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -149,7 +149,7 @@ export const fetchGeneListAggregation = (name, values) => dispatch => {
     };
 
     dispatch({ type: REQUEST_GENE_LIST_AGGREGATION, payload: { isFetching: true, query: aggregationQuery } });
-    return fetch('https://sharpener.ncats.io/api/aggregate', {
+    return fetch(process.env.REACT_APP_BACKEND_URL+'aggregate', {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -182,7 +182,7 @@ export const fetchGeneListTransformation = (name, values) => dispatch => {
     };
 
     dispatch({ type: REQUEST_GENE_LIST_TRANSFORMATION, payload: { isFetching: true, query: transformerQuery } });
-    return fetch('https://sharpener.ncats.io/api/transform', {
+    return fetch(process.env.REACT_APP_BACKEND_URL+'transform', {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
