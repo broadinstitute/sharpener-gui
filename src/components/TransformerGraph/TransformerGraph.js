@@ -63,50 +63,61 @@ export class GraphLayout extends React.Component {
     }
 
     componentWillReceiveProps(nextProps, _) {
-        console.log("graph updating");
-        let selectedGeneListsById = this.props.getSelectedGeneListIds().payload.selections;
+        let selectedGeneListsById = nextProps.selectedGeneLists;
 
         // The roster is used to prevent the redundant creation of nodes as we traverse through the
         // transactions (which double count the query id when a gene list serves as both an output and an input.
         // We check against the roster whether a node has already been created, then get it; else we skip trying to get a node
         // and create it if the gene_list_id is not null.
         let roster = {};
+
+        // check if the node is previously on the graph
+        const nodesIndexedByName = this.engine.getModel().getNodes().reduce((acc, node) => Object.assign(acc, { [node.name]: node }), {})
+
+        console.group("Graph Updating");
+        console.log(selectedGeneListsById);
+        console.log(this.engine.getModel().getNodes());
+
         if (nextProps.transactions) {
-            console.log("transactions");
-
             let newModel = new DiagramModel();
-            nextProps.transactions.forEach(transaction => {
 
+            nextProps.transactions.forEach(transaction => {
                 const { gene_list_id, query, size } = transaction;
                 if (!nextProps.deletedGeneLists.includes(gene_list_id)) {
-                    console.log("not deleted")
 
-                    const outputNode = new JSCustomNodeModel({
-                        name: gene_list_id,
-                        title: nextProps.transformerName[gene_list_id],
-                        controls: query.controls,
-                        size: size,
-                        isSelected: selectedGeneListsById.includes(gene_list_id),
-                        function: nextProps.transformersNormalized.byName[query.name].function
-                    });
+                    let outputNode = {};
+                    if (Object.keys(nodesIndexedByName).includes(gene_list_id)) {
+
+                        // TODO: make this node a clone of the existing node
+                            // in particular, preserve all UI specific state
+                                // selectedness
+                                // given position
+                        outputNode = nodesIndexedByName[gene_list_id] // TODO: what happens when a node is added while exisitng?
+
+                    } else {
+
+                        outputNode = new JSCustomNodeModel({
+                            name: gene_list_id,
+                            title: nextProps.transformerName[gene_list_id],
+                            controls: query.controls,
+                            size: size,
+                            selected: selectedGeneListsById.includes(gene_list_id),
+                            function: nextProps.transformersNormalized.byName[query.name].function
+                        });
+
+                    }
                     roster[gene_list_id] = outputNode.options.id;
 
-                    // TODO: refactor and simplify
                     if (typeof query.gene_list_id !== "undefined") {
-                        console.log("query gene list id not undefined")
-
                         // if the query's gene_list_id is not null, then that means it is related to another gene_list_id from the session
                         // so our updated graph must include a link between the two, else we just add the node to the graph without a link
                         if (query.gene_list_id !== null && !nextProps.deletedGeneLists.includes(query.gene_list_id)) {
-                            console.log("query gene list id not null and not deleted")
-
                             let inputNode = null;
                             // if the gene list id is already in the roster, then we can just get the node as it already exists
                             // in the graph and use its model in the graph-model updating (including adding a linkage)
                             if (typeof roster[query.gene_list_id] != "undefined") {
                                 inputNode = newModel.getNode(roster[query.gene_list_id])
                             } else {
-                                console.log("input node not in roster");
                                 if (typeof query.gene_list_id !== "undefined") {
 
                                     inputNode = new JSCustomNodeModel({
@@ -114,7 +125,7 @@ export class GraphLayout extends React.Component {
                                         title: nextProps.transformerName[query.gene_list_id],
                                         controls: query.controls,
                                         size: size,
-                                        isSelected: selectedGeneListsById.includes(query.gene_list_id),
+                                        selected: selectedGeneListsById.includes(gene_list_id),
                                         function: nextProps.transformersNormalized.byName[query.name].function
                                     });
                                     roster[query.gene_list_id] = inputNode.options.id;
@@ -130,21 +141,13 @@ export class GraphLayout extends React.Component {
                             newModel.addAll(inputNode, outputNode, newLink);
 
                         }
-                        console.log("query gene list id is null")
                         newModel.addNode(outputNode);
 
                     } else if (typeof query.gene_list_ids !== "undefined") {
-                        console.log("query gene list id undefined")
-                        console.log("query gene list ids not undefined")
-
                         if (query.gene_list_ids !== null && query.gene_list_ids.length > 0) {
-                            console.log("query gene list ids not null and not empty")
-
                             query.gene_list_ids.filter(gene_list_id => !nextProps.deletedGeneLists.includes(gene_list_id)).forEach(gene_list_id => {
-                                console.log(gene_list_id);
                                 let inputNode = null;
                                 if (typeof roster[gene_list_id] != "undefined") {
-                                    console.log("node is already in roster")
                                     inputNode = newModel.getNode(roster[gene_list_id])
                                 } else {
                                     inputNode = new JSCustomNodeModel({
@@ -152,7 +155,7 @@ export class GraphLayout extends React.Component {
                                         title: nextProps.transformerName[gene_list_id],
                                         controls: query.controls,
                                         size: size,
-                                        isSelected: selectedGeneListsById.includes(gene_list_id),
+                                        selected: selectedGeneListsById.includes(gene_list_id),
                                         function: nextProps.transformersNormalized.byName[query.name].function
                                     });
                                     roster[gene_list_id] = inputNode.options.id;
@@ -166,8 +169,6 @@ export class GraphLayout extends React.Component {
                         }
 
                     } else {
-                        console.log("query gene list id undefined")
-                        console.log("query gene list ids undefined")
                         newModel.addNode(outputNode);
                     }
 
@@ -180,8 +181,12 @@ export class GraphLayout extends React.Component {
                 })
             });
 
-            this.layoutEngine.redistribute(newModel);
+            // this.layoutEngine.redistribute(newModel);
             this.engine.setModel(newModel);
+
+            console.log(this.engine.getModel().getNodes());
+            console.groupEnd();
+
         }
     }
 

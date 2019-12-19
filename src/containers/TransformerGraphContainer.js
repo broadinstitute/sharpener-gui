@@ -44,11 +44,11 @@ const geneListDiffSelector = (leftGeneListId, rightGeneListId) => createSelector
     })
 );
 
-
 const mapStateToProps = (state, ownProps) => ({
     transactions: transactionSelector(state),
     transactionsByGeneListId: transactionsByOutputGeneListId(state),
     currentGeneLists: geneListIdsSelector(state),
+    selectedGeneLists: state.geneLists.selectedMultipleGeneListsById,
     deletedGeneLists:  state.geneLists.deletedGeneLists,
     transformersNormalized: state.transformers.transformersNormalized,
     transformerName: nameSelector(state),

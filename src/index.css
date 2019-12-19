@@ -1,4 +1,5 @@
 body {
+    overflow: hidden;
     overflow-x: hidden;
     -ms-overflow-x: hidden;
     overflow-y: hidden;
