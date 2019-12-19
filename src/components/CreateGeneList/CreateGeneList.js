@@ -110,7 +110,7 @@ export default class CreateGeneList extends React.Component {
                     justifyContent: "space-around",
                     marginTop: "0.25em"
                 }}>
-                    <ReactFileReader handleFiles={ this.handleFiles } fileTypes={['.csv', '.tsv']}>
+                    <ReactFileReader handleFiles={ this.handleFiles } fileTypes={['.csv', '.tsv', '.txt']}>
                         <button>
                             Upload Gene List
                         </button>
