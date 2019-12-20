@@ -7,8 +7,6 @@ import CreateGeneListContainer from "../../containers/CreateGeneListContainer";
 import AsyncListenerContainer from "../../containers/AsyncListenerContainer";
 import TransformerDraftContainer from "../../containers/TransformerDraftContainer";
 import TransformerGraphContainer from "../../containers/TransformerGraphContainer";
-import ClusterGramContainer from "../../containers/ClusterGramContainer";
-import ReactCollapsibleHeatMap from "../CollapsibleHeatMap/ReactCollapsibleHeatMap";
 import CollapsibleHeatMapContainer from "../../containers/CollapsibleHeatMapContainer";
 
 import * as Spaces from "react-spaces"

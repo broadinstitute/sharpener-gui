@@ -111,10 +111,7 @@ export class CollapsibleHeatMap {
     }
 
     load() {
-        d3.json(this.dataUrl).then(data => {
-            this.data = this.data === null ? this.dataAsNetwork(data) : this.data ;
-            console.log("collapsible heatmap data load", this.data)
-
+        if (!(this.data === null)) {
             this.genes = this.data.nodes
                 .filter(item => item.type === "gene")
                 .sort((a, b) => (a.name > b.name ? 1 : b.name > a.name ? -1 : 0));
@@ -127,7 +124,7 @@ export class CollapsibleHeatMap {
             this.rows = this.genes.reverse();
             this.columns = this.procedures;
             this.render();
-        });
+        }
     }
 
     render(sortBy) {
@@ -285,6 +282,7 @@ export class CollapsibleHeatMap {
 
 
     // this shapes the data for us
+    /*
     dataAsNetwork(data) {
         const pivot =
             "marker_accession_id,marker_symbol,procedure_stable_id,procedure_name,parameter_stable_id,parameter_name,significant";
@@ -345,7 +343,7 @@ export class CollapsibleHeatMap {
         console.log({ nodes: nodes, links: links });
         return { nodes: nodes, links: links };
     }
-
+    */
     truncate(n, useWordBoundary) {
         if (this.length <= n) {
             return this;

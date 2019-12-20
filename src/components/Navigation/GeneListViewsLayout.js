@@ -1,8 +1,6 @@
 import React, {Fragment, useEffect, useState} from 'react';
 import * as Space from 'react-spaces';
 import GeneTableContainer from "../../containers/GeneTableContainer";
-import ClusterGramContainer from "../../containers/ClusterGramContainer";
-
 import "./Navigation.css"
 import SharpenerInfo from "../SharpenerInfo/SharpenerInfo";
 
