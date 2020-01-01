@@ -18,15 +18,13 @@ function ReactCollapsibleHeatMapFunction ({nodes, links, size}) {
     useEffect(() => {
         console.log(nodes, links)
         if (nodes && links && svg) {
-            const url =
-                "https://gist.githubusercontent.com/ficolo/ec9f88861ef417d05830765680ba0d76/raw/2d9969a81a12efff491234836a381de9374591fe/late-adult-data.json";
             const margin = { top: 80, bottom: 20, left: 80, right: 20 };
             const data = { nodes, links }
             const onClick = (d) => {
                 dispatch({ type: "TEST", payload: d })
             }
 
-            const heatmap = new CollapsibleHeatMap(size.height, size.width, margin, url, svg, data, onClick);
+            const heatmap = new CollapsibleHeatMap(size.height, size.width, margin, svg, data, onClick);
             heatmap.init();
             heatmap.load();
 

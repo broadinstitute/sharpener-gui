@@ -1,11 +1,10 @@
 import * as d3 from "d3"
 
 export class CollapsibleHeatMap {
-    constructor(height, width, margin, dataUrl, rootElement, data=null, onClick=null) {
+    constructor(height, width, margin, rootElement, data=null, onClick=null) {
         this.height = height;
         this.width = width;
         this.margin = margin;
-        this.dataUrl = dataUrl;
         this.rootElement = rootElement;
         this.data = data;
         this.onClick = onClick;
