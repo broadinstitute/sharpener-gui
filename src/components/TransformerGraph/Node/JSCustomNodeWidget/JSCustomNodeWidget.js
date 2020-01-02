@@ -45,9 +45,9 @@ export class JSCustomNodeWidget extends DefaultNodeWidget {
                     </span>
                 </ReactTooltip>
 
-                <Node data-tip data-for={'tooltip-'+this.props.node.name}
-                      background={FunctionToColorMapping[this.props.node.function]}
-                      selected={this.props.node.isSelected()}>
+                <Node selected={this.props.node.isSelected()}
+                      data-tip data-for={'tooltip-'+this.props.node.name}
+                      background={FunctionToColorMapping[this.props.node.function]}>
 
                     <div className={"title"}>
                         <div className={"title-name"}
@@ -58,17 +58,13 @@ export class JSCustomNodeWidget extends DefaultNodeWidget {
                                  paddingRight: "0.25em"
                              }}>
                             {this.props.node.getOptions().title}
-
-                            {/*<button*/}
-                            {/*    className={"remove-button"}*/}
-                            {/*    disabled={false} // TODO*/}
-                            {/*    onClick={(e) => {*/}
-                            {/*    }}*/}
-                            {/*>*/}
-                            {/*    &#10799;*/}
-                            {/*</button>*/}
-
                         </div>
+                        <button className={"remove-button"}
+                                onClick={(e) => {
+                                    console.log("should delete")
+                                }}>
+                            &#10799;
+                        </button>
                     </div>
                     <div className={"ports-container"}>
                         <PortWidget engine={this.props.engine} port={this.props.node.getPort('in')}>

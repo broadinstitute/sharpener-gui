@@ -11,6 +11,8 @@ import CollapsibleHeatMapContainer from "../../containers/CollapsibleHeatMapCont
 
 import * as Spaces from "react-spaces"
 
+import messages from "../../message-properties";
+
 const TransformerViewsLayout = () => {
     return (
         <Fragment>
@@ -21,8 +23,8 @@ const TransformerViewsLayout = () => {
                     <Spaces.LeftResizable size={"35%"} maxWidth={"35%"} className={"gutter"}>
 
                         <span>
-                            <h5 className={"info-header"}>Create Gene List</h5>
-                            <SharpenerInfo description={"Create a Gene List by submitting gene symbols through the input box, or by uploading a table in CSV format."}/>
+                            <h5 className={"info-header"}>{messages.header.create}</h5>
+                            <SharpenerInfo description={messages.tooltip.create}/>
                         </span>
                         <CreateGeneListContainer />
 
@@ -34,8 +36,8 @@ const TransformerViewsLayout = () => {
                             alignItems: "center"
                         }}>
                             <span>
-                                <h5 className={"info-header"}>Transformer Draft</h5>
-                                <SharpenerInfo description={"Query the Sharpener by staging Transformers before submitting them. You can modify the value of parameters, or use their defaults."}/>
+                                <h5 className={"info-header"}> { messages.header.transform } </h5>
+                                <SharpenerInfo description={ messages.tooltip.transform }/>
                             </span>
                             <AsyncListenerContainer />
                         </div>
@@ -50,9 +52,7 @@ const TransformerViewsLayout = () => {
                 </Spaces.Fixed>
 
                 <Space.Fixed height={ window.innerHeight } trackSize>
-
                     <CollapsibleHeatMapContainer />
-
                 </Space.Fixed>
 
         </Fragment>

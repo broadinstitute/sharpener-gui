@@ -12,6 +12,8 @@ import JSZip from 'jszip'
 import PivotNav from "../Navigation/PivotNav";
 import GeneTableMUI from "../GeneTable/MaterialGeneTable";
 
+import messages from "../../message-properties";
+
 const GeneListTabsFunction = ({selectedGeneListIds, transformerName, normalizedGeneLists}) => {
     const [ tabIndex, setTabIndex ] = useState(0);
     return (
@@ -22,8 +24,8 @@ const GeneListTabsFunction = ({selectedGeneListIds, transformerName, normalizedG
                 justifyContent: "space-between"
             }}>
                 <span>
-                    <h5 className={"info-header"}>Gene List Details</h5>
-                    <SharpenerInfo description={'Show the contents of a gene list from a transformer selected in Transformer Graph'}/>
+                    <h5 className={"info-header"}>{ messages.header.datatable }</h5>
+                    <SharpenerInfo description={messages.tooltip.datatable }/>
                 </span>
                 <span>
                 {selectedGeneListIds.length > 0 ?

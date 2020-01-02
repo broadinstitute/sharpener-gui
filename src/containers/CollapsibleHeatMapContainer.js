@@ -2,17 +2,13 @@ import React, { Component } from 'react';
 import {connect} from "react-redux";
 import ReactCollapsibleHeatMap from "../components/CollapsibleHeatMap/ReactCollapsibleHeatMap"
 import {createSelector} from "reselect";
-import _ from "lodash";
-import * as Space from "react-spaces";
+
 import SharpenerInfo from "../components/SharpenerInfo/SharpenerInfo";
 
-/*
-* Target Shape of Data
-*
-*
-*
-*
-* */
+import _ from "lodash";
+import * as Space from "react-spaces";
+
+import messages from "../message-properties";
 
 const transactionSelector = state => state.app.transactionLedger;
 const normalizedTransactions = state => state.app.transactionsNormalized;
@@ -122,8 +118,8 @@ const CollapsibleHeatMapLayout = ({nodes, links}) => {
                     justifyContent: "flex-left",
                     alignItems: "center"
                 }}>
-                    <h5 className={"info-header"}>Gene Pivot Table</h5>
-                    <SharpenerInfo description={"Shows which gene lists different genes are part of (including single genes in multiple gene sets."}/>
+                    <h5 className={"info-header"}>{messages.header.pivot}</h5>
+                    <SharpenerInfo description={messages.tooltip.pivot}/>
                 </div>
 
 

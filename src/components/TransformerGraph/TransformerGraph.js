@@ -11,6 +11,8 @@ import _ from "lodash";
 import SharpenerInfo from "../SharpenerInfo/SharpenerInfo";
 import {InputType, DeleteItemsAction, ZoomCanvasAction} from "@projectstorm/react-canvas-core";
 
+import messages from "../../message-properties";
+
 export class GraphLayout extends React.Component {
     constructor(props) {
         super(props);
@@ -37,17 +39,15 @@ export class GraphLayout extends React.Component {
 
         model.getNodes().forEach(node => {
             node.registerListener({
+                eventWillFire: event => console.log("event will fire", event),
                 // TODO: tweak, maybe create a cache which can track previous results, if identical, stop propagation?
-                eventDidFire: _.debounce((event) => this.handleNodeEvent(event), 80, { leading: true }),
+                eventDidFire:(event) => this.handleNodeEvent(event)
             })
         });
 
         model.registerListener({
             linksUpdated: event => {
                 console.log("linksUpdated", event);
-                if (!event.isCreated) {
-                    event.stopPropagation()
-                }
             }
         });
 
@@ -177,6 +177,7 @@ export class GraphLayout extends React.Component {
 
             newModel.getNodes().forEach(node => {
                 node.registerListener({
+                    eventWillFire: event => console.log("event will fire", event),
                     eventDidFire: (event) => this.handleNodeEvent(event)
                 })
             });
@@ -231,8 +232,8 @@ export class GraphLayout extends React.Component {
                     justifyContent: "space-between"
                 }}>
                     <span>
-                        <h5 className={"info-header"}>Graph View</h5>
-                        <SharpenerInfo description={'Displays the relationships between successfully executed transformations. Provides information about the resulting Gene Lists, including inputs, list size, and a preview of newly added genes.'}/>
+                        <h5 className={"info-header"}>{messages.header.graph}</h5>
+                        <SharpenerInfo description={messages.tooltip.graph}/>
                     </span>
                     <button className={"graph-control"} onClick={ () => this.autoDistributeNodes(this.engine) }>Layout</button>
                 </div>

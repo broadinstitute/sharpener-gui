@@ -4,6 +4,8 @@ import {useDispatch, useSelector} from 'react-redux'
 import {ADD_TRANSFORMER, REMOVE_TRANSFORMER} from "../../actions";
 import * as R from 'rambda'
 
+import messages from "../../message-properties";
+
 const TransformerSelect = ({transformers}) => {
     const dispatch = useDispatch();
     const [ options, setOptions ] = useState([]);
@@ -14,7 +16,7 @@ const TransformerSelect = ({transformers}) => {
 
     return (
         <Fragment key={"transformer-select"}>
-            <Select placeholder={ "Choose a transformer" }
+            <Select placeholder={ messages.select.transform }
                 options={ options }
                 components={{ Option }}
                 styles={{

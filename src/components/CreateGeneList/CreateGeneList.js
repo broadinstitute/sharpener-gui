@@ -6,6 +6,8 @@ import Papa from 'papaparse'
 import _ from "lodash"
 import Select from "react-select";
 
+import messages from "../../message-properties";
+
 const createOption = (string) => {
     return _.uniq(string.split(", ")).map(label => ({
         label: label,
@@ -82,7 +84,7 @@ export default class CreateGeneList extends React.Component {
                 {/*TODO: overflow https://codesandbox.io/s/v638kx67w7*/}
                 <CreatableSelect
                     isMulti
-                    placeholder={"Add genes"}
+                    placeholder={ messages.select.create }
                     onChange={this.handleChange}
                     onCreateOption={this.handleCreate}
                     options={options}
