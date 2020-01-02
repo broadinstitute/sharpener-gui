@@ -59,12 +59,12 @@ export class JSCustomNodeWidget extends DefaultNodeWidget {
                              }}>
                             {this.props.node.getOptions().title}
                         </div>
-                        <button className={"remove-button"}
-                                onClick={(e) => {
-                                    console.log("should delete")
-                                }}>
-                            &#10799;
-                        </button>
+                        {/*<button className={"remove-button"}*/}
+                        {/*        onClick={(e) => {*/}
+                        {/*            console.log("should delete")*/}
+                        {/*        }}>*/}
+                        {/*    &#10799;*/}
+                        {/*</button>*/}
                     </div>
                     <div className={"ports-container"}>
                         <PortWidget engine={this.props.engine} port={this.props.node.getPort('in')}>

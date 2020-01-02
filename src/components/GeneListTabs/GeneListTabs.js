@@ -17,7 +17,7 @@ import messages from "../../message-properties";
 const GeneListTabsFunction = ({selectedGeneListIds, transformerName, normalizedGeneLists}) => {
     const [ tabIndex, setTabIndex ] = useState(0);
     return (
-        <Fragment>
+        <div style={{paddingRight: "6px"}}>
 
             <div style={{
                 display: "flex",
@@ -112,7 +112,8 @@ const GeneListTabsFunction = ({selectedGeneListIds, transformerName, normalizedG
                 </Tabs>
 
             : <></> }
-        </Fragment>
+
+        </div>
 )
 };
 
