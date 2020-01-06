@@ -19,7 +19,7 @@ const InfoSymbol = styled.div`
 const SharpenerInfo = ({description, size, place="right"}) => {
     return (
         <div style={{display: "inline"}}>
-            <Tooltip placement="top" trigger="click" tooltip={description}>
+            <Tooltip placement="top" trigger="hover" tooltip={description}>
                 <InfoSymbol size={size}>
                     ⓘ
                 </InfoSymbol>
