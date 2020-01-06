@@ -55,8 +55,8 @@ export class GraphLayout extends React.Component {
             graph: {
                 rankdir: 'LR',
                 ranker: 'longest-path',
-                marginx: 100,
-                marginy: 100
+                marginx: 50,
+                marginy: 50
             },
             includeLinks: true
         });
@@ -226,11 +226,12 @@ export class GraphLayout extends React.Component {
     render() {
         return (
             <Fragment>
+
                 <div style={{
-                    display: "flex",
-                    flexShrink: "0",
-                    justifyContent: "space-between"
-                }}>
+                        display: "flex",
+                        flexShrink: "0",
+                        justifyContent: "space-between"
+                     }}>
                     <span>
                         <h5 className={"info-header"}>{messages.header.graph}</h5>
                         <SharpenerInfo description={messages.tooltip.graph}/>
@@ -238,9 +239,7 @@ export class GraphLayout extends React.Component {
                     <button className={"graph-control"} onClick={ () => this.autoDistributeNodes(this.engine) }>Layout</button>
                 </div>
 
-
-                <BodyWidget engine={this.engine}/>
-
+                <BodyWidget className={"back-graph-container"} engine={this.engine}/>
 
             </Fragment>
         )

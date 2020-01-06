@@ -20,7 +20,7 @@ const TransformerViewsLayout = () => {
              <Spaces.Fixed height={ window.innerHeight }
                            trackSize>
 
-                    <Spaces.LeftResizable size={"35%"} maxWidth={"35%"} className={"gutter"}>
+                    <Spaces.LeftResizable size={"35%"} maxWidth={"35%"} className={"left-segment gutter"}>
 
                         <span>
                             <h5 className={"info-header"}>{messages.header.create}</h5>
@@ -45,7 +45,7 @@ const TransformerViewsLayout = () => {
 
                     </Spaces.LeftResizable>
 
-                    <Space.Fill className={"gutter"}>
+                    <Space.Fill className={"top-segment gutter"}>
                         <TransformerGraphContainer />
                     </Space.Fill>
 

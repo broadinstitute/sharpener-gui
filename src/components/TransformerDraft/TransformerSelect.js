@@ -125,14 +125,14 @@ const Option = props => {
 
                 { props.isFocused ?
                     <>
-                        <div className={"transformerProperties"}>
-                            {/*{Object.keys(transformersByName[props.data.value].properties).map(property => transformersByName[props.data.value].properties[property] !== null ?*/}
-                            {/*    <div>*/}
-                            {/*        {property}: {transformersByName[props.data.value].properties[property]}*/}
-                            {/*    </div>*/}
-                            {/*: <></>)}*/}
-                            {transformersByName[props.data.value].description}
-                        </div>
+                        {/*<div className={"transformerProperties"}>*/}
+                        {/*    /!*{Object.keys(transformersByName[props.data.value].properties).map(property => transformersByName[props.data.value].properties[property] !== null ?*!/*/}
+                        {/*    /!*    <div>*!/*/}
+                        {/*    /!*        {property}: {transformersByName[props.data.value].properties[property]}*!/*/}
+                        {/*    /!*    </div>*!/*/}
+                        {/*    /!*: <></>)}*!/*/}
+                        {/*    {transformersByName[props.data.value].description}*/}
+                        {/*</div>*/}
                     </>
                 :   <></> }
 

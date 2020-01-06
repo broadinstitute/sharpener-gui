@@ -1,10 +1,7 @@
-import React, {Fragment} from "react"
+import React from "react"
 import styled from "@emotion/styled"
-import ReactTooltip from 'react-tooltip'
-import { FaInfo } from "react-icons/fa"
-import hash from "js-hash-code";
-
 import "./SharpenerInfo.css"
+import Tooltip from "./Tooltip";
 
 // TODO: size
 const InfoSymbol = styled.div`
@@ -22,12 +19,11 @@ const InfoSymbol = styled.div`
 const SharpenerInfo = ({description, size, place="right"}) => {
     return (
         <div style={{display: "inline"}}>
-            <ReactTooltip className={"info-tooltip"} id={hash(description)} type='dark' place={place} effect={"solid"}>
-                <div className={"info-tooltip-content"}>{description}</div>
-            </ReactTooltip>
-            <InfoSymbol data-tip data-for={hash(description)} size={size}>
-                ⓘ
-            </InfoSymbol>
+            <Tooltip placement="top" trigger="click" tooltip={description}>
+                <InfoSymbol size={size}>
+                    ⓘ
+                </InfoSymbol>
+            </Tooltip>
         </div>
     )
 };

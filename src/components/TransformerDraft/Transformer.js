@@ -4,19 +4,11 @@ import {
 } from "../../actions";
 import {useDispatch, useSelector} from "react-redux";
 import {Form, Field} from 'react-final-form'
-import {Card} from "react-bootstrap";
 import {Input, InputGroup, InputGroupAddon, Label, Tooltip} from "reactstrap";
-
-import ReactTooltip from "react-tooltip";
-import hash from "js-hash-code";
 
 import "./Transformer.css";
 
 import Select from "react-select";
-import SharpenerInfo from "../SharpenerInfo/SharpenerInfo";
-
-import { TextField } from '@material-ui/core';
-
 const SubmitMapping = {
     "producer": "Produce",
     "expander": "Expand",

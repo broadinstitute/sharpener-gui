@@ -18,16 +18,19 @@ function App() {
     return (
         <div>
             <Space.ViewPort>
+
                 <Space.LeftResizable size={"63%"}
                                      className={"gutter"}
                                      scrollable>
                     <TransformerViewsLayout />
                 </Space.LeftResizable>
+
                 <Space.Fill className={"gutter"}>
-                    <Space.Top size={"100%"} className={"gutter"} scrollable>
+                    <Space.Top size={"100%"} className={"right-segment gutter"} scrollable>
                         <GeneTableContainer/>
                     </Space.Top>
                 </Space.Fill>
+
             </Space.ViewPort>
         </div>
     );

@@ -25,25 +25,30 @@ const GeneTableMUI = ({ geneListId, nameMap }) => {
             }
         });
 
-    useEffect(() => {
-        setTable(geneList[geneListId]);
-    }, [geneListId])
-
     const [columns, setColumns] = useState([]);
     const [data, setData] = useState([]);
     const [urlIndex, setUrlIndex] = useState({});
 
     function setTable (geneList) {
-        setColumns(
-            computeColumns(geneList) //.map(entry => entry.accessor)
-        );
-        setData(
-            computeData(geneList) //.map(entry => Object.values(entry))
-        );
-        setUrlIndex(
-            computerUrlIndex(geneList)
-        );
+        if (geneList) {
+            setColumns(
+                computeColumns(geneList) //.map(entry => entry.accessor)
+            );
+            setData(
+                computeData(geneList) //.map(entry => Object.values(entry))
+            );
+        }
     }
+
+    useEffect(() => {
+        setUrlIndex(
+            computerUrlIndex(geneList[geneListId])
+        );
+    }, [geneListId])
+
+    useEffect(() => {
+        setTable(geneList[geneListId]);
+    }, [urlIndex])
 
     const options = {
         filterType: "textField",
@@ -56,24 +61,16 @@ const GeneTableMUI = ({ geneListId, nameMap }) => {
         rowsPerPageOptions: [10, 15, 20, 50, 100, geneList[geneListId].genes.length].filter(option => option <= geneList[geneListId].genes.length)
     };
 
-    // assume heterogeneity of attributes of gene data?
-        // TODO: a lot of this would be resolved by an API refactoring that loaded on attributes of a gene list total
-            // wouldn't have to assume i needed to look over every gene (lazily or not) due to aggregators blowing
-            // up the cases
-    const computeColumns = geneList => (geneList ?
+    const computeColumns = geneList =>
         [
             ...Object.keys(geneList.genes[0].identifiers ? geneList.genes[0].identifiers : [])
                 .map(identifierType => ({ name: identifierType, label: identifierType }))
-                .map(attributeProperties => Object.assign(attributeProperties, {
+                .map(columnProperties => Object.assign(columnProperties, {
                     options: {
                         filter: true,
                         sort: true,
                         display: 'false',
-                        customBodyRender: (value, tableMeta, updateValue) => {
-                            return (
-                                <GeneDataColumn data={value}/>
-                            );
-                        }
+                        customBodyRender: (value, tableMeta, updateValue) => renderCellElement(false)(value, tableMeta, updateValue),
                     }
                 })),
             ...geneList.genes[0].attributes
@@ -88,12 +85,20 @@ const GeneTableMUI = ({ geneListId, nameMap }) => {
                     options: {
                         filter: true,
                         sort: true,
+                        show: !(columnProperties.name === "myGene.info id") ? 'true' : 'false',
                         customBodyRender: (value, tableMeta, updateValue) => renderCellElement(columnProperties.has_url)(value, tableMeta, updateValue),
-                        show: !(columnProperties.name === "myGene.info id") ? 'true' : 'false'
                     }
-                }))
-        ]
-        : null);
+                })),
+            {
+                name: "gene_id",
+                options: {
+                    display: 'false',
+                    filter: false,
+                    sort: false,
+                    viewColumns: false,
+                }
+            }
+        ];
 
 
     // TODO
@@ -106,21 +111,24 @@ const GeneTableMUI = ({ geneListId, nameMap }) => {
     const renderCellElement = (has_url) => (value, tableMeta, updateValue) => {
         if (typeof value !== "undefined" && typeof tableMeta.rowData !== "undefined" && tableMeta.rowData.length > 0) {
             if (has_url) {
-
                 // get rowData element matching HGNC id
                 // get current label
-                // use HGNC id against URL map (if index is not undefined, then get url)
+                // FALSE: use HGNC id against URL map (if index is not undefined, then get url)
                 // * takes advantage of gene_id being known as hgnc (guaranteed unique)
                 // * takes advantage of columns being known at point of render
                 // * completely hedges against unguaranteed row and column order
                 // given the table's sorting functions
 
                 let columnId = tableMeta.columnData.name;
-                let geneId = tableMeta.rowData.filter(element => element.includes("HGNC"))[0]
-                let url = urlIndex[geneId] ? urlIndex[geneId][columnId] : null;
+
+                // TODO: NOTE: the final entry is reserved for gene_id which us used internally!
+                let geneId = tableMeta.rowData[tableMeta.rowData.length - 1];
+                let url = geneId && urlIndex[geneId] && urlIndex[geneId][columnId] ? urlIndex[geneId][columnId] : null;
+
+                console.log(columnId, geneId, url)
 
                 return (
-                    <a href={url ? url : null} target="_blank" rel="noopener noreferrer">
+                    <a href={url} target="_blank" rel="noopener noreferrer">
                         {renderCellContent(value)}
                     </a>
                 )
@@ -144,7 +152,8 @@ const GeneTableMUI = ({ geneListId, nameMap }) => {
                     [attribute.name]: attribute.value
                 })
             }, {}),
-            ...(gene.identifiers ? gene.identifiers : [])
+            ...(gene.identifiers ? gene.identifiers : []),
+            "gene_id": gene.gene_id
         })
     }, []) : null);
 
@@ -154,14 +163,19 @@ const GeneTableMUI = ({ geneListId, nameMap }) => {
     }
 
     const computerUrlIndex = (geneList) => {
-        return geneList.genes.reduce((urlIndexByGeneId, gene) => {
+        console.group("compute URL index")
+        const newUrlIndex = geneList.genes.reduce((urlIndexByGeneId, gene) => {
             urlIndexByGeneId[gene.gene_id] = {
                 ...gene.attributes.reduce((attributes, attribute) => Object.assign(attributes, {
                     [attribute.name]: attribute.url === null ? undefined : attribute.url
                 }), {})
             };
+            console.log("outcome for "+ gene.gene_id, urlIndexByGeneId[gene.gene_id])
             return urlIndexByGeneId;
         }, {})
+        console.log(newUrlIndex)
+        console.groupEnd()
+        return newUrlIndex;
     }
 
     return (
@@ -188,27 +202,6 @@ const mapping = {
 const ordering = (a, b) => {
     return (mapping[a] > mapping[b]) - (mapping[b] > mapping[a])
 };
-
-const GeneDataColumn = ({ data }) => {
-    if (typeof data !== "undefined") {
-        let label = !Number.isNaN(+data.label) ?
-            Number(+data.label).toPrecision(3) // TODO minimal of precisions
-            : data.label;
-        return (
-            <div>
-                { data.url ?
-                    <a href={data.url} target="_blank" rel="noopener noreferrer">
-                        {data.value}
-                    </a>
-                :   <span>
-                        {data.value}
-                    </span> }
-            </div>
-        )
-    } else {
-        return null;
-    }
-}
 
 function getSignificantDigitCount(n) {
     const log10 = Math.log(10);
