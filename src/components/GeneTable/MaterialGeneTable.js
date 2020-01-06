@@ -80,7 +80,7 @@ const GeneTableMUI = ({ geneListId, nameMap }) => {
                 // .reduce((acc, gene) => acc.concat(...gene.attributes), [])
                 .filter(attribute => !(attribute.name === "myGene.info id")).sort(ordering)
                 .map(attribute => ({
-                    name: attribute.name+".label",
+                    name: attribute.name,
                     label: attribute.name,
                     has_url: attribute.url && true
                 }))
@@ -104,26 +104,33 @@ const GeneTableMUI = ({ geneListId, nameMap }) => {
     // function is responsible for managing element structure based on input genes
     // right now only case is that there is a url or not
     const renderCellElement = (has_url) => (value, tableMeta, updateValue) => {
-        // get rowData element matching HGNC id
-        // get current label
-        // use HGNC id against URL map (if index is not undefined, then get url)
-        // * takes advantage of gene_id being known as hgnc (guaranteed unique)
-        // * takes advantage of columns being known at point of render
-        // * completely hedges against unguaranteed row and column order
-        // given the table's sorting functions
-
         if (typeof value !== "undefined" && typeof tableMeta.rowData !== "undefined" && tableMeta.rowData.length > 0) {
-            return (
-                <div>
-                    {has_url ?
-                        <a href={"http://google.com"} target="_blank" rel="noopener noreferrer">
-                            {renderCellContent(value)}
-                        </a>
-                        : <span>
-                            {renderCellContent(value)}
-                        </span>}
-                </div>
-            );
+            if (has_url) {
+
+                // get rowData element matching HGNC id
+                // get current label
+                // use HGNC id against URL map (if index is not undefined, then get url)
+                // * takes advantage of gene_id being known as hgnc (guaranteed unique)
+                // * takes advantage of columns being known at point of render
+                // * completely hedges against unguaranteed row and column order
+                // given the table's sorting functions
+
+                let columnId = tableMeta.columnData.name;
+                let geneId = tableMeta.rowData.filter(element => element.includes("HGNC"))[0]
+                let url = urlIndex[geneId] ? urlIndex[geneId][columnId] : null;
+
+                return (
+                    <a href={url ? url : null} target="_blank" rel="noopener noreferrer">
+                        {renderCellContent(value)}
+                    </a>
+                )
+            } else {
+                return (
+                    <span>
+                        {renderCellContent(value)}
+                    </span>
+                )
+            }
         } else {
             return null;
         }
@@ -134,7 +141,7 @@ const GeneTableMUI = ({ geneListId, nameMap }) => {
         return data.concat({
             ...gene.attributes.reduce((geneProps, attribute) => {
                 return Object.assign(geneProps, {
-                    [attribute.name]: { label: attribute.value, url: attribute.url }
+                    [attribute.name]: attribute.value
                 })
             }, {}),
             ...(gene.identifiers ? gene.identifiers : [])
