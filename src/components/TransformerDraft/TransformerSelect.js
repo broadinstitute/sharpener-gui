@@ -5,6 +5,7 @@ import {ADD_TRANSFORMER, REMOVE_TRANSFORMER} from "../../actions";
 import * as R from 'rambda'
 
 import messages from "../../message-properties";
+import Tooltip from "../Tooltip";
 
 const TransformerSelect = ({transformers}) => {
     const dispatch = useDispatch();
@@ -118,25 +119,16 @@ const groupBy = function(data, key) {
 const Option = props => {
     const transformersByName = useSelector(state => state.transformers.transformersNormalized.byName)
     return (
-            <>
-                <components.Option
-                    {...props}
-                />
-
-                { props.isFocused ?
-                    <>
-                        {/*<div className={"transformerProperties"}>*/}
-                        {/*    /!*{Object.keys(transformersByName[props.data.value].properties).map(property => transformersByName[props.data.value].properties[property] !== null ?*!/*/}
-                        {/*    /!*    <div>*!/*/}
-                        {/*    /!*        {property}: {transformersByName[props.data.value].properties[property]}*!/*/}
-                        {/*    /!*    </div>*!/*/}
-                        {/*    /!*: <></>)}*!/*/}
-                        {/*    {transformersByName[props.data.value].description}*/}
-                        {/*</div>*/}
-                    </>
-                :   <></> }
-
-            </>
+        <Tooltip tooltipShown={props.isFocused} placement="auto" trigger="hover" tooltip={transformersByName[props.data.value].description}>
+            {/*{Object.keys(transformersByName[props.data.value].properties).map(property => transformersByName[props.data.value].properties[property] !== null ?*/}
+            {/*    <div>*/}
+            {/*        {property}: {transformersByName[props.data.value].properties[property]}*/}
+            {/*    </div>*/}
+            {/*: <></>)}*/}
+            <components.Option
+                {...props}
+            />
+        </Tooltip>
     )
 }
 

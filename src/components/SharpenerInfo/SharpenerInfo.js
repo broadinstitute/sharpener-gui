@@ -1,7 +1,7 @@
 import React from "react"
 import styled from "@emotion/styled"
 import "./SharpenerInfo.css"
-import Tooltip from "./Tooltip";
+import Tooltip from "../Tooltip";
 
 // TODO: size
 const InfoSymbol = styled.div`
