@@ -5,7 +5,7 @@ import {ADD_TRANSFORMER, REMOVE_TRANSFORMER} from "../../actions";
 import * as R from 'rambda'
 
 import messages from "../../message-properties";
-import Tooltip from "../Tooltip";
+import Tooltip from "../Tooltip/Tooltip";
 
 const TransformerSelect = ({transformers}) => {
     const dispatch = useDispatch();

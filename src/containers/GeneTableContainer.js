@@ -1,8 +1,5 @@
 import {connect} from "react-redux";
-import GeneTable from "../components/GeneTable/GeneTable";
 import { createSelector } from "reselect";
-import _ from "lodash"
-import { selectGeneList, unselectGeneList } from "../actions";
 import GeneListTabsFunction from "../components/GeneListTabs/GeneListTabs";
 
 const selectedGeneListIdMultipleSelector = state => state.geneLists.selectedMultipleGeneListsById;

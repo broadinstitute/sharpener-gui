@@ -1,6 +1,5 @@
 import React, {Fragment, useState} from 'react';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
-import GeneTable from "../GeneTable/GeneTable";
 
 import 'react-tabs/style/react-tabs.css';
 import "./GeneListTabs.css"
@@ -9,7 +8,6 @@ import SharpenerInfo from "../SharpenerInfo/SharpenerInfo";
 import Papa from "papaparse"
 import fileDownload from "js-file-download";
 import JSZip from 'jszip'
-import PivotNav from "../Navigation/PivotNav";
 import GeneTableMUI from "../GeneTable/MaterialGeneTable";
 
 import messages from "../../message-properties";
