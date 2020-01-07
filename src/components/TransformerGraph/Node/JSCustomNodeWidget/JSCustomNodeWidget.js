@@ -30,20 +30,20 @@ export class JSCustomNodeWidget extends DefaultNodeWidget {
         return (
             <Fragment>
 
-                <ReactTooltip id={'tooltip-'+this.props.node.name}
-                              type='error' place={"bottom"}
-                              effect={"float"}>
-                    <span>
-                        {this.props.node.function} inputs<br/>
-                        <ul>
-                            {this.props.node.getOptions().controls.map(
-                               control => <li>
-                                   <u>{control.name}</u><br/>
-                                   <b>{control.value}</b>
-                               </li>)}
-                        </ul>
-                    </span>
-                </ReactTooltip>
+                {/*<ReactTooltip id={'tooltip-'+this.props.node.name}*/}
+                {/*              type='error' place={"bottom"}*/}
+                {/*              effect={"float"}>*/}
+                {/*    <span>*/}
+                {/*        {this.props.node.function} inputs<br/>*/}
+                {/*        <ul>*/}
+                {/*            {this.props.node.getOptions().controls.map(*/}
+                {/*               control => <li>*/}
+                {/*                   <u>{control.name}</u><br/>*/}
+                {/*                   <b>{control.value}</b>*/}
+                {/*               </li>)}*/}
+                {/*        </ul>*/}
+                {/*    </span>*/}
+                {/*</ReactTooltip>*/}
 
                 <Node selected={this.props.node.isSelected()}
                       data-tip data-for={'tooltip-'+this.props.node.name}

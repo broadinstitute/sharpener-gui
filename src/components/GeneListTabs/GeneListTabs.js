@@ -115,10 +115,4 @@ const GeneListTabsFunction = ({selectedGeneListIds, transformerName, normalizedG
 )
 };
 
-// const GeneListTabsFunction = ({selectedGeneListIds}) => (
-//     <pre>
-//         {JSON.stringify(selectedGeneListIds)}
-//     </pre>
-// )
-
 export default GeneListTabsFunction;

@@ -37,7 +37,6 @@ const nodesSelector = createSelector(
         _.flatten(geneListIds.filter(geneListId => !deletedGeneLists.includes(geneListId)).map(geneListId => geneListsById[geneListId])
             .map(geneList =>
                 {
-                    console.log(geneListIds, geneListsById, geneList)
                     return [
                         ...geneList.genes.map(gene => ({
                             id: gene.gene_id,

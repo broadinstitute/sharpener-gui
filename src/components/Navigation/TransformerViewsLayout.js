@@ -1,4 +1,4 @@
-import React, {Fragment, useEffect, useState} from 'react';
+import React, {Fragment, useEffect, useLayoutEffect, useState} from 'react';
 import * as Space from 'react-spaces';
 
 import "./Navigation.css"
@@ -13,12 +13,33 @@ import * as Spaces from "react-spaces"
 
 import messages from "../../message-properties";
 
+
+
+function useWindowSize() {
+    const [size, setSize] = useState([0, 0]);
+    useLayoutEffect(() => {
+        function updateSize() {
+            setSize([window.innerWidth, window.innerHeight]);
+        }
+        window.addEventListener('resize', updateSize);
+        updateSize();
+        return () => window.removeEventListener('resize', updateSize);
+    }, []);
+    return size;
+}
+
+
 const TransformerViewsLayout = () => {
+    const [pivot, setPivot] = useState(true);
+    const [width, height] = useWindowSize();
+
     return (
         <Fragment>
-
-             <Spaces.Fixed height={ window.innerHeight }
-                           trackSize>
+            {/*<button onClick={() => setPivot(!pivot)}>Pivot</button>*/}
+            <Spaces.Fixed height={ height }
+                          trackSize>
+            {/*{ pivot ?*/}
+                <>
 
                     <Spaces.LeftResizable size={"35%"} maxWidth={"35%"} className={"left-segment gutter"}>
 
@@ -49,12 +70,16 @@ const TransformerViewsLayout = () => {
                         <TransformerGraphContainer />
                     </Space.Fill>
 
+                </>
+            </Spaces.Fixed>
+
+             {/*:*/}
+                <Spaces.Fixed height={ height }
+                              trackSize>
+                    <CollapsibleHeatMapContainer/>
                 </Spaces.Fixed>
 
-                <Space.Fixed height={ window.innerHeight } trackSize>
-                    <CollapsibleHeatMapContainer />
-                </Space.Fixed>
-
+                {/*}*/}
         </Fragment>
     )
 }

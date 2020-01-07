@@ -23,8 +23,4 @@ export const reducerFn = (state = getInitialState(), action) => {
     }
 };
 
-const history = undoable(reducerFn, {
-    filter: includeAction(['update-model'])
-});
-
-export default history;
+export default reducerFn;

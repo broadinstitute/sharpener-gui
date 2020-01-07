@@ -39,9 +39,8 @@ export class GraphLayout extends React.Component {
 
         model.getNodes().forEach(node => {
             node.registerListener({
-                eventWillFire: event => console.log("event will fire", event),
                 // TODO: tweak, maybe create a cache which can track previous results, if identical, stop propagation?
-                eventDidFire:(event) => this.handleNodeEvent(event)
+                eventDidFire: (event) => this.handleNodeEvent(event)
             })
         });
 

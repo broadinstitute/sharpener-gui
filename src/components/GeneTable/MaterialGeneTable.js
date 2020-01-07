@@ -1,5 +1,6 @@
 import React, {useEffect, useMemo, useState} from "react"
 import {useSelector} from "react-redux";
+import Parallel from "paralleljs"
 
 import MUIDataTables from "mui-datatables"
 import {
@@ -7,48 +8,66 @@ import {
     MuiThemeProvider
 } from "@material-ui/core/styles";
 
-import _ from "lodash";
-
-
-const GeneTableMUI = ({ geneListId, nameMap }) => {
-    const geneList = useSelector(state => state.geneLists.byId);
-    // const data = useMemo(() => computeData(geneList[geneListId]), [geneListId]);
-
-    const getMuiTheme = () =>
-        createMuiTheme({
-            overrides: {
-                MUIDataTable: {
-                    paper: {
-                        boxShadow: "none"
-                    }
+const getMuiTheme = () =>
+    createMuiTheme({
+        overrides: {
+            MUIDataTable: {
+                paper: {
+                    boxShadow: "none"
                 }
             }
-        });
-
-    const [columns, setColumns] = useState([]);
-    const [data, setData] = useState([]);
-    const [urlIndex, setUrlIndex] = useState({});
-
-    function setTable (geneList) {
-        if (geneList) {
-            setColumns(
-                computeColumns(geneList) //.map(entry => entry.accessor)
-            );
-            setData(
-                computeData(geneList) //.map(entry => Object.values(entry))
-            );
         }
-    }
+    });
+
+const GeneTableMUI = ({ geneListId, nameMap }) => {
+    const geneList = useSelector(state => state.geneLists.byId[geneListId]);
+    const [urlIndex, setUrlIndex] = useState(null);
+    const [columns, setColumns] = useState(null);
+    const [data, setData] = useState(null);
 
     useEffect(() => {
-        setUrlIndex(
-            computerUrlIndex(geneList[geneListId])
-        );
+        computeUrlIndex(geneList);
     }, [geneListId])
 
     useEffect(() => {
-        setTable(geneList[geneListId]);
-    }, [urlIndex])
+        if (urlIndex) {
+            setColumns(computeColumns(geneList));
+        }
+    }, [urlIndex]);
+
+    useEffect(() => {
+        if (urlIndex) {
+            let para = new Parallel(geneList.genes);
+            para.spawn(function (data) {
+                return data.map(gene => {
+                    let tmpObj = {};
+
+                    // for of = property values
+                    for (let attribute of gene.attributes) {
+                        // console.log(attribute, gene.attributes)
+                        tmpObj = Object.assign(tmpObj, {
+                            [attribute.name]: attribute.value
+                        })
+                    }
+                    // for in = property names
+                    for (let identifier in gene.identifiers) {
+                        // console.log(identifier, gene.identifiers)
+                        tmpObj = Object.assign(tmpObj, {
+                            [identifier]: gene.identifiers[identifier]
+                        })
+                    }
+                    tmpObj = Object.assign(tmpObj, {
+                        "gene_id": gene.gene_id
+                    });
+
+                    return tmpObj;
+                })
+            })
+            .then(result => {
+                setData(result)
+            });
+        }
+    }, [urlIndex]);
 
     const options = {
         filterType: "textField",
@@ -58,11 +77,12 @@ const GeneTableMUI = ({ geneListId, nameMap }) => {
         searchOpen: true,
         print: false,
         downloadOptions: {filename: nameMap[geneListId]+'.csv', separator: ','},
-        rowsPerPageOptions: [10, 15, 20, 50, 100, geneList[geneListId].genes.length].filter(option => option <= geneList[geneListId].genes.length)
+        rowsPerPageOptions: [10, 15, 20, 50, 100, geneList.genes.length].filter(option => option <= geneList.genes.length)
     };
 
-    const computeColumns = geneList =>
-        [
+    const computeColumns = geneList => {
+        // TODO: ASSUMING ATTRIBUTES ARE HETEROGENUOUS ON GENES
+        const columns = [
             ...Object.keys(geneList.genes[0].identifiers ? geneList.genes[0].identifiers : [])
                 .map(identifierType => ({ name: identifierType, label: identifierType }))
                 .map(columnProperties => Object.assign(columnProperties, {
@@ -99,7 +119,8 @@ const GeneTableMUI = ({ geneListId, nameMap }) => {
                 }
             }
         ];
-
+        return columns;
+    };
 
     // TODO
     // function is responsible for reformatting literal values (like floats for sigfig) based on datatype
@@ -113,19 +134,18 @@ const GeneTableMUI = ({ geneListId, nameMap }) => {
             if (has_url) {
                 // get rowData element matching HGNC id
                 // get current label
-                // FALSE: use HGNC id against URL map (if index is not undefined, then get url)
+                // FALSE: use HGNC id against URL map (if index is not undefined, then get url) -> not ever gene has an HGNC ID?!?
+                    // Actual: gene_id can be IDs other than HGNC
+                // SOLUTION: append gene_id as a column since it's the sole consistent arbitrator of identity in the client AFAICT
                 // * takes advantage of gene_id being known as hgnc (guaranteed unique)
                 // * takes advantage of columns being known at point of render
                 // * completely hedges against unguaranteed row and column order
                 // given the table's sorting functions
 
                 let columnId = tableMeta.columnData.name;
-
                 // TODO: NOTE: the final entry is reserved for gene_id which us used internally!
                 let geneId = tableMeta.rowData[tableMeta.rowData.length - 1];
                 let url = geneId && urlIndex[geneId] && urlIndex[geneId][columnId] ? urlIndex[geneId][columnId] : null;
-
-                console.log(columnId, geneId, url)
 
                 return (
                     <a href={url} target="_blank" rel="noopener noreferrer">
@@ -142,54 +162,54 @@ const GeneTableMUI = ({ geneListId, nameMap }) => {
         } else {
             return null;
         }
-    }
-
-    const computeData = geneList => (geneList ? geneList.genes.reduce( (data, gene) => {
-        // merge gene list attributes with gene list identifiers
-        return data.concat({
-            ...gene.attributes.reduce((geneProps, attribute) => {
-                return Object.assign(geneProps, {
-                    [attribute.name]: attribute.value
-                })
-            }, {}),
-            ...(gene.identifiers ? gene.identifiers : []),
-            "gene_id": gene.gene_id
-        })
-    }, []) : null);
+    };
 
     const computeTitle = (geneList) => {
         const { source, attributes } = geneList;
         return attributes.reduce((title, attribute, index) => title + attribute.name + ": " + attribute.value + index > 0 && index < attributes.length - 1 ? ', and' : '', '')
-    }
+    };
 
-    const computerUrlIndex = (geneList) => {
-        console.group("compute URL index")
-        const newUrlIndex = geneList.genes.reduce((urlIndexByGeneId, gene) => {
-            urlIndexByGeneId[gene.gene_id] = {
-                ...gene.attributes.reduce((attributes, attribute) => Object.assign(attributes, {
-                    [attribute.name]: attribute.url === null ? undefined : attribute.url
-                }), {})
+    const computeUrlIndex = (geneList) => {
+        let para = new Parallel(geneList.genes);
+        para.spawn(function (data) {
+            const reducer = (acc, gene) => {
+                let urlAttributePredicateTable = {};
+                for (let attribute of gene.attributes) {
+                    urlAttributePredicateTable = Object.assign(
+                        urlAttributePredicateTable,
+                        {
+                            [attribute.name]: attribute.url
+                        }
+                    )
+                }
+                acc[gene.gene_id] = urlAttributePredicateTable;
+                return acc;
             };
-            console.log("outcome for "+ gene.gene_id, urlIndexByGeneId[gene.gene_id])
-            return urlIndexByGeneId;
-        }, {})
-        console.log(newUrlIndex)
-        console.groupEnd()
-        return newUrlIndex;
-    }
+            const paraReducer = (d) => reducer(d[0], d[1]);
+
+            return data.reduce(reducer)
+        })
+        .then(result => {
+            setUrlIndex(result);
+        });
+    };
 
     return (
-        <MuiThemeProvider theme={getMuiTheme()}>
-            {(computeTitle(geneList[geneListId]))}
-            <MUIDataTables
-                title={''}
-                columns={ columns }
-                data={ data }
-                options={ options }
-            />
-        </MuiThemeProvider>
+        <>
+            { columns && data ?
+                <MuiThemeProvider theme={getMuiTheme()}>
+                    {(computeTitle(geneList))}
+                    <MUIDataTables
+                        title={''}
+                        columns={ columns }
+                        data={ data }
+                        options={ options }
+                    />
+                </MuiThemeProvider>
+            : <p>Loading</p>}
+        </>
     )
-}
+};
 
 // column order
 // DONE
