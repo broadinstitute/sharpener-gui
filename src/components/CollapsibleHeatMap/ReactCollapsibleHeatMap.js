@@ -29,9 +29,14 @@ function ReactCollapsibleHeatMapFunction ({nodes, links, size}) {
             heatmap.load();
 
             const heatmapControl = document.getElementById("controls")
+
             const sortByGene = document.getElementById("sortGene");
             sortByGene.onclick = () => {
                 heatmap.sortRows();
+            };
+            const sortByGeneFrequency = document.getElementById("sortGeneFrequency");
+            sortByGeneFrequency.onclick = () => {
+                heatmap.sortRowsFrequency();
             };
 
             // heatmapControl.appendChild(sortByGene);
@@ -39,6 +44,11 @@ function ReactCollapsibleHeatMapFunction ({nodes, links, size}) {
             const sortByProcedure = document.getElementById("sortProcedure");
             sortByProcedure.onclick = () => {
                 heatmap.sortColumns();
+            };
+
+            const sortByProcedureFrequency = document.getElementById("sortProcedureFrequency");
+            sortByProcedureFrequency.onclick = () => {
+                heatmap.sortColumnsFrequency();
             };
 
             // heatmapControl.appendChild(sortByProcedure);

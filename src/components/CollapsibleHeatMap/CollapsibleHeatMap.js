@@ -1,4 +1,5 @@
 import * as d3 from "d3"
+import _ from "lodash"
 
 export class CollapsibleHeatMap {
     constructor(height, width, margin, rootElement, data=null, onClick=null) {
@@ -279,6 +280,15 @@ export class CollapsibleHeatMap {
         this.render("columns");
     }
 
+    sortRowsFrequency() {
+        this.rows = _.sortBy(this.rows, ['frequency'])
+        this.render("rows");
+    }
+
+    sortColumnsFrequency() {
+        this.columns = _.sortBy(this.columns, ['frequency']).reverse();
+        this.render("columnsFrequency");
+    }
 
     // this shapes the data for us
     /*
@@ -442,4 +452,5 @@ export class CollapsibleHeatMap {
         }
         this.render();
     }
+
 }

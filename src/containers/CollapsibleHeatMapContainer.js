@@ -28,12 +28,40 @@ const nameSelector = createSelector(
     nameMap
 );
 
+const currentGeneListsSelector = createSelector(
+    state => state.geneLists.Ids,
+    state => state.geneLists.byId,
+    state => state.geneLists.deletedGeneLists,
+    (geneListIds, geneListsById, deletedGeneLists) => geneListIds.filter(geneListId => !deletedGeneLists.includes(geneListId)).map(geneListId => geneListsById[geneListId])
+)
+
+const geneFrequency = createSelector(
+    currentGeneListsSelector,
+    currentGeneLists => (
+        _.countBy(currentGeneLists
+            .reduce((acc, geneList) => acc.concat(...geneList.genes), [])
+            .map(gene => gene.gene_id))
+    )
+)
+
+const sourceFrequency = createSelector(
+    currentGeneListsSelector,
+    currentGeneLists => (
+        _.countBy(currentGeneLists
+            .map(geneList => geneList.source)
+            .map(sourceIdentifier => sourceIdentifier.split(" ")[0])  // source name
+        )
+    )
+)
+
 const nodesSelector = createSelector(
     state => state.geneLists.Ids,
     state => state.geneLists.byId,
     state => state.geneLists.deletedGeneLists,
     nameSelector,
-    (geneListIds, geneListsById, deletedGeneLists, geneListNames) =>
+    geneFrequency,
+    sourceFrequency,
+    (geneListIds, geneListsById, deletedGeneLists, geneListNames, geneFrequency, sourceFrequency) =>
         _.flatten(geneListIds.filter(geneListId => !deletedGeneLists.includes(geneListId)).map(geneListId => geneListsById[geneListId])
             .map(geneList =>
                 {
@@ -41,7 +69,8 @@ const nodesSelector = createSelector(
                         ...geneList.genes.map(gene => ({
                             id: gene.gene_id,
                             name: gene.attributes.filter(attribute => attribute.name === "gene_symbol")[0].value, // TODO: should make a map at some point at reducer level to make lookups not take so long
-                            type: "gene"
+                            type: "gene",
+                            frequency: geneFrequency[gene.gene_id]
                         })),
                         ({
                             id: geneList.source + "|" + geneList.gene_list_id,
@@ -53,10 +82,11 @@ const nodesSelector = createSelector(
             ))
             .concat(
                 _.uniq(geneListIds.filter(geneListId => !deletedGeneLists.includes(geneListId)).map(geneListId => geneListsById[geneListId]).map(geneList => geneList.source))
-                    .map(uniqueGeneListSourceName => ({
-                        id: uniqueGeneListSourceName,
-                        name: uniqueGeneListSourceName.split(" ")[0],
-                        type: "procedure"
+                    .map(uniqueGeneListSourceIdentifier => ({
+                        id: uniqueGeneListSourceIdentifier,
+                        name: uniqueGeneListSourceIdentifier.split(" ")[0],
+                        type: "procedure",
+                        frequency: sourceFrequency[uniqueGeneListSourceIdentifier.split(" ")[0]]
                     }))
             )
 )
@@ -127,11 +157,13 @@ const CollapsibleHeatMapLayout = ({nodes, links}) => {
                     <div className={"heatmap-control"}>
                         <h6>Sort Genes</h6>
                         <button id={"sortGene"}>Alphabetically</button><br/>
+                        <button id={"sortGeneFrequency"}>Frequency</button><br/>
                     </div>
 
                     <div className={"heatmap-control"}>
                         <h6>Sort Gene Lists</h6>
                         <button id={"sortProcedure"}>Alphabetically</button><br/>
+                        <button id={"sortProcedureFrequency"}>Frequency</button><br/>
                     </div>
 
                     <div className={"heatmap-control"}>
