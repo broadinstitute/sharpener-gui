@@ -7,8 +7,8 @@ import {useDispatch} from "react-redux";
 
 function ReactCollapsibleHeatMapFunction ({nodes, links, size}) {
     const dispatch = useDispatch();
-
     const [svg, setSvg] = useState(null);
+
     const measuredSVGRef = useCallback(node => {
         if (node !== null) {
             setSvg(d3.select(node));
