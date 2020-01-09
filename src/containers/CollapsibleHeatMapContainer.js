@@ -1,14 +1,16 @@
-import React, { Component } from 'react';
+import React, { Component, useState } from 'react';
 import {connect} from "react-redux";
 import ReactCollapsibleHeatMap from "../components/CollapsibleHeatMap/ReactCollapsibleHeatMap"
 import {createSelector} from "reselect";
-
 import SharpenerInfo from "../components/SharpenerInfo/SharpenerInfo";
 
 import _ from "lodash";
 import * as Space from "react-spaces";
 
 import messages from "../message-properties";
+
+import TextField from '@material-ui/core/TextField';
+// import Autocomplete from '@material-ui/lab/Autocomplete';
 
 const transactionSelector = state => state.app.transactionLedger;
 const normalizedTransactions = state => state.app.transactionsNormalized;
@@ -35,13 +37,23 @@ const currentGeneListsSelector = createSelector(
     (geneListIds, geneListsById, deletedGeneLists) => geneListIds.filter(geneListId => !deletedGeneLists.includes(geneListId)).map(geneListId => geneListsById[geneListId])
 )
 
-const geneFrequency = createSelector(
+const currentGenesSelector = createSelector(
     currentGeneListsSelector,
-    currentGeneLists => (
-        _.countBy(currentGeneLists
-            .reduce((acc, geneList) => acc.concat(...geneList.genes), [])
-            .map(gene => gene.gene_id))
-    )
+    currentGeneLists => currentGeneLists.reduce((acc, geneList) => acc.concat(...geneList.genes), [])
+)
+
+const geneSymbolOfGene = gene => gene.attributes.filter(attribute => attribute.name === "gene_symbol")[0].value;
+const geneLabelIndex = createSelector(
+    currentGenesSelector,
+    currentGenes => currentGenes.reduce(
+        (acc, gene) => Object.assign(acc, {
+            [gene.gene_id]: geneSymbolOfGene(gene)
+        }), {})
+)
+
+const geneFrequency = createSelector(
+    currentGenesSelector,
+    currentGenes => _.countBy(currentGenes.map(gene => gene.gene_id))
 )
 
 const sourceFrequency = createSelector(
@@ -58,17 +70,18 @@ const nodesSelector = createSelector(
     state => state.geneLists.Ids,
     state => state.geneLists.byId,
     state => state.geneLists.deletedGeneLists,
+    geneLabelIndex,
     nameSelector,
     geneFrequency,
     sourceFrequency,
-    (geneListIds, geneListsById, deletedGeneLists, geneListNames, geneFrequency, sourceFrequency) =>
+    (geneListIds, geneListsById, deletedGeneLists, geneLabel, geneListNames, geneFrequency, sourceFrequency) =>
         _.flatten(geneListIds.filter(geneListId => !deletedGeneLists.includes(geneListId)).map(geneListId => geneListsById[geneListId])
             .map(geneList =>
                 {
                     return [
                         ...geneList.genes.map(gene => ({
                             id: gene.gene_id,
-                            name: gene.attributes.filter(attribute => attribute.name === "gene_symbol")[0].value, // TODO: should make a map at some point at reducer level to make lookups not take so long
+                            name: geneLabel[gene.gene_id], // TODO: should make a map at some point at reducer level to make lookups not take so long (like an index or normalization!)
                             type: "gene",
                             frequency: geneFrequency[gene.gene_id]
                         })),
@@ -125,6 +138,8 @@ const linksSelector = createSelector(
 const mapStateToProps = state => ({
     geneListIds: state => state.geneLists.Ids,
     selectedGeneListIds: state => state.geneLists.selectedMultipleGeneListsById,
+    genes: currentGenesSelector(state),
+    geneLabels: geneLabelIndex(state),
     nodes: nodesSelector(state),
     links: linksSelector(state),
     names: nameSelector(state)
@@ -133,7 +148,9 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
 });
 
-const CollapsibleHeatMapLayout = ({nodes, links}) => {
+
+const CollapsibleHeatMapLayout = ({nodes, links, genes, geneLabels}) => {
+    const [value, setValue] = useState('');
     return (
         <div>
 
@@ -141,16 +158,6 @@ const CollapsibleHeatMapLayout = ({nodes, links}) => {
                 size={"35%"}
                 maxWidth={"35%"}
                 className={"gutter"}>
-
-                <div style={{
-                    display: "flex",
-                    justifyContent: "flex-left",
-                    alignItems: "center"
-                }}>
-                    <h5 className={"info-header"}>{messages.header.pivot}</h5>
-                    <SharpenerInfo description={messages.tooltip.pivot}/>
-                </div>
-
 
                 <div id="heatmap-controls">
 
@@ -168,7 +175,10 @@ const CollapsibleHeatMapLayout = ({nodes, links}) => {
 
                     <div className={"heatmap-control"}>
                         <h6>Filter for Genes</h6>
-                        <input name={"rowFilter"} style={{ width: "100%" }}></input>
+                        <input
+                            name={"rowFilter"}
+                            style={{width: "100%"}}
+                        />
                     </div>
 
                 </div>
