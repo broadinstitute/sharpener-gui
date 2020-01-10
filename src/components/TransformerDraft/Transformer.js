@@ -87,7 +87,7 @@ const Transformer = ({index, transformerName, fetchGeneListTransformation, fetch
                             : ["aggregator"].includes(transformerInfo.function) ? queryAggregator(transformerName)
                             : null
                       }
-                      validate={ onValidate }
+                      validate={ onValidate(transformerInfo) }
                       render={({ handleSubmit, form, values }) => {
                           return (
                             <form className={"transformerForm"}
@@ -214,8 +214,26 @@ const Transformer = ({index, transformerName, fetchGeneListTransformation, fetch
     )
 
 };
-const onValidate = validate => validateTransformerQuery(validate);
-const validateTransformerQuery = validate => true;
+const onValidate = transformerInfo => validate => validateTransformerQuery(transformerInfo)(validate);
+const validateTransformerQuery = transformerInfo => values => {
+    const fieldNames = transformerInfo.parameters.map(parameter => parameter.name)
+        .concat([
+            ["aggregator"].includes(transformerInfo.function) ? "gene_list_ids"
+            : ["expander", "filter"].includes(transformerInfo.function) ? "gene_list_id"
+            : null
+        ]);
+    const errors = {}
+    fieldNames.map(fieldName => {
+        if (fieldName != null) {
+            if (!values[fieldName]) {
+                errors[fieldName] = `${fieldName} Required`
+                console.log(values[fieldName])
+            }
+        }
+    });
+    // console.log("errors", errors);
+    return errors;
+}
 
 const inputProps = parameter => {
 

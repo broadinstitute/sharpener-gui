@@ -1,4 +1,4 @@
-import React, {Fragment, useEffect, useLayoutEffect, useState} from 'react';
+import React, {Fragment, useCallback, useEffect, useLayoutEffect, useState} from 'react';
 import * as Space from 'react-spaces';
 
 import "./Navigation.css"
@@ -10,10 +10,13 @@ import TransformerGraphContainer from "../../containers/TransformerGraphContaine
 import CollapsibleHeatMapContainer from "../../containers/CollapsibleHeatMapContainer";
 
 import * as Spaces from "react-spaces"
+import * as TabTab from "react-tabtab"
+import * as customStyle from 'react-tabtab/lib/themes/bulma';
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faProjectDiagram, faBorderAll } from '@fortawesome/free-solid-svg-icons'
 
 import messages from "../../message-properties";
-
-
 
 function useWindowSize() {
     const [size, setSize] = useState([0, 0]);
@@ -31,6 +34,9 @@ function useWindowSize() {
 
 const TransformerViewsLayout = () => {
     const [pivot, setPivot] = useState(true);
+    const onChange = useCallback(
+        e => setPivot(e.value), []);
+
     const [width, height] = useWindowSize();
 
     return (
@@ -41,7 +47,7 @@ const TransformerViewsLayout = () => {
             {/*{ pivot ?*/}
                 <>
 
-                    <Spaces.LeftResizable size={"35%"} maxWidth={"35%"} className={"left-segment gutter"}>
+                    <Spaces.LeftResizable size={"35%"} maxWidth={"35%"} className={"left-segment downshift gutter"}>
 
                         <span>
                             <h5 className={"info-header"}>{messages.header.create}</h5>
@@ -67,19 +73,61 @@ const TransformerViewsLayout = () => {
                     </Spaces.LeftResizable>
 
                     <Space.Fill className={"top-segment gutter"}>
-                        <TransformerGraphContainer />
+                        <TabTab.Tabs
+                            customStyle={customStyle}
+                            showArrowButton={false}
+                        >
+                            <TabTab.TabList>
+                                <TabTab.Tab
+                                    name={"tab-graph"}
+                                    onClick = {() => {
+                                        setPivot(false)
+                                    }}
+                                >
+                                    <div key={pivot}
+                                         // className={pivot ? "underline" : ''}
+                                        onClick = {() => {
+                                            setPivot(true)
+                                        }}>
+                                    <FontAwesomeIcon
+                                        icon={faProjectDiagram}/>
+                                    </div>
+                                </TabTab.Tab>
+                                <TabTab.Tab
+                                    name={"tab-pivot"}
+                                    onClick = {() => {
+                                        setPivot(true)
+                                    }}>
+                                    <div key={pivot}
+                                        // className={!pivot ? "underline" : ''}
+                                        >
+                                        <FontAwesomeIcon
+                                            icon={faBorderAll}/>
+                                    </div>
+                                </TabTab.Tab>
+                            </TabTab.TabList>
+                            <TabTab.PanelList>
+                                <TabTab.Panel>
+                                    <Spaces.Fixed height={ height * 0.90 }
+                                                  trackSize>
+                                        <TransformerGraphContainer />
+                                    </Spaces.Fixed>
+                                </TabTab.Panel>
+                                <TabTab.Panel>
+                                    <Spaces.Fixed height={ height * 0.90 }
+                                                  trackSize>
+                                        <CollapsibleHeatMapContainer/>
+                                    </Spaces.Fixed>
+                                </TabTab.Panel>
+                            </TabTab.PanelList>
+                        </TabTab.Tabs>
                     </Space.Fill>
 
                 </>
             </Spaces.Fixed>
 
-             {/*:*/}
-                <Spaces.Fixed height={ height }
-                              trackSize>
-                    <CollapsibleHeatMapContainer/>
-                </Spaces.Fixed>
 
-                {/*}*/}
+
         </Fragment>
     )
 }

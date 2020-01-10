@@ -15,6 +15,7 @@ export class CollapsibleHeatMap {
 
     init() {
         this.rootElement.selectAll("*").remove();
+
         this.svg = (this.rootElement)
             .append("svg")
             .attr("height", this.height)
@@ -145,7 +146,7 @@ export class CollapsibleHeatMap {
                 .select(".title")
                 .attr("class", "title")
                 .on("click", null)
-                .text("Genes vs Transformers");
+                .text("Genes vs Sources");
         }
 
         const pairing = d3.cross(this.rows, this.columns);
@@ -195,7 +196,7 @@ export class CollapsibleHeatMap {
                             this.reds(matrix[gene.id][procedure.id])
                         )
                         .attr("width", this.x.bandwidth())
-                        .attr("height", this.y.bandwidth())
+                        .attr("height", Math.round(this.y.bandwidth()))
                         .on("mouseover", p => this.mouseover(p))
                         .on("mouseout", this.mouseout)
                         .on("click", d => {
@@ -450,6 +451,10 @@ export class CollapsibleHeatMap {
                 )
                 .filter(filter);
         }
+        this.render();
+    }
+
+    resize(size) {
         this.render();
     }
 

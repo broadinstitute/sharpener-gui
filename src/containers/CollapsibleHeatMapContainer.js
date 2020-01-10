@@ -154,10 +154,20 @@ const CollapsibleHeatMapLayout = ({nodes, links, genes, geneLabels}) => {
     return (
         <div>
 
-            <Space.LeftResizable
-                size={"35%"}
-                maxWidth={"35%"}
-                className={"gutter"}>
+            <Space.Fill
+                size={"100%"}>
+
+                <div style={{
+                        display: "flex",
+                        flexShrink: "0",
+                        justifyContent: "space-between"
+                    }}>
+                        <span>
+                            <h5 className={"info-header"}>{messages.header.pivot}</h5>
+                            <SharpenerInfo description={messages.tooltip.pivot}/>
+                        </span>
+                        {/*<button className={"graph-control"} onClick={ () => this.autoDistributeNodes(this.engine) }>Layout</button>*/}
+                </div>
 
                 <div id="heatmap-controls">
 
@@ -183,10 +193,6 @@ const CollapsibleHeatMapLayout = ({nodes, links, genes, geneLabels}) => {
 
                 </div>
 
-            </Space.LeftResizable>
-
-            <Space.Fill
-                trackSize>
                 <Space.Info>
                     {info => <ReactCollapsibleHeatMap size={info} nodes={nodes} links={links}/>}
                 </Space.Info>

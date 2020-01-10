@@ -15,7 +15,7 @@ function App() {
                 </Space.LeftResizable>
 
                 <Space.Fill className={"gutter"}>
-                    <Space.Top size={"100%"} className={"right-segment gutter"} scrollable>
+                    <Space.Top size={"100%"} className={"right-segment downshift gutter"} scrollable>
                         <GeneTableContainer/>
                     </Space.Top>
                 </Space.Fill>

@@ -13,7 +13,7 @@ import {InputType, DeleteItemsAction, ZoomCanvasAction} from "@projectstorm/reac
 
 import messages from "../../message-properties";
 
-export class GraphLayout extends React.Component {
+export class GraphWrapper extends React.Component {
     constructor(props) {
         super(props);
 
@@ -59,134 +59,147 @@ export class GraphLayout extends React.Component {
             },
             includeLinks: true
         });
+
+        this.loadFromTransactions = this.loadFromTransactions.bind(this);
     }
 
-    componentWillReceiveProps(nextProps, _) {
-        let selectedGeneListsById = nextProps.selectedGeneLists;
+    componentDidMount() {
+        this.loadFromTransactions(this.props);
+        // this.autoDistributeNodes(this.engine);
+    }
 
-        // The roster is used to prevent the redundant creation of nodes as we traverse through the
-        // transactions (which double count the query id when a gene list serves as both an output and an input.
-        // We check against the roster whether a node has already been created, then get it; else we skip trying to get a node
-        // and create it if the gene_list_id is not null.
-        let roster = {};
+    componentWillReceiveProps (nextProps) {
+        this.loadFromTransactions(nextProps);
+        // this.autoDistributeNodes(this.engine);
+    }
 
-        // check if the node is previously on the graph
-        const nodesIndexedByName = this.engine.getModel().getNodes().reduce((acc, node) => Object.assign(acc, { [node.name]: node }), {})
-
+    loadFromTransactions({selectedGeneLists, deletedGeneLists, transactions, transformerName, transformersNormalized}) {
         console.group("Graph Updating");
-        console.log(selectedGeneListsById);
-        console.log(this.engine.getModel().getNodes());
+        console.log("props", {selectedGeneLists, deletedGeneLists, transactions, transformerName, transformersNormalized});
+        if (typeof selectedGeneLists !== "undefined") {
+            let selectedGeneListsById = selectedGeneLists;
+            // The roster is used to prevent the redundant creation of nodes as we traverse through the
+            // transactions (which double count the query id when a gene list serves as both an output and an input.
+            // We check against the roster whether a node has already been created, then get it; else we skip trying to get a node
+            // and create it if the gene_list_id is not null.
+            let roster = {};
 
-        if (nextProps.transactions) {
-            let newModel = new DiagramModel();
+            // check if the node is previously on the graph
+            const nodesIndexedByName = this.engine.getModel().getNodes().reduce((acc, node) => Object.assign(acc, { [node.name]: node }), {})
 
-            nextProps.transactions.forEach(transaction => {
-                const { gene_list_id, query, size } = transaction;
-                if (!nextProps.deletedGeneLists.includes(gene_list_id)) {
+            console.log(selectedGeneListsById);
+            console.log(this.engine.getModel().getNodes());
 
-                    let outputNode = {};
-                    if (Object.keys(nodesIndexedByName).includes(gene_list_id)) {
+            if (transactions) {
+                let newModel = new DiagramModel();
 
-                        // TODO: make this node a clone of the existing node
+                transactions.forEach(transaction => {
+                    const { gene_list_id, query, size } = transaction;
+                    if (!deletedGeneLists.includes(gene_list_id)) {
+
+                        let outputNode = {};
+                        if (Object.keys(nodesIndexedByName).includes(gene_list_id)) {
+
+                            // TODO: make this node a clone of the existing node
                             // in particular, preserve all UI specific state
-                                // selectedness
-                                // given position
-                        outputNode = nodesIndexedByName[gene_list_id] // TODO: what happens when a node is added while exisitng?
+                            // selectedness
+                            // given position
+                            outputNode = nodesIndexedByName[gene_list_id] // TODO: what happens when a node is added while exisitng?
 
-                    } else {
+                        } else {
 
-                        outputNode = new JSCustomNodeModel({
-                            name: gene_list_id,
-                            title: nextProps.transformerName[gene_list_id],
-                            controls: query.controls,
-                            size: size,
-                            selected: selectedGeneListsById.includes(gene_list_id),
-                            function: nextProps.transformersNormalized.byName[query.name].function
-                        });
-
-                    }
-                    roster[gene_list_id] = outputNode.options.id;
-
-                    if (typeof query.gene_list_id !== "undefined") {
-                        // if the query's gene_list_id is not null, then that means it is related to another gene_list_id from the session
-                        // so our updated graph must include a link between the two, else we just add the node to the graph without a link
-                        if (query.gene_list_id !== null && !nextProps.deletedGeneLists.includes(query.gene_list_id)) {
-                            let inputNode = null;
-                            // if the gene list id is already in the roster, then we can just get the node as it already exists
-                            // in the graph and use its model in the graph-model updating (including adding a linkage)
-                            if (typeof roster[query.gene_list_id] != "undefined") {
-                                inputNode = newModel.getNode(roster[query.gene_list_id])
-                            } else {
-                                if (typeof query.gene_list_id !== "undefined") {
-
-                                    inputNode = new JSCustomNodeModel({
-                                        name: query.gene_list_id,
-                                        title: nextProps.transformerName[query.gene_list_id],
-                                        controls: query.controls,
-                                        size: size,
-                                        selected: selectedGeneListsById.includes(gene_list_id),
-                                        function: nextProps.transformersNormalized.byName[query.name].function
-                                    });
-                                    roster[query.gene_list_id] = inputNode.options.id;
-
-                                }
-
-                            }
-
-                            const newLink = new DefaultLinkModel();
-                            // TODO: Link deltas: size, diff elements
-                            newLink.setSourcePort(inputNode.getPort("out"));
-                            newLink.setTargetPort(outputNode.getPort("in"));
-                            newModel.addAll(inputNode, outputNode, newLink);
+                            outputNode = new JSCustomNodeModel({
+                                name: gene_list_id,
+                                title: transformerName[gene_list_id],
+                                controls: query.controls,
+                                size: size,
+                                selected: selectedGeneListsById.includes(gene_list_id),
+                                function: transformersNormalized.byName[query.name].function
+                            });
 
                         }
-                        newModel.addNode(outputNode);
+                        roster[gene_list_id] = outputNode.options.id;
 
-                    } else if (typeof query.gene_list_ids !== "undefined") {
-                        if (query.gene_list_ids !== null && query.gene_list_ids.length > 0) {
-                            query.gene_list_ids.filter(gene_list_id => !nextProps.deletedGeneLists.includes(gene_list_id)).forEach(gene_list_id => {
+                        if (typeof query.gene_list_id !== "undefined") {
+                            // if the query's gene_list_id is not null, then that means it is related to another gene_list_id from the session
+                            // so our updated graph must include a link between the two, else we just add the node to the graph without a link
+                            if (query.gene_list_id !== null && !deletedGeneLists.includes(query.gene_list_id)) {
                                 let inputNode = null;
-                                if (typeof roster[gene_list_id] != "undefined") {
-                                    inputNode = newModel.getNode(roster[gene_list_id])
+                                // if the gene list id is already in the roster, then we can just get the node as it already exists
+                                // in the graph and use its model in the graph-model updating (including adding a linkage)
+                                if (typeof roster[query.gene_list_id] != "undefined") {
+                                    inputNode = newModel.getNode(roster[query.gene_list_id])
                                 } else {
-                                    inputNode = new JSCustomNodeModel({
-                                        name: gene_list_id,
-                                        title: nextProps.transformerName[gene_list_id],
-                                        controls: query.controls,
-                                        size: size,
-                                        selected: selectedGeneListsById.includes(gene_list_id),
-                                        function: nextProps.transformersNormalized.byName[query.name].function
-                                    });
-                                    roster[gene_list_id] = inputNode.options.id;
+                                    if (typeof query.gene_list_id !== "undefined") {
+
+                                        inputNode = new JSCustomNodeModel({
+                                            name: query.gene_list_id,
+                                            title: transformerName[query.gene_list_id],
+                                            controls: query.controls,
+                                            size: size,
+                                            selected: selectedGeneListsById.includes(gene_list_id),
+                                            function: transformersNormalized.byName[query.name].function
+                                        });
+                                        roster[query.gene_list_id] = inputNode.options.id;
+
+                                    }
+
                                 }
+
                                 const newLink = new DefaultLinkModel();
                                 // TODO: Link deltas: size, diff elements
                                 newLink.setSourcePort(inputNode.getPort("out"));
                                 newLink.setTargetPort(outputNode.getPort("in"));
                                 newModel.addAll(inputNode, outputNode, newLink);
-                            })
+
+                            }
+                            newModel.addNode(outputNode);
+
+                        } else if (typeof query.gene_list_ids !== "undefined") {
+                            if (query.gene_list_ids !== null && query.gene_list_ids.length > 0) {
+                                query.gene_list_ids.filter(gene_list_id => !deletedGeneLists.includes(gene_list_id)).forEach(gene_list_id => {
+                                    let inputNode = null;
+                                    if (typeof roster[gene_list_id] != "undefined") {
+                                        inputNode = newModel.getNode(roster[gene_list_id])
+                                    } else {
+                                        inputNode = new JSCustomNodeModel({
+                                            name: gene_list_id,
+                                            title: transformerName[gene_list_id],
+                                            controls: query.controls,
+                                            size: size,
+                                            selected: selectedGeneListsById.includes(gene_list_id),
+                                            function: transformersNormalized.byName[query.name].function
+                                        });
+                                        roster[gene_list_id] = inputNode.options.id;
+                                    }
+                                    const newLink = new DefaultLinkModel();
+                                    // TODO: Link deltas: size, diff elements
+                                    newLink.setSourcePort(inputNode.getPort("out"));
+                                    newLink.setTargetPort(outputNode.getPort("in"));
+                                    newModel.addAll(inputNode, outputNode, newLink);
+                                })
+                            }
+
+                        } else {
+                            newModel.addNode(outputNode);
                         }
 
-                    } else {
-                        newModel.addNode(outputNode);
                     }
+                });
 
-                }
-            });
+                newModel.getNodes().forEach(node => {
+                    node.registerListener({
+                        eventWillFire: event => console.log("event will fire", event),
+                        eventDidFire: (event) => this.handleNodeEvent(event)
+                    })
+                });
 
-            newModel.getNodes().forEach(node => {
-                node.registerListener({
-                    eventWillFire: event => console.log("event will fire", event),
-                    eventDidFire: (event) => this.handleNodeEvent(event)
-                })
-            });
+                this.engine.setModel(newModel);
 
-            // this.layoutEngine.redistribute(newModel);
-            this.engine.setModel(newModel);
+                console.log(this.engine.getModel().getNodes());
+                console.groupEnd();
 
-            console.log(this.engine.getModel().getNodes());
-            console.groupEnd();
-
+            }
         }
     }
 
@@ -238,6 +251,7 @@ export class GraphLayout extends React.Component {
                     <button className={"graph-control"} onClick={ () => this.autoDistributeNodes(this.engine) }>Layout</button>
                 </div>
 
+                {/* in a fragment to get parent size instead of having to pass through */}
                 <BodyWidget className={"back-graph-container"} engine={this.engine}/>
 
             </Fragment>

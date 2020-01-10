@@ -1,7 +1,7 @@
 import React from 'react';
 import {connect} from 'react-redux';
 
-import {GraphLayout} from "../components/TransformerGraph/TransformerGraph"
+import {GraphWrapper} from "../components/TransformerGraph/TransformerGraph"
 
 import {selectGeneListMultiple, unselectGeneListMultiple, getSelections, removeGeneList} from "../actions";
 import { createSelector } from "reselect";
@@ -64,4 +64,4 @@ const mapDispatchToProps = dispatch => ({
     getSelectedGeneListIds: () => dispatch(getSelections())
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(GraphLayout);
+export default connect(mapStateToProps, mapDispatchToProps)(GraphWrapper);

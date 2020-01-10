@@ -1,12 +1,13 @@
 import React, {useEffect, useMemo, useState} from "react"
 import {useSelector} from "react-redux";
 import Parallel from "paralleljs"
-
+import {Spinner} from "reactstrap"
 import MUIDataTables from "mui-datatables"
 import {
     createMuiTheme,
     MuiThemeProvider
 } from "@material-ui/core/styles";
+import "./GeneTable.css";
 
 const getMuiTheme = () =>
     createMuiTheme({
@@ -71,7 +72,6 @@ const GeneTableMUI = ({ geneListId, nameMap }) => {
 
     const options = {
         filterType: "textField",
-        responsive: "scrollMaxHeight",
         pagination: true,
         selectableRows: 'none',
         searchOpen: true,
@@ -206,7 +206,9 @@ const GeneTableMUI = ({ geneListId, nameMap }) => {
                         options={ options }
                     />
                 </MuiThemeProvider>
-            : <p>Loading</p>}
+            :   <div style={{paddingTop: "50%", paddingLeft: "50%", height: "1vh"}}>
+                    <Spinner size={"lg"}/>
+                </div> }
         </>
     )
 };

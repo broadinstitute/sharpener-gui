@@ -2,13 +2,14 @@
     padding: 0 5px 0 5px !important;
 }
 
-[class *= MUIDataTable-responsiveScrollMaxHeight] {
-    max-height: 90% !important;
-}
-
-[class *= MUIDataTable-paper] {
+[class *= MuiPaper-root] {
     border-left: 1px solid #aaa;
     border-right: 1px solid #aaa;
     border-bottom: 1px solid #aaa;
-    /*height: 60% !important;*/
 }
+
+[class *= MuiPaper-rounded] {
+    border-top-left-radius: 0px !important;
+    border-top-right-radius: 0px !important;
+}
+
