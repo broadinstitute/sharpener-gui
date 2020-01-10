@@ -103,6 +103,13 @@ export default class CreateGeneList extends React.Component {
                             height: '100%',
                             fontSize: 14
                         }),
+                        valueContainer: base => ({
+                            ...base,
+                            textOverflow: "ellipsis",
+                            // whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            // display: "initial"
+                        })
                     }}
 
                 />

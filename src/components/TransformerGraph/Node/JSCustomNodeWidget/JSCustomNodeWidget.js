@@ -5,6 +5,7 @@ import styled from '@emotion/styled';
 
 import "./JSCustomNodeWidget.css"
 import Tooltip from "../../../Tooltip/Tooltip";
+import * as _ from "lodash";
 
 const FunctionToColorMapping = {
     "producer": "#ca4f00",
@@ -26,6 +27,16 @@ const Node = styled.div`
 		border: solid 2px ${p => (p.selected ? 'rgb(0,192,255)' : 'black')};  // selection
 	`;
 
+function renderCellContent(value) {
+    return _.isArray(value) ?
+       (<ul className={"columns"}>
+           { _.take(value, 10)
+               .map(v => <li>{v}</li>)
+               .concat(value.length > 10 ? <li>...</li> : null)}
+       </ul>)
+    : value;
+}
+
 export class JSCustomNodeWidget extends DefaultNodeWidget {
     render() {
         return (
@@ -36,10 +47,13 @@ export class JSCustomNodeWidget extends DefaultNodeWidget {
                         {this.props.node.function} inputs<br/>
                         <ul>
                             {this.props.node.getOptions().controls.map(
-                                control => <li>
-                                    <u>{control.name}</u><br/>
-                                    <b>{control.value}</b>
-                                </li>)}
+                                control =>
+                                    <li>
+                                        <u>{control.name}</u><br/>
+                                        <b>{renderCellContent(control.value)}</b>
+                                    </li>
+                            )
+                            }
                         </ul>
                     </span>
                 }>
