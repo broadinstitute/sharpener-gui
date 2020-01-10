@@ -1,6 +1,8 @@
 import * as d3 from "d3"
 import _ from "lodash"
 
+
+const SCALE_HEIGHT = 1
 export class CollapsibleHeatMap {
     constructor(height, width, margin, rootElement, data=null, onClick=null) {
         this.height = height;
@@ -9,8 +11,6 @@ export class CollapsibleHeatMap {
         this.rootElement = rootElement;
         this.data = data;
         this.onClick = onClick;
-        console.log("collapsible heatmap data internal", this.data)
-
     }
 
     init() {
@@ -195,7 +195,7 @@ export class CollapsibleHeatMap {
                         .attr("fill", ([gene, procedure]) =>
                             this.reds(matrix[gene.id][procedure.id])
                         )
-                        .attr("width", this.x.bandwidth())
+                        .attr("width", Math.round(this.x.bandwidth()))
                         .attr("height", Math.round(this.y.bandwidth()))
                         .on("mouseover", p => this.mouseover(p))
                         .on("mouseout", this.mouseout)
@@ -210,8 +210,8 @@ export class CollapsibleHeatMap {
                     update
                         .transition(transition)
                         .delay(sortBy ? delayCell : 0)
-                        .attr("width", this.x.bandwidth())
-                        .attr("height", this.y.bandwidth())
+                        .attr("width", Math.round(this.x.bandwidth()))
+                        .attr("height", Math.round(this.y.bandwidth()))
                         .attr("transform", ([row, column], index) => {
                             return `translate(${this.x(column.name)},${this.y(row.name)})`;
                         });
@@ -436,7 +436,8 @@ export class CollapsibleHeatMap {
     }
 
     filter(filterBy, text) {
-        const filter = d => (text !== "" ? d.name.indexOf(text) >= 0 : true);
+        // make case insensitive
+        const filter = d => (text !== "" ? d.name.toLowerCase().indexOf(text.toLowerCase()) >= 0 : true);
         if (filterBy == "rows") {
             this.rows = this.genes.filter(filter);
         } else if (!this.selectedProcedure) {
