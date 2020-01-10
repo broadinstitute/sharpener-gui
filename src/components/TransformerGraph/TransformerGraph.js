@@ -10,6 +10,7 @@ import './TransformerGraph.css'
 import _ from "lodash";
 import SharpenerInfo from "../SharpenerInfo/SharpenerInfo";
 import {InputType, DeleteItemsAction, ZoomCanvasAction} from "@projectstorm/react-canvas-core";
+import Tooltip from "../Tooltip/Tooltip";
 
 import messages from "../../message-properties";
 
@@ -83,12 +84,8 @@ export class GraphWrapper extends React.Component {
             // We check against the roster whether a node has already been created, then get it; else we skip trying to get a node
             // and create it if the gene_list_id is not null.
             let roster = {};
-
-            // check if the node is previously on the graph
-            const nodesIndexedByName = this.engine.getModel().getNodes().reduce((acc, node) => Object.assign(acc, { [node.name]: node }), {})
-
-            console.log(selectedGeneListsById);
-            console.log(this.engine.getModel().getNodes());
+            const currentNodesIndexedByGeneListId  = this.engine.getModel().getNodes().reduce((acc, node) => Object.assign(acc, { [node.name]: node }), {})
+            console.log("previous nodes", this.engine.getModel().getNodes());
 
             if (transactions) {
                 let newModel = new DiagramModel();
@@ -96,16 +93,17 @@ export class GraphWrapper extends React.Component {
                 transactions.forEach(transaction => {
                     const { gene_list_id, query, size } = transaction;
                     if (!deletedGeneLists.includes(gene_list_id)) {
-
-                        let outputNode = {};
-                        if (Object.keys(nodesIndexedByName).includes(gene_list_id)) {
+			let outputNode = {};
+			
+			// check if the node is previously on the graph
+			if (Object.keys(currentNodesIndexedByGeneListId).includes(gene_list_id)) {
 
                             // TODO: make this node a clone of the existing node
                             // in particular, preserve all UI specific state
                             // selectedness
                             // given position
-                            outputNode = nodesIndexedByName[gene_list_id] // TODO: what happens when a node is added while exisitng?
-
+                            outputNode = currentNodesIndexedByGeneListId[gene_list_id] // TODO: what happens when a node is added while exisitng?
+			    console.log("previous output node position", outputNode.position);
                         } else {
 
                             outputNode = new JSCustomNodeModel({
@@ -129,6 +127,7 @@ export class GraphWrapper extends React.Component {
                                 // in the graph and use its model in the graph-model updating (including adding a linkage)
                                 if (typeof roster[query.gene_list_id] != "undefined") {
                                     inputNode = newModel.getNode(roster[query.gene_list_id])
+				    console.log("previous node position", inputNode.position)
                                 } else {
                                     if (typeof query.gene_list_id !== "undefined") {
 
@@ -161,6 +160,7 @@ export class GraphWrapper extends React.Component {
                                     let inputNode = null;
                                     if (typeof roster[gene_list_id] != "undefined") {
                                         inputNode = newModel.getNode(roster[gene_list_id])
+					console.log("previous node position", inputNode.position)
                                     } else {
                                         inputNode = new JSCustomNodeModel({
                                             name: gene_list_id,
@@ -189,14 +189,13 @@ export class GraphWrapper extends React.Component {
 
                 newModel.getNodes().forEach(node => {
                     node.registerListener({
-                        eventWillFire: event => console.log("event will fire", event),
                         eventDidFire: (event) => this.handleNodeEvent(event)
                     })
                 });
 
                 this.engine.setModel(newModel);
 
-                console.log(this.engine.getModel().getNodes());
+                console.log("new nodes", this.engine.getModel().getNodes());
                 console.groupEnd();
 
             }
@@ -221,6 +220,7 @@ export class GraphWrapper extends React.Component {
             this.props.unselectGeneList(event.entity.name);
             this.props.removeGeneList(event.entity.name);
         }
+	return event;
     }
 
     autoDistributeNodes (engine) {
@@ -247,8 +247,43 @@ export class GraphWrapper extends React.Component {
                     <span>
                         <h5 className={"info-header"}>{messages.header.graph}</h5>
                         <SharpenerInfo description={messages.tooltip.graph}/>
-                    </span>
-                    <button className={"graph-control"} onClick={ () => this.autoDistributeNodes(this.engine) }>Layout</button>
+                </span>
+		<div style={{
+		    marginLeft: "0.2em"
+		}}>
+		<button className={"graph-control"} onClick = {
+		    () => this.props.selectedGeneLists.map(selectedGeneList => this.props.removeGeneList(selectedGeneList))
+		} disabled={!(this.props.selectedGeneLists.length > 0)}>
+		<Tooltip placement="bottom" trigger="hover" tooltip={
+			<div>
+			{/*   */}
+			Removes selected gene lists from the graph. {/*You can undo this action.*/}
+			<br/>
+			<br/>
+		    {
+			!(this.props.selectedGeneLists.length > 0) ? <p>Select a gene list before deleting it.</p>
+			    : this.props.selectedGeneLists.length > 0 ? `Will remove ${this.props.selectedGeneLists.length} gene list${ this.props.selectedGeneLists.length > 1 ? 's' : ''}:`
+			    : null
+		    }
+		    {
+			this.props.selectedGeneLists.length > 0 ? <p>
+			    <ul>
+			    {this.props.selectedGeneLists.map(selectedGeneList => <li>{this.props.transformerName[selectedGeneList]}</li>)}
+			</ul>
+			    </p>
+			    : null
+		    }
+
+			<em>You can also press the 'Delete' key on your keyboard to delete selected gene lists.</em>
+		    </div>
+		}>
+		<span>
+		Remove	 
+	    </span>
+		</Tooltip>
+	        </button>&nbsp;
+                <button className={"graph-control"} onClick={ () => this.autoDistributeNodes(this.engine) }>Layout</button>
+		</div>
                 </div>
 
                 {/* in a fragment to get parent size instead of having to pass through */}
