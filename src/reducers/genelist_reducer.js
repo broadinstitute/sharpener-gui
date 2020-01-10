@@ -1,4 +1,12 @@
-import { FETCH_TRANSFORMATION_SUCCESS, REMOVE_GENE_LIST, SELECT_MULTIPLE_GENE_LIST, SELECT_SINGLE_GENE_LIST, UNSELECT_MULTIPLE_GENE_LIST, UNSELECT_SINGLE_GENE_LIST } from "../actions";
+import {
+    FETCH_TRANSFORMATION_SUCCESS,
+    REMOVE_GENE_LIST,
+    SELECT_MULTIPLE_GENE_LIST,
+    SELECT_SINGLE_GENE_LIST,
+    UNDO_REMOVE_GENE_LIST,
+    UNSELECT_MULTIPLE_GENE_LIST,
+    UNSELECT_SINGLE_GENE_LIST
+} from "../actions";
 
 const initialGeneListsState = {
     byId: {},
@@ -24,13 +32,19 @@ const geneLists = (state=initialGeneListsState, action) => {
                 ...state,
                 byId: {
                     ...state.byId,
-                    [action.payload.removedGeneListId]: undefined
+                    // TODO: NOTE: Eliminating this following line of code because now we want this action to be undoable.
+                    // [action.payload.removedGeneListId]: undefined
                 },
                 // Ids: state.Ids.filter(geneListId => geneListId !== action.payload.removedGeneListId),
                 selectedMultipleGeneListsById: state.selectedMultipleGeneListsById.filter(geneListId => geneListId !== action.payload.removedGeneListId),
                 selectedSingleGeneListsById: null,
-                deletedGeneLists: state.deletedGeneLists.concat(action.payload.removedGeneListId)
+                deletedGeneLists: state.deletedGeneLists.concat([action.payload.removedGeneListId])
             };
+        case UNDO_REMOVE_GENE_LIST:
+            return {
+                ...state,
+                deletedGeneLists: state.deletedGeneLists.filter(geneListId => state.deletedGeneLists.indexOf(geneListId) != state.deletedGeneLists.length - 1)
+            }
         case SELECT_MULTIPLE_GENE_LIST:
             return {
                 ...state,

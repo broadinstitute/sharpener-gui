@@ -268,7 +268,7 @@ export class GraphWrapper extends React.Component {
 		    {
 			this.props.selectedGeneLists.length > 0 ? <p>
 			    <ul>
-			    {this.props.selectedGeneLists.map(selectedGeneList => <li>{this.props.transformerName[selectedGeneList]}</li>)}
+			    {this.props.selectedGeneLists.map(selectedGeneList => <li>"{this.props.transformerName[selectedGeneList]}"</li>)}
 			</ul>
 			    </p>
 			    : null
@@ -281,7 +281,13 @@ export class GraphWrapper extends React.Component {
 		Remove	 
 	    </span>
 		</Tooltip>
-	        </button>&nbsp;
+	        </button>
+            <button
+                className={"graph-control"}
+                onClick={ () => this.props.undoRemoveGeneList() }
+                disabled={!(this.props.deletedGeneLists.length > 0)}>
+                Undo
+            </button>&nbsp;
                 <button className={"graph-control"} onClick={ () => this.autoDistributeNodes(this.engine) }>Layout</button>
 		</div>
                 </div>

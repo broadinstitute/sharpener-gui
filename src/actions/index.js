@@ -233,6 +233,7 @@ export const UNSELECT_MULTIPLE_GENE_LIST = 'UNSELECT_MULTIPLE_GENE_LIST'
 export const UNSELECT_SINGLE_GENE_LIST = 'UNSELECT_SINGLE_GENE_LIST'
 export const SELECT_SINGLE_GENE_LIST = 'SELECT_SINGLE_GENE_LIST'
 export const REMOVE_GENE_LIST = 'REMOVE_GENE_LIST'
+export const UNDO_REMOVE_GENE_LIST = 'UNDO_REMOVE_GENE_LIST'
 
 export function selectGeneList(geneListId) {
     return {
@@ -267,6 +268,13 @@ export function removeGeneList(geneListId) {
         payload: {
             removedGeneListId: geneListId
         }
+    }
+}
+
+export function undoRecentRemoveGeneList() {
+    return {
+        type: UNDO_REMOVE_GENE_LIST
+        // no payload?
     }
 }
 

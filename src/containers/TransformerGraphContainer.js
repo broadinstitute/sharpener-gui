@@ -3,7 +3,13 @@ import {connect} from 'react-redux';
 
 import {GraphWrapper} from "../components/TransformerGraph/TransformerGraph"
 
-import {selectGeneListMultiple, unselectGeneListMultiple, getSelections, removeGeneList} from "../actions";
+import {
+    selectGeneListMultiple,
+    unselectGeneListMultiple,
+    getSelections,
+    removeGeneList,
+    undoRecentRemoveGeneList
+} from "../actions";
 import { createSelector } from "reselect";
 
 import _ from "lodash";
@@ -60,6 +66,7 @@ const mapDispatchToProps = dispatch => ({
     selectGeneList: geneListId => dispatch(selectGeneListMultiple(geneListId)),
     unselectGeneList: geneListId => dispatch(unselectGeneListMultiple(geneListId)),
     removeGeneList: geneListId => dispatch(removeGeneList(geneListId)),
+    undoRemoveGeneList: geneListId => dispatch(undoRecentRemoveGeneList()),
     // TODO we use this to inject the selections into the flow of control without having to re-render the component. USE SPARINGLY.
     getSelectedGeneListIds: () => dispatch(getSelections())
 });
