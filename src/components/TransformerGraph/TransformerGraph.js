@@ -257,7 +257,7 @@ export class GraphWrapper extends React.Component {
 		<Tooltip placement="bottom" trigger="hover" tooltip={
 			<div>
 			{/*   */}
-			Removes selected gene lists from the graph. {/*You can undo this action.*/}
+			Removes selected gene lists from the graph. You can undo this action.
 			<br/>
 			<br/>
 		    {
