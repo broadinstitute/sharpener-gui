@@ -8,6 +8,7 @@ import {
     MuiThemeProvider
 } from "@material-ui/core/styles";
 import "./GeneTable.css";
+import * as RD from "ramda-decimal"
 
 const getMuiTheme = () =>
     createMuiTheme({
@@ -125,7 +126,11 @@ const GeneTableMUI = ({ geneListId, nameMap }) => {
     // TODO
     // function is responsible for reformatting literal values (like floats for sigfig) based on datatype
     // also responsible for ellipses/overflow?
-    const renderCellContent = value => value;
+    const renderCellContent = value =>
+        value &&!isNaN(value) ?
+            isExponential(value) ? Number.parseFloat(+value).toPrecision(3)
+            : RD.toFixed(Math.min(getSignificantDigitCount(+value), 3))(+value)
+        : value ;
 
     // function is responsible for managing element structure based on input genes
     // right now only case is that there is a url or not
@@ -231,6 +236,10 @@ function getSignificantDigitCount(n) {
     if (n == 0) return 0;
     while (n != 0 && n % 10 == 0) n /= 10; //kill the 0s at the end of n
     return Math.floor(Math.log(n) / log10) + 1; //get number of digits
+}
+
+function isExponential(n) {
+    return /[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)/.test(n);
 }
 
 export default GeneTableMUI

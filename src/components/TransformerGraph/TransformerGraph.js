@@ -52,7 +52,7 @@ export class GraphWrapper extends React.Component {
 
         this.layoutEngine = new DagreEngine({
             graph: {
-                rankdir: 'LR',
+                rankdir: 'TD',
                 ranker: 'longest-path',
                 marginx: 50,
                 marginy: 50
@@ -65,12 +65,12 @@ export class GraphWrapper extends React.Component {
 
     componentDidMount() {
         this.loadFromTransactions(this.props);
-        // this.autoDistributeNodes(this.engine);
+        this.autoDistributeNodes(this.engine);
     }
 
     componentWillReceiveProps (nextProps) {
         this.loadFromTransactions(nextProps);
-        // this.autoDistributeNodes(this.engine);
+        this.autoDistributeNodes(this.engine);
     }
 
     loadFromTransactions({selectedGeneLists, deletedGeneLists, transactions, transformerName, transformersNormalized}) {
