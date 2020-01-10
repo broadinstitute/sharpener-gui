@@ -1,25 +1,31 @@
 import React from "react"
-import CreatableSelect from 'react-select/creatable';
+import CreatableSelect, {makeCreatableSelect} from 'react-select/creatable';
+
+import MultiSelect from '@khanacademy/react-multi-select';
+import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
+
 import ReactFileReader from "react-file-reader";
 import Papa from 'papaparse'
 
 import _ from "lodash"
-import Select from "react-select";
 
 import messages from "../../message-properties";
+import Tooltip from "../Tooltip/Tooltip";
 
 const createOption = (string) => {
-    return _.uniq(string.split(", ")).map(label => ({
-        label: label,
-        value: label
+     return _.uniq(string.split(/[\r\n;, ]+/).filter(el => el !== '' && el !== ' ')).map(label => ({
+        label: label.trim(),
+        value: label.trim()
     }))
 };
 
 export default class CreateGeneList extends React.Component {
     state = {
         isLoading: false,
-        options: [],
-        value: []
+        options: [{value: "NGLY1", label: "NGLY1"}, {value: "BRCA1", label: "BRCA1"}],
+        value: [],
+        selected: [],
+        addGeneValue: ''
     };
 
     constructor(props) {
@@ -50,13 +56,20 @@ export default class CreateGeneList extends React.Component {
         });
     };
 
+    handleGeneChange = (event) => {
+        this.setState({ addGeneValue: event.target.value });
+    }
+
+    handleGeneSubmit = (event) => {
+        this.handleCreate(this.state.addGeneValue);
+    }
 
     handleChange = (newValue, actionMeta) => {
         this.setState({ value: newValue });
     };
 
     handleCreate = (inputValue) => {
-        const { options, value } = this.state;
+        const { options, value, addGeneValue } = this.state;
 
         const newOption = createOption(inputValue)
             .filter(option => !options.map(option => option.value).includes(option.value));  // prevent duplicates
@@ -72,64 +85,75 @@ export default class CreateGeneList extends React.Component {
     };
 
     handleSubmit = () => {
-        const { value } = this.state;
-        const symbols = value.map(item => item.value);  // exclude label
+        const { selected } = this.state;
+        console.log("selected options", selected);
+        // const symbols = value.map(item => item.value);
+        const symbols = selected.map(item => item);  // exclude label
         this.props.createGeneList(symbols); // redux dispatch
     };
 
     render() {
-        const { options, value } = this.state;
+        const { options, value, selected, addGeneValue } = this.state;
         return (
             <>
-                {/*TODO: overflow https://codesandbox.io/s/v638kx67w7*/}
-                <CreatableSelect
-                    isMulti
-                    placeholder={ messages.select.create }
-                    onChange={this.handleChange}
-                    onCreateOption={this.handleCreate}
+                <MultiSelect
                     options={options}
-                    value={value}
-
-                    onFocus={() => console.log("focus")}
-                    onBlur={() => console.log("blur")}
-
-                    styles={{
-                        placeholder: base => ({
-                            ...base,
-                            fontSize: 14
-                        }),
-                        option: base => ({
-                            ...base,
-                            height: '100%',
-                            fontSize: 14
-                        }),
-                        valueContainer: base => ({
-                            ...base,
-                            textOverflow: "ellipsis",
-                            // whiteSpace: "nowrap",
-                            overflow: "hidden",
-                            // display: "initial"
-                        })
-                    }}
-
+                    selected={selected}
+                    onSelectedChanged={selected =>
+                        this.setState({selected})}
                 />
+                {/*TODO: overflow https://codesandbox.io/s/v638kx67w7*/}
+                {/*<ReactMultiSelectCheckboxes*/}
+                {/*<ReactMultiSelectCheckboxes*/}
+                {/*    placeholder={ messages.select.create }*/}
+                {/*    onChange={this.handleChange}*/}
+                {/*    options={options}*/}
+                {/*    value={value}*/}
+                {/*    styles={{*/}
+                {/*        placeholder: base => ({*/}
+                {/*            ...base,*/}
+                {/*            fontSize: 14*/}
+                {/*        }),*/}
+                {/*        option: base => ({*/}
+                {/*            ...base,*/}
+                {/*            height: '100%',*/}
+                {/*            fontSize: 14*/}
+                {/*        }),*/}
+                {/*        valueContainer: base => ({*/}
+                {/*            ...base,*/}
+                {/*            textOverflow: "ellipsis",*/}
+                {/*            // whiteSpace: "nowrap",*/}
+                {/*            overflow: "hidden",*/}
+                {/*            // display: "initial"*/}
+                {/*        })*/}
+                {/*    }}*/}
+
+                {/*/>*/}
 
                 <div style={{
                     display: "flex",
                     justifyContent: "space-around",
                     marginTop: "0.25em"
                 }}>
+                    <div style={{ display: "block" }}>
+                    <input placeholder={"Add Gene Symbols"} type="text"
+                           value={this.state.addGeneValue}
+                           onChange={this.handleGeneChange} />
+                    <button onClick={this.handleGeneSubmit}>
+                        +
+                    </button>
+                    </div>
                     <ReactFileReader handleFiles={ this.handleFiles } fileTypes={['.csv', '.tsv', '.txt']}>
                         <button>
                             Upload Gene List
                         </button>
                     </ReactFileReader>
-                    <button
-                        // style={{marginLeft: "0.2em"}}
-                        onClick={ this.handleSubmit }>
-                        Submit Genes
-                    </button>
                 </div>
+                <button
+                    // style={{marginLeft: "0.2em"}}
+                    onClick={ this.handleSubmit }>
+                    Submit Genes
+                </button>
             </>
         );
     }
