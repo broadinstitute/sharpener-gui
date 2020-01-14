@@ -1,5 +1,6 @@
 import React, {Fragment, useCallback, useEffect, useLayoutEffect, useState} from 'react';
 import * as Space from 'react-spaces';
+import createEngine from '@projectstorm/react-diagrams'
 
 import "./Navigation.css"
 import SharpenerInfo from "../SharpenerInfo/SharpenerInfo";
@@ -39,6 +40,12 @@ const TransformerViewsLayout = () => {
         e => setPivot(e.value), []);
 
     const [width, height] = useWindowSize();
+    const [engine, setEngine] = useState(createEngine());
+    const setEngineCallback = useCallback((newEngine) => {
+        console.log("prev engine callback", engine);
+        console.log("new engine callback", newEngine);
+        setEngine(newEngine);
+    }, []);
 
     return (
         <Fragment>
@@ -76,6 +83,7 @@ const TransformerViewsLayout = () => {
 
                     <Space.Fill className={"top-segment gutter"}>
                         <TabTab.Tabs
+                            className={"gene_list_views"}
                             customStyle={customStyle}
                             showArrowButton={false}
                         >
@@ -112,7 +120,7 @@ const TransformerViewsLayout = () => {
                                 <TabTab.Panel>
                                     <Spaces.Fixed height={ height * 0.90 }
                                                   trackSize>
-                                        <TransformerGraphContainer />
+                                        <TransformerGraphContainer engine={engine} setEngine={setEngineCallback}/>
                                     </Spaces.Fixed>
                                 </TabTab.Panel>
                                 <TabTab.Panel>
@@ -123,7 +131,7 @@ const TransformerViewsLayout = () => {
                                 </TabTab.Panel>
                             </TabTab.PanelList>
                         </TabTab.Tabs>
-                    </Space.Fill>
+                </Space.Fill>
 
                 </>
             </Spaces.Fixed>

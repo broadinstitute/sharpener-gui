@@ -305,3 +305,12 @@ export const togglePivot = () => (dispatch, getState) => {
         }
     })
 };
+
+export const updateModel = (newModel) => {
+    return {type: 'update-model', model: newModel}
+}
+
+export const getModel = () => (_, getState) => {
+    const currentModel = getState().graph.model;
+    return currentModel;
+};

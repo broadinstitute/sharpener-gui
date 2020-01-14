@@ -1,5 +1,6 @@
 import React, {Fragment, useState} from 'react';
-import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+// import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import {Tabs, TabList, Tab, PanelList, AsyncPanel, Panel} from 'react-tabtab';
 
 import 'react-tabs/style/react-tabs.css';
 import "./GeneListTabs.css"
@@ -9,6 +10,7 @@ import Papa from "papaparse"
 import fileDownload from "js-file-download";
 import JSZip from 'jszip'
 import GeneTableMUI from "../GeneTable/MaterialGeneTable";
+import * as customStyle from 'react-tabtab/lib/themes/bootstrap';
 
 import messages from "../../message-properties";
 
@@ -90,7 +92,7 @@ const GeneListTabsFunction = ({selectedGeneListIds, transformerName, normalizedG
 
 
             { selectedGeneListIds.length > 0 ?
-                <Tabs selectedIndex={tabIndex} onSelect={index => setTabIndex(index)}>
+                <Tabs customStyle={customStyle} selectedIndex={tabIndex} onSelect={index => setTabIndex(index)}>
                     <TabList>
                         {selectedGeneListIds.map(geneListId => (
                             <Tab>
@@ -98,15 +100,23 @@ const GeneListTabsFunction = ({selectedGeneListIds, transformerName, normalizedG
                             </Tab>
                         ))}
                     </TabList>
-                    {selectedGeneListIds.map(geneListId => (
-                        <TabPanel>
-                            <GeneTableMUI
-                                key={geneListId}
-                                geneListId={geneListId}
-                                nameMap={transformerName}
-                            />
-                        </TabPanel>
-                    ))}
+                    <PanelList>
+                        {selectedGeneListIds.map(geneListId => (
+                            <Panel>
+                                <GeneTableMUI
+                                    key={geneListId}
+                                    geneListId={geneListId}
+                                    nameMap={transformerName}
+                                />
+                            </Panel>
+                            // <AsyncPanel loadContent={loadContentFunc}
+                            // render={data => (
+                            //     )}
+                            // renderLoading={() => (<div>Loading...</div>)}
+                            // cache={true}
+                            // />
+                        ))}
+                    </PanelList>
                 </Tabs>
 
             : <></> }

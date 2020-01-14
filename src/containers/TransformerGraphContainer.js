@@ -8,11 +8,12 @@ import {
     unselectGeneListMultiple,
     getSelections,
     removeGeneList,
-    undoRecentRemoveGeneList
+    undoRecentRemoveGeneList, updateModel, getModel
 } from "../actions";
 import { createSelector } from "reselect";
 
 import _ from "lodash";
+import graph from "../reducers/graph_reducer";
 
 const NodeTemplate = (gene_list_id, source, type="empty") => ({
     id: gene_list_id,
@@ -51,6 +52,9 @@ const geneListDiffSelector = (leftGeneListId, rightGeneListId) => createSelector
 );
 
 const mapStateToProps = (state, ownProps) => ({
+    // prevEngine: ownProps.engine,
+    // setPrevEngine: (engine) => { ownProps.setEngine(engine); },
+    // model: state.graph.model,
     transactions: transactionSelector(state),
     transactionsByGeneListId: transactionsByOutputGeneListId(state),
     currentGeneLists: geneListIdsSelector(state),
@@ -63,12 +67,14 @@ const mapStateToProps = (state, ownProps) => ({
 });
 
 const mapDispatchToProps = dispatch => ({
+    saveModel: newModel => dispatch(updateModel(newModel)),
     selectGeneList: geneListId => dispatch(selectGeneListMultiple(geneListId)),
     unselectGeneList: geneListId => dispatch(unselectGeneListMultiple(geneListId)),
     removeGeneList: geneListId => dispatch(removeGeneList(geneListId)),
     undoRemoveGeneList: geneListId => dispatch(undoRecentRemoveGeneList()),
     // TODO we use this to inject the selections into the flow of control without having to re-render the component. USE SPARINGLY.
-    getSelectedGeneListIds: () => dispatch(getSelections())
+    getSelectedGeneListIds: () => dispatch(getSelections()),
+    getModel: () => dispatch(getModel())
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(GraphWrapper);

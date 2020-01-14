@@ -29,7 +29,7 @@ class ReactCollapsibleHeatMapClass extends React.Component {
     // }, []);
 
     initializeHeatMap = (nodes, links, size) => {
-        const margin = { top: 80, bottom: 80, left: 80, right: 0 };
+        const margin = { top: 80, bottom: 0, left: 80, right: 0 };
         const data = { nodes, links }
         const heatmap = new CollapsibleHeatMap(size.height, size.width, margin, this.svg, data);
         heatmap.init();

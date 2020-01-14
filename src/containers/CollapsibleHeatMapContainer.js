@@ -154,8 +154,8 @@ const CollapsibleHeatMapLayout = ({nodes, links, genes, geneLabels}) => {
     return (
         <div>
 
-            <Space.Top size={"15%"}>
-                <div style={{
+            <Space.Fill size={"100%"}>
+            <div style={{
                         display: "flex",
                         flexShrink: "0",
                         justifyContent: "space-between"
@@ -189,13 +189,12 @@ const CollapsibleHeatMapLayout = ({nodes, links, genes, geneLabels}) => {
                     </div>
 
                 </div>
-            </Space.Top>
-            <Space.Fill trackSize>
-                <Space.Info>
-                    {info => <ReactCollapsibleHeatMapClass size={info} nodes={nodes} links={links}/>}
-                </Space.Info>
+                <Space.Bottom size={"75%"} trackSize>
+                    <Space.Info>
+                        {info => <ReactCollapsibleHeatMapClass size={info} nodes={nodes} links={links}/>}
+                    </Space.Info>
+                </Space.Bottom>
             </Space.Fill>
-
         </div>
     )
 }

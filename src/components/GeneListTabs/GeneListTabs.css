@@ -1,6 +1,6 @@
 .no-selection-placeholder {
 }
 
-.react-tabs__tab-list {
-    margin-bottom: 0 !important;
+.right-segment [id *= react-tabtab-panel] {
+    padding: 0 !important;
 }
