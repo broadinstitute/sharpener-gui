@@ -116,7 +116,7 @@ export default class CreateGeneList extends React.Component {
 
                 <div style={{
                     display: "flex",
-                    justifyContent: "space-around",
+                    justifyContent: "right",
                     marginTop: "0.25em"
                 }}>
                     <ReactFileReader handleFiles={ this.handleFiles } fileTypes={['.csv', '.tsv', '.txt']}>
@@ -125,7 +125,8 @@ export default class CreateGeneList extends React.Component {
                         </button>
                     </ReactFileReader>
                     <button
-                        // style={{marginLeft: "0.2em"}}
+            style={{marginLeft: "0.2em"}}
+	    disabled={!(this.state.value.length > 0)}
                         onClick={ this.handleSubmit }>
                         Submit Genes
                     </button>

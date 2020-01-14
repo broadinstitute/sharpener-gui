@@ -5,6 +5,7 @@ import "./Navigation.css"
 import SharpenerInfo from "../SharpenerInfo/SharpenerInfo";
 import CreateGeneListContainer from "../../containers/CreateGeneListContainer";
 import AsyncListenerContainer from "../../containers/AsyncListenerContainer";
+import AsyncCreateListListenerContainer from "../../containers/AsyncCreateListListenerContainer";
 import TransformerDraftContainer from "../../containers/TransformerDraftContainer";
 import TransformerGraphContainer from "../../containers/TransformerGraphContainer";
 import CollapsibleHeatMapContainer from "../../containers/CollapsibleHeatMapContainer";
@@ -52,6 +53,7 @@ const TransformerViewsLayout = () => {
                         <span>
                             <h5 className={"info-header"}>{messages.header.create}</h5>
                             <SharpenerInfo description={messages.tooltip.create}/>
+                            <AsyncCreateListListenerContainer />
                         </span>
                         <CreateGeneListContainer />
 

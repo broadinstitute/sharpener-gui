@@ -1,10 +1,17 @@
-import {FETCH_TRANSFORMATION_ERROR, FETCH_TRANSFORMATION_SUCCESS, REQUEST_GENE_LIST_TRANSFORMATION, TOGGLE_PIVOT} from "../actions";
+import {
+    FETCH_TRANSFORMATION_ERROR,
+    FETCH_TRANSFORMATION_SUCCESS,
+    REQUEST_GENE_LIST_CREATION,
+    REQUEST_GENE_LIST_TRANSFORMATION,
+    TOGGLE_PIVOT
+} from "../actions";
 
 const initialState = {
     focusOrBlur: false, // start off blurred
     pivot: true,
 
     isFetching: null,
+    isCreateFetching: null,
     transactionsFetching: [],
     transactionLedger: [],
     transactionsNormalized: {
@@ -20,6 +27,11 @@ const app = (state=initialState, action) => {
                 ...state,
                 pivot: action.payload.pivot
             }
+        //case REQUEST_GENE_LIST_CREATION:
+          //  return {
+            //    isCreateFetching: action.payload.isCreateFetching,
+	//	transactionsFetching: state.transactionsFetching.concat(action.payload.query.name)
+          //  }
         case REQUEST_GENE_LIST_TRANSFORMATION:
             return {
                 ...state,
@@ -33,6 +45,7 @@ const app = (state=initialState, action) => {
                     ...state.transactionsFetching.slice(0, state.transactionsFetching.indexOf(action.payload.query.name)),
                     ...state.transactionsFetching.slice(state.transactionsFetching.indexOf(action.payload.query.name) + 1),
                 ].length > 0,
+                isCreateFetching: false,
                 transactionsFetching: [
                     ...state.transactionsFetching.slice(0, state.transactionsFetching.indexOf(action.payload.query.name)),
                     ...state.transactionsFetching.slice(state.transactionsFetching.indexOf(action.payload.query.name) + 1),
@@ -64,6 +77,7 @@ const app = (state=initialState, action) => {
                     ...state.transactionsFetching.slice(0, state.transactionsFetching.indexOf(action.payload.query.name)),
                     ...state.transactionsFetching.slice(state.transactionsFetching.indexOf(action.payload.query.name) + 1),
                 ].length > 0,
+                isCreateFetching: false
             };
         default:
             return state;

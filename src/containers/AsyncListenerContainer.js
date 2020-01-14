@@ -7,7 +7,8 @@ const mapDispatchToProps = {
 
 const mapStateToProps = state => ({
     isFetching: state.app.isFetching,
-    transactionsFetching: state.app.transactionsFetching
+    transactionsFetching: state.app.transactionsFetching,
+    message: null // default
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(AsyncListener)

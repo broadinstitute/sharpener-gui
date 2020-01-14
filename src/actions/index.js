@@ -122,7 +122,7 @@ export const createGeneList = geneSymbols => dispatch => {
             { name: "Gene Symbols", value: geneSymbols }
         ]
     };
-    dispatch( { type: REQUEST_GENE_LIST_CREATION, payload: { isFetching: true, query: geneSymbolsQuery } });
+    dispatch( { type: REQUEST_GENE_LIST_CREATION, payload: { isCreateFetching: true, query: geneSymbolsQuery } });
     return fetch(process.env.REACT_APP_BACKEND_URL+'create_gene_list', {
             method: 'POST',
             headers: {

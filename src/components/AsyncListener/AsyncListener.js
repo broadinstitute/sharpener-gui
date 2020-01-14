@@ -2,18 +2,20 @@ import ReactTooltip from "react-tooltip";
 import {Spinner} from "reactstrap";
 import React from "react";
 
-export const AsyncListener = ({ isFetching, transactionsFetching }) => (
+export const AsyncListener = ({ isFetching, transactionsFetching, message }) => (
     <>
         {isFetching ? <>
             <ReactTooltip id={'async-load'} place={"bottom"}>
-                Loading queries...<br/>
+                {message ? message : "Loading queries..."}
+                <br/>
                 <ul>
-                    {transactionsFetching.map(
+                    {transactionsFetching ? transactionsFetching.map(
                         fetchingTransactionName =>
                             <li>
                                 {fetchingTransactionName}
                             </li>
-                    )}
+                    )
+                    : null}
                 </ul>
             </ReactTooltip>
             <Spinner size={"sm"} data-tip data-for={'async-load'}/>
