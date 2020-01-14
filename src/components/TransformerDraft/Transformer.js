@@ -18,6 +18,18 @@ const SubmitMapping = {
     "aggregator": "Aggregate"
 }
 
+const Error = ({ name }) => (
+  <Field
+    name={name}
+    subscription={{ touched: true, error: true }}
+    render={({ meta: { touched, error } }) =>
+	    touched && error ?
+	    <span className={"error"}>{error}</span>
+	    : null
+    }
+  />
+)
+
 const Transformer = ({index, transformerName, fetchGeneListTransformation, fetchGeneListAggregation}) => {
 
     const dispatch = useDispatch();
@@ -111,7 +123,9 @@ const Transformer = ({index, transformerName, fetchGeneListTransformation, fetch
                                                     <option value={geneListIdOption.value}>
                                                         {geneListIdOption.label}
                                                     </option>)}
-                                        </Field>
+
+                                  </Field>
+				  <Error name={"gene_list_id"}/>
                                     </>
                                 : ["aggregator"].includes(transformerInfo.function) ?
                                         <>
@@ -136,7 +150,9 @@ const Transformer = ({index, transformerName, fetchGeneListTransformation, fetch
                                                         options={currentGeneListIds.filter(geneListItem => !deletedGeneListIds.includes(geneListItem.value))}
                                                     />
                                                 )}
-                                            </Field>
+                                  </Field>
+				  				  <Error name={"gene_list_ids"}/>
+
                                         </>
                                 : null }
 
@@ -156,7 +172,8 @@ const Transformer = ({index, transformerName, fetchGeneListTransformation, fetch
                                                         <option value={allowed_value}>
                                                             {allowed_value}
                                                         </option>) }
-                                                </Field>
+                                    </Field>
+														  <Error name={parameter.name}/>
                                             </>
                                         :   <>
                                                 <Label className={"parameterLabel"} for={ parameter.name+"-field" }>{ parameter.name }</Label>
@@ -164,7 +181,9 @@ const Transformer = ({index, transformerName, fetchGeneListTransformation, fetch
                                                        id={ parameter.name+"-field" }
                                                        component={"input"}
                                                        className={"form-control"}
-                                                       {...inputProps(parameter)} />
+                                    {...inputProps(parameter)} />
+									  <Error name={parameter.name}/>
+
                                             </>
                                 ) }
 
@@ -226,7 +245,7 @@ const validateTransformerQuery = transformerInfo => values => {
     fieldNames.map(fieldName => {
         if (fieldName != null) {
             if (!values[fieldName]) {
-                errors[fieldName] = `${fieldName} Required`
+                errors[fieldName] = `${fieldName} required`
                 console.log(values[fieldName])
             }
         }

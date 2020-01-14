@@ -1,6 +1,6 @@
 import React, { Component, useState } from 'react';
 import {connect} from "react-redux";
-import ReactCollapsibleHeatMap from "../components/CollapsibleHeatMap/ReactCollapsibleHeatMap"
+import ReactCollapsibleHeatMapClass from "../components/CollapsibleHeatMap/ReactCollapsibleHeatMapClass"
 import {createSelector} from "reselect";
 import SharpenerInfo from "../components/SharpenerInfo/SharpenerInfo";
 
@@ -154,9 +154,7 @@ const CollapsibleHeatMapLayout = ({nodes, links, genes, geneLabels}) => {
     return (
         <div>
 
-            <Space.Fill
-                size={"100%"}>
-
+            <Space.Top size={"15%"}>
                 <div style={{
                         display: "flex",
                         flexShrink: "0",
@@ -166,7 +164,6 @@ const CollapsibleHeatMapLayout = ({nodes, links, genes, geneLabels}) => {
                             <h5 className={"info-header"}>{messages.header.pivot}</h5>
                             <SharpenerInfo description={messages.tooltip.pivot}/>
                         </span>
-                        {/*<button className={"graph-control"} onClick={ () => this.autoDistributeNodes(this.engine) }>Layout</button>*/}
                 </div>
 
                 <div id="heatmap-controls">
@@ -192,9 +189,10 @@ const CollapsibleHeatMapLayout = ({nodes, links, genes, geneLabels}) => {
                     </div>
 
                 </div>
-
+            </Space.Top>
+            <Space.Fill trackSize>
                 <Space.Info>
-                    {info => <ReactCollapsibleHeatMap size={info} nodes={nodes} links={links}/>}
+                    {info => <ReactCollapsibleHeatMapClass size={info} nodes={nodes} links={links}/>}
                 </Space.Info>
             </Space.Fill>
 
