@@ -9,7 +9,14 @@ function ReactCollapsibleHeatMapFunction ({nodes, links, size}) {
     const dispatch = useDispatch();
 
     const [heatmap, setHeatmap] = useState();
-    const [svg, setSvg] = useStateWithCallback(null, () => {
+    const [svg, setSvg] = useState();
+    const measuredSVGRef = useCallback(node => {
+        if (node !== null) {
+            setSvg(d3.select(node));
+        }
+    }, []);
+
+    const initializeHeatMap = useCallback(() => {
         if (svg && !heatmap) {
             const margin = { top: 80, bottom: 80, left: 0, right: 0 };
             const data = { nodes, links }
@@ -18,45 +25,39 @@ function ReactCollapsibleHeatMapFunction ({nodes, links, size}) {
             };
             setHeatmap(new CollapsibleHeatMap(size.height, size.width, margin, svg, data, onClick));
         }
-    });
-    const measuredSVGRef = useCallback(node => {
-        if (node !== null) {
-            setSvg(d3.select(node));
-        }
-    }, []);
+    }, [links]);
 
     useEffect(() => {
-        if (heatmap) {
-            heatmap.init();
-            heatmap.load();
+        initializeHeatMap()
+        heatmap.init();
+        heatmap.load();
 
-            const heatmapControl = document.getElementById("controls")
+        const heatmapControl = document.getElementById("controls")
 
-            const sortByGene = document.getElementById("sortGene");
-            sortByGene.onclick = () => {
-                heatmap.sortRows();
-            };
-            const sortByGeneFrequency = document.getElementById("sortGeneFrequency");
-            sortByGeneFrequency.onclick = () => {
-                heatmap.sortRowsFrequency();
-            };
+        const sortByGene = document.getElementById("sortGene");
+        sortByGene.onclick = () => {
+            heatmap.sortRows();
+        };
+        const sortByGeneFrequency = document.getElementById("sortGeneFrequency");
+        sortByGeneFrequency.onclick = () => {
+            heatmap.sortRowsFrequency();
+        };
 
-            const sortByProcedure = document.getElementById("sortProcedure");
-            sortByProcedure.onclick = () => {
-                heatmap.sortColumns();
-            };
+        const sortByProcedure = document.getElementById("sortProcedure");
+        sortByProcedure.onclick = () => {
+            heatmap.sortColumns();
+        };
 
-            const sortByProcedureFrequency = document.getElementById("sortProcedureFrequency");
-            sortByProcedureFrequency.onclick = () => {
-                heatmap.sortColumnsFrequency();
-            };
+        const sortByProcedureFrequency = document.getElementById("sortProcedureFrequency");
+        sortByProcedureFrequency.onclick = () => {
+            heatmap.sortColumnsFrequency();
+        };
 
-            const filterByRowsInput = document.getElementsByName("rowFilter")[0];
-            filterByRowsInput.addEventListener("input", e =>
-                heatmap.filter("rows", filterByRowsInput.value)
-            );
-        }
-    }, [heatmap])
+        const filterByRowsInput = document.getElementsByName("rowFilter")[0];
+        filterByRowsInput.addEventListener("input", e =>
+            heatmap.filter("rows", filterByRowsInput.value)
+        );
+}, [links])
 
     useEffect(() => {
         if (nodes && links && svg) {
