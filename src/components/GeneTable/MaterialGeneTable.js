@@ -61,6 +61,9 @@ const GeneTableMUI = ({ geneListId, nameMap }) => {
                     tmpObj = Object.assign(tmpObj, {
                         "gene_id": gene.gene_id
                     });
+                    tmpObj = Object.assign(tmpObj, {
+                        "source": gene.source
+                    });
 
                     return tmpObj;
                 })
@@ -117,6 +120,15 @@ const GeneTableMUI = ({ geneListId, nameMap }) => {
                     filter: false,
                     sort: false,
                     viewColumns: false,
+                }
+            },
+            {
+                name: "source",
+                options: {
+                    display: true,
+                    filter: true,
+                    sort: true,
+                    viewColumns: true,
                 }
             }
         ];
