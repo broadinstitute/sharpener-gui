@@ -10,6 +10,7 @@ import * as Space from "react-spaces";
 import messages from "../message-properties";
 
 import TextField from '@material-ui/core/TextField';
+import {Spinner} from "reactstrap";
 // import Autocomplete from '@material-ui/lab/Autocomplete';
 
 const transactionSelector = state => state.app.transactionLedger;
@@ -34,7 +35,12 @@ const currentGeneListsSelector = createSelector(
     state => state.geneLists.Ids,
     state => state.geneLists.byId,
     state => state.geneLists.deletedGeneLists,
-    (geneListIds, geneListsById, deletedGeneLists) => geneListIds.filter(geneListId => !deletedGeneLists.includes(geneListId)).map(geneListId => geneListsById[geneListId])
+    state => state.geneLists.selectedMultipleGeneListsById,
+    (geneListIds, geneListsById, deletedGeneLists, selectedGeneLists) =>
+        geneListIds
+            .filter(geneListId => !deletedGeneLists.includes(geneListId))
+            .filter(geneListId => selectedGeneLists.includes(geneListId))
+            .map(geneListId => geneListsById[geneListId])
 )
 
 const currentGenesSelector = createSelector(
@@ -70,12 +76,15 @@ const nodesSelector = createSelector(
     state => state.geneLists.Ids,
     state => state.geneLists.byId,
     state => state.geneLists.deletedGeneLists,
+    state => state.geneLists.selectedMultipleGeneListsById,
     geneLabelIndex,
     nameSelector,
     geneFrequency,
     sourceFrequency,
-    (geneListIds, geneListsById, deletedGeneLists, geneLabel, geneListNames, geneFrequency, sourceFrequency) =>
-        _.flatten(geneListIds.filter(geneListId => !deletedGeneLists.includes(geneListId)).map(geneListId => geneListsById[geneListId])
+    (geneListIds, geneListsById, deletedGeneLists, selectedGeneLists, geneLabel, geneListNames, geneFrequency, sourceFrequency) =>
+        _.flatten(geneListIds.filter(geneListId => !deletedGeneLists.includes(geneListId))
+            .filter(geneListId => selectedGeneLists.includes(geneListId))
+            .map(geneListId => geneListsById[geneListId])
             .map(geneList =>
                 {
                     return [
@@ -94,7 +103,10 @@ const nodesSelector = createSelector(
                 }
             ))
             .concat(
-                _.uniq(geneListIds.filter(geneListId => !deletedGeneLists.includes(geneListId)).map(geneListId => geneListsById[geneListId]).map(geneList => geneList.source))
+                _.uniq(geneListIds
+                    .filter(geneListId => !deletedGeneLists.includes(geneListId))
+                    .filter(geneListId => selectedGeneLists.includes(geneListId))
+                    .map(geneListId => geneListsById[geneListId]).map(geneList => geneList.source))
                     .map(uniqueGeneListSourceIdentifier => ({
                         id: uniqueGeneListSourceIdentifier,
                         name: uniqueGeneListSourceIdentifier.split(" ")[0],
@@ -108,9 +120,12 @@ const linksSelector = createSelector(
     state => state.geneLists.Ids,
     state => state.geneLists.byId,
     state => state.geneLists.deletedGeneLists,
-    (geneListIds, geneListsById, deletedGeneLists) =>
+    state => state.geneLists.selectedMultipleGeneListsById,
+    (geneListIds, geneListsById, deletedGeneLists, selectedGeneLists) =>
         [].concat(
-            _.flatten(geneListIds.filter(geneListId => !deletedGeneLists.includes(geneListId)).map(geneListId => geneListsById[geneListId])
+            _.flatten(geneListIds.filter(geneListId => !deletedGeneLists.includes(geneListId))
+                .filter(geneListId => selectedGeneLists.includes(geneListId))
+                .map(geneListId => geneListsById[geneListId])
                 .map(geneList => [
                     ...geneList.genes.map(
                         gene => ({
@@ -122,7 +137,10 @@ const linksSelector = createSelector(
                 ]))
             )
             .concat(
-                _.flatten(geneListIds.filter(geneListId => !deletedGeneLists.includes(geneListId)).map(geneListId => geneListsById[geneListId])
+                _.flatten(geneListIds
+                    .filter(geneListId => !deletedGeneLists.includes(geneListId))
+                    .filter(geneListId => selectedGeneLists.includes(geneListId))
+                    .map(geneListId => geneListsById[geneListId])
                     .map(geneList => [
                         ...geneList.genes.map(
                             gene => ({
@@ -149,13 +167,13 @@ const mapDispatchToProps = dispatch => ({
 });
 
 
-const CollapsibleHeatMapLayout = ({nodes, links, genes, geneLabels}) => {
+const CollapsibleHeatMapLayout = ({nodes, links, selectedGeneListIds}) => {
     const [value, setValue] = useState('');
     return (
         <div>
 
-            <Space.Fill size={"100%"}>
-            <div style={{
+            <Space.Left size={"25%"}>
+                <div style={{
                         display: "flex",
                         flexShrink: "0",
                         justifyContent: "space-between"
@@ -170,18 +188,18 @@ const CollapsibleHeatMapLayout = ({nodes, links, genes, geneLabels}) => {
 
                     <div className={"heatmap-control"}>
                         <h6>Sort Genes</h6>
-                        <button id={"sortGene"}>Alphabetically</button><br/>
+                        <button id={"sortGene"}>Alphabetical</button><br/>
                         <button id={"sortGeneFrequency"}>Frequency</button><br/>
                     </div>
 
                     <div className={"heatmap-control"}>
                         <h6>Sort Gene Lists</h6>
-                        <button id={"sortProcedure"}>Alphabetically</button><br/>
+                        <button id={"sortProcedure"}>Alphabetical</button><br/>
                         <button id={"sortProcedureFrequency"}>Frequency</button><br/>
                     </div>
 
                     <div className={"heatmap-control"}>
-                        <h6>Filter for Genes</h6>
+                        <h6>{messages.pivot.filter}</h6>
                         <input
                             name={"rowFilter"}
                             style={{width: "100%"}}
@@ -189,12 +207,16 @@ const CollapsibleHeatMapLayout = ({nodes, links, genes, geneLabels}) => {
                     </div>
 
                 </div>
-                <Space.Bottom size={"75%"} trackSize>
+            </Space.Left>
+            { selectedGeneListIds.length > 0 ?
+                <Space.Fill size={"100%"} trackSize>
                     <Space.Info>
                         {info => <ReactCollapsibleHeatMapClass size={info} nodes={nodes} links={links}/>}
                     </Space.Info>
-                </Space.Bottom>
-            </Space.Fill>
+                </Space.Fill>
+                :   <div style={{paddingTop: "50%", paddingLeft: "50%", height: "1vh"}}>
+                    <Spinner size={"lg"}/>
+                </div> }
         </div>
     )
 }

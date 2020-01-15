@@ -19,6 +19,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faProjectDiagram, faBorderAll } from '@fortawesome/free-solid-svg-icons'
 
 import messages from "../../message-properties";
+import {SelectionManager} from "../SelectionManager/SelectionManager";
 
 function useWindowSize() {
     const [size, setSize] = useState([0, 0]);
@@ -56,7 +57,6 @@ const TransformerViewsLayout = () => {
                 <>
 
                     <Spaces.LeftResizable size={"35%"} maxWidth={"35%"} className={"left-segment downshift gutter"}>
-
                         <span>
                             <h5 className={"info-header"}>{messages.header.create}</h5>
                             <SharpenerInfo description={messages.tooltip.create}/>
@@ -78,7 +78,8 @@ const TransformerViewsLayout = () => {
                             <AsyncListenerContainer />
                         </div>
                         <TransformerDraftContainer/>
-
+                        <br/>
+                        <SelectionManager />
                     </Spaces.LeftResizable>
 
                     <Space.Fill className={"top-segment gutter"}>
@@ -118,13 +119,13 @@ const TransformerViewsLayout = () => {
                             </TabTab.TabList>
                             <TabTab.PanelList>
                                 <TabTab.Panel>
-                                    <Spaces.Fixed height={ height * 0.90 }
+                                    <Spaces.Fixed height={ height * 0.85 }
                                                   trackSize>
                                         <TransformerGraphContainer engine={engine} setEngine={setEngineCallback}/>
                                     </Spaces.Fixed>
                                 </TabTab.Panel>
                                 <TabTab.Panel>
-                                    <Spaces.Fixed height={ height * 0.90 }
+                                    <Spaces.Fixed height={ height * 0.85 }
                                                   trackSize>
                                         <CollapsibleHeatMapContainer/>
                                     </Spaces.Fixed>

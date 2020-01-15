@@ -78,6 +78,12 @@ export class GraphWrapper extends React.Component {
             this.loadFromTransactions(nextProps);
             // this.autoDistributeNodes(this.engine);
         }
+        // let prevModel = this.props.getModel();
+        // let newModel = new DiagramModel();
+        //
+        // let oldNodes = prevModel.getNodes();
+        // oldNodes.forEach(node => node)
+
     }
 
     loadFromTransactions({selectedGeneLists, deletedGeneLists, transactions, transformerName, transformersNormalized}) {
@@ -90,13 +96,13 @@ export class GraphWrapper extends React.Component {
         let prevModel = this.props.getModel();
         let newModel = new DiagramModel();
 
-        const propTest = (node, data="test") => node.name == data;
+        const nameTest = (node, data="test") => node.name == data;
         currentTransactions
             .forEach(transaction => {
 
                 // make node
                 let newNode = {};
-                if (!prevModel.getNodes().filter(node => propTest(node, transaction.gene_list_id)).length > 0) {
+                if (!prevModel.getNodes().filter(node => nameTest(node, transaction.gene_list_id)).length > 0) {
                     const transactionNode = new JSCustomNodeModel({
                         name: transaction.gene_list_id,
                         title: transformerName[transaction.gene_list_id],
@@ -109,9 +115,10 @@ export class GraphWrapper extends React.Component {
                     newNode = transactionNode;
                 } else {
                     // don't create node, instead get it from the old model
-                    console.log("recover node", prevModel.getNodes().filter(node => propTest(node, transaction.gene_list_id))[0]);
-                    const foundNode = prevModel.getNodes().filter(node => propTest(node, transaction.gene_list_id))[0];
+                    console.log("recover node", prevModel.getNodes().filter(node => nameTest(node, transaction.gene_list_id))[0]);
+                    const foundNode = prevModel.getNodes().filter(node => nameTest(node, transaction.gene_list_id))[0];
                     newNode = foundNode;
+                    foundNode.options.selected = selectedGeneLists.includes(transaction.gene_list_id)
                 }
                 newModel.addNode(newNode);
                 potentiallyLinkedNodes[transaction.gene_list_id] = newNode;
@@ -121,6 +128,7 @@ export class GraphWrapper extends React.Component {
                     if (transaction.query.gene_list_id !== null) {
                         if (typeof potentiallyLinkedNodes[transaction.query.gene_list_id] !== "undefined") {
                             inputNode = potentiallyLinkedNodes[transaction.query.gene_list_id];
+                            inputNode.options.selected = selectedGeneLists.includes(transaction.gene_list_id)
                         } else {
                             // make input node
                             inputNode = new JSCustomNodeModel({
@@ -146,6 +154,7 @@ export class GraphWrapper extends React.Component {
                         if (gene_list_id !== null) {
                             if (typeof potentiallyLinkedNodes[gene_list_id] !== "undefined") {
                                 inputNode = potentiallyLinkedNodes[gene_list_id];
+                                inputNode.options.selected = selectedGeneLists.includes(transaction.gene_list_id)
                             } else {
                                 // make input node
                                 inputNode = new JSCustomNodeModel({
@@ -456,15 +465,6 @@ export class GraphWrapper extends React.Component {
                     <div style={{
                         marginLeft: "0.2em"
                     }}>
-                    <button onClick={() => this.exportTransactions(transactions)} disabled={!(transactions.length > 0)}>
-                        <Tooltip placement="bottom" trigger="hover" tooltip={
-                            <p>
-                                {messages.tooltip.graph_export}
-                            </p>
-                        }>
-                            Export Graph
-                        </Tooltip>
-                    </button>&nbsp;
                     <button className={"graph-control"} onClick = {
                         () => this.props.selectedGeneLists.map(selectedGeneList => this.props.removeGeneList(selectedGeneList))
                     } disabled={!(this.props.selectedGeneLists.length > 0)}>
@@ -501,6 +501,15 @@ export class GraphWrapper extends React.Component {
                             onClick={ () => this.props.undoRemoveGeneList() }
                             disabled={!(this.props.deletedGeneLists.length > 0)}>
                             Undo
+                        </button>&nbsp;
+                        <button onClick={() => this.exportTransactions(transactions)} disabled={!(transactions.length > 0)}>
+                            <Tooltip placement="bottom" trigger="hover" tooltip={
+                                <p>
+                                    {messages.tooltip.graph_export}
+                                </p>
+                            }>
+                                Export Graph
+                            </Tooltip>
                         </button>&nbsp;
                         <button className={"graph-control"} onClick={ () => this.autoDistributeNodes(this.engine) }>Layout</button>
                     </div>

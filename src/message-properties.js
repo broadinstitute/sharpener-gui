@@ -3,7 +3,7 @@ header.create="Create Gene List"
 header.transform="Transformer Draft"
 header.graph="Graph View"
 header.datatable="Gene List Details"
-header.pivot="Gene Pivot Table"
+header.pivot="Pivot View"
 
 let tooltip={}
 tooltip.create="Create a Gene List by submitting gene symbols through the input box, or by uploading a table in CSV/TSV/TXT format."
@@ -17,10 +17,16 @@ let select={}
 select.create="Add genes"
 select.transform="Choose a transformer"
 
+let pivot={}
+// pivot.frequency_header=
+// pivot.alphabet_header=
+pivot.filter="Filter Genes"
+
 const messages = {
     header,
     tooltip,
-    select
+    select,
+    pivot
 }
 
 export default messages;

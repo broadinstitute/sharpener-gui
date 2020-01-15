@@ -2,8 +2,6 @@ import React, {useCallback, useEffect, useRef, useState} from "react"
 import * as d3 from "d3";
 import "./CollapsibleHeatMap.css"
 import {CollapsibleHeatMap} from "./CollapsibleHeatMap";
-import {useDispatch} from "react-redux";
-import useStateWithCallback from 'use-state-with-callback';
 
 class ReactCollapsibleHeatMapClass extends React.Component {
     constructor(props) {
