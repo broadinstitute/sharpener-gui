@@ -21,6 +21,7 @@ const initialState = {
 };
 
 const app = (state=initialState, action) => {
+    console.log(state, action)
     switch (action.type) {
         case TOGGLE_PIVOT:
             return {

@@ -134,7 +134,7 @@ export const createGeneList = geneSymbols => dispatch => {
         .then(response => response.json())
         .then(data => { if (data.gene_list_id !== "Error") { return data; } else { throw "Transformer Error"; } })
         .then(json => dispatch(receiveGeneList(json, geneSymbolsQuery)))
-        .catch(error => dispatch(failToReceiveGeneList(error)))
+        .catch(error => dispatch(failToReceiveGeneList(error, geneSymbolsQuery)))
 };
 
 export const REQUEST_GENE_LIST_AGGREGATION = 'REQUEST_GENE_LIST_AGGREGATION'
@@ -165,7 +165,7 @@ export const fetchGeneListAggregation = (name, values) => dispatch => {
         .then(json => dispatch(receiveGeneList(json,
             Object.assign({}, { ...aggregationQuery, name: aggregationQuery.operation })  // if i don't do it here i'm going to have a lot of duplications handling two cases for the names elsewhere
         )))
-        .catch(error => dispatch(failToReceiveGeneList(error)))
+        .catch(error => dispatch(failToReceiveGeneList(error, aggregationQuery)))
 };
 
 export const REQUEST_GENE_LIST_TRANSFORMATION = 'REQUEST_GENE_LIST_TRANSFORMATION'
@@ -196,7 +196,7 @@ export const fetchGeneListTransformation = (name, values) => dispatch => {
         if (data.gene_list_id !== "Error") { return data; } else { throw "Transformer Error"; }
     })
     .then(json => dispatch(receiveGeneList(json, transformerQuery)))
-    .catch(error => dispatch(failToReceiveGeneList(error)))
+    .catch(error => dispatch(failToReceiveGeneList(error, transformerQuery)))
 };
 
 export const receiveGeneList = (geneListInfo, query=null) => {
@@ -214,7 +214,7 @@ export const receiveGeneList = (geneListInfo, query=null) => {
     }
 };
 
-export const failToReceiveGeneList = error => {
+export const failToReceiveGeneList = (error, query) => {
     return {
         type: FETCH_TRANSFORMATION_ERROR,
         payload: {
@@ -222,6 +222,7 @@ export const failToReceiveGeneList = error => {
             status: "error",
             geneList: null,
             error: error,
+            query: query,
             receivedAt: Date.now()
         }
     }
